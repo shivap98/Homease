@@ -12,7 +12,9 @@
   "dependencies": {
     "@react-navigation/native": "^5.7.4",
     "react": "16.13.1",
-    "react-native": "0.63.2"
+    "react-native": "0.63.2",
+    "react-native-paper": "^4.2.0",
+    "react-native-vector-icons": "^7.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
