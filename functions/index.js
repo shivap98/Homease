@@ -9,3 +9,9 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 	  result: "Hello from Firebase!"
   });
 });
+
+exports.yoyo = functions.https.onCall((data, context) => {
+	return {
+		data: data
+	}
+})
