@@ -85,6 +85,9 @@ class LoginPage extends Component {
                                         color={theme.buttonColor}
                                         style={styles.buttonContainedStyle}
                                         mode="contained"
+                                        onPress={() => {
+                                            this.props.navigation.navigate('SignUp')
+                                        }}
                                     >
                                         <Text style={{fontSize: 11, fontWeight: 'bold', color: 'white'}}>
                                             CREATE ACCOUNT
