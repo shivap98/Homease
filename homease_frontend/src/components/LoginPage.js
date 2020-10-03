@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {Alert, Image, ScrollView, Text, View} from 'react-native';
+import {Image, ScrollView, Text, View} from 'react-native';
 import {Card, CardSection} from "./common";
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
-import componentStyles from './common/componentStyles'
+import componentStyles from './common/componentStyles';
+import { StackActions } from '@react-navigation/native';
 
 
 class LoginPage extends Component {
@@ -19,7 +20,6 @@ class LoginPage extends Component {
         this._isMounted = true;
     }
 
-
     state = {email: '', password: '', loggedIn: null};
 
     render() {
@@ -29,7 +29,6 @@ class LoginPage extends Component {
                 <PaperProvider theme={paperTheme}>
                     <ScrollView>
                         <View style={styles.containerStyle}>
-
                             <Card>
                                 <CardSection>
                                     <Image
@@ -39,9 +38,7 @@ class LoginPage extends Component {
                                     />
                                 </CardSection>
 
-
                                 <CardSection>
-
                                     <TextInput
                                         testID="emailID"
                                         style={styles.textInputStyle}
@@ -52,7 +49,6 @@ class LoginPage extends Component {
 
                                     />
                                 </CardSection>
-
 
                                 <CardSection>
                                     <TextInput
@@ -72,6 +68,11 @@ class LoginPage extends Component {
                                         testID="loginButton"
                                         style={{...styles.buttonContainedStyle, margin: 0}}
                                         mode="contained"
+                                        onPress={() => {
+                                            this.props.navigation.dispatch(
+                                                StackActions.replace('Account')
+                                              );
+                                        }}
                                     >
                                         <Text style={componentStyles.bigButtonTextStyle}>
                                             LOG IN
@@ -102,7 +103,6 @@ class LoginPage extends Component {
                                             FORGOT PASSWORD
                                         </Text>
                                     </Button>
-
                                 </CardSection>
                             </Card>
                         </View>
@@ -113,13 +113,12 @@ class LoginPage extends Component {
     }
 }
 
-const backgroundColor = theme.backgroundColor;
 
 const styles = {
     containerStyle: {
         paddingTop: 20,
         flex: 1,
-        backgroundColor: {backgroundColor}
+        backgroundColor: theme.backgroundColor
     },
     textInputStyle: {
         flex: 1,

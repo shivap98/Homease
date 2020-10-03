@@ -4,7 +4,8 @@ import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import {CardSection} from "./common";
-import componentStyles from './common/componentStyles'
+import componentStyles from './common/componentStyles';
+import { StackActions } from '@react-navigation/native';
 
 
 class CreateAccount extends Component{
@@ -92,6 +93,14 @@ class CreateAccount extends Component{
                                     color={theme.buttonColor}
                                     style={{...styles.buttonContainedStyle}}
                                     mode="contained"
+                                    onPress={() => {
+                                        this.props.navigation.dispatch(
+                                            StackActions.popToTop()
+                                        );
+                                        this.props.navigation.dispatch(
+                                            StackActions.replace('Account')
+                                        );
+                                    }}
                                 >
                                 <Text style={componentStyles.bigButtonTextStyle}>
                                     CREATE USER

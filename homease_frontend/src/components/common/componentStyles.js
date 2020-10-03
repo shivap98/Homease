@@ -1,7 +1,6 @@
 
 import theme from './theme';
 
-
 export default {
 	smallButtonTextStyle: {
         fontSize: theme.smallButtonFontSize,
