@@ -3,6 +3,9 @@ import {ScrollView, View, Text, Alert} from "react-native";
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
+import {CardSection} from "./common";
+import componentStyles from './common/componentStyles'
+
 
 class CreateAccount extends Component{
     static navigationOptions = () => {
@@ -86,10 +89,13 @@ class CreateAccount extends Component{
                                 onChangeText={textString => this.setState({venmoUsername: textString})}
                             />
                             <Button
-                                style={styles.buttonContainedStyle}
-                                mode="contained"
-                                onPress={this.createUserButtonPressed.bind(this)}>
-                                <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>CREATE USER</Text>
+                                    color={theme.buttonColor}
+                                    style={{...styles.buttonContainedStyle}}
+                                    mode="contained"
+                                >
+                                <Text style={componentStyles.bigButtonTextStyle}>
+                                    CREATE USER
+                                </Text>
                             </Button>
                         </View>
                     </ScrollView>
@@ -108,13 +114,15 @@ const styles = {
     },
 
     textInputStyle: {
-        flex: 1
+        flex: 1,
+        marginTop: 20
     },
 
     buttonContainedStyle: {
         height: 47,
         justifyContent: 'center',
-        marginTop: 4
+        flex: 1,
+        marginTop: 25
     }
 };
 

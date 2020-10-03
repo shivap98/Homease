@@ -4,6 +4,7 @@ import {Card, CardSection} from "./common";
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
+import componentStyles from './common/componentStyles'
 
 
 class LoginPage extends Component {
@@ -54,7 +55,6 @@ class LoginPage extends Component {
 
 
                                 <CardSection>
-
                                     <TextInput
                                         testID="password"
                                         style={styles.textInputStyle}
@@ -73,7 +73,7 @@ class LoginPage extends Component {
                                         style={{...styles.buttonContainedStyle, margin: 0}}
                                         mode="contained"
                                     >
-                                        <Text style={styles.TextStyle}>
+                                        <Text style={componentStyles.bigButtonTextStyle}>
                                             LOG IN
                                         </Text>
                                     </Button>
@@ -89,7 +89,7 @@ class LoginPage extends Component {
                                             this.props.navigation.navigate('SignUp')
                                         }}
                                     >
-                                        <Text style={{fontSize: 11, fontWeight: 'bold', color: 'white'}}>
+                                        <Text style={componentStyles.smallButtonTextStyle}>
                                             CREATE ACCOUNT
                                         </Text>
                                     </Button>
@@ -98,7 +98,7 @@ class LoginPage extends Component {
                                         style={styles.buttonContainedStyle}
                                         mode="contained"
                                     >
-                                        <Text style={{fontSize: 11, fontWeight: 'bold', color: 'white'}}>
+                                        <Text style={componentStyles.smallButtonTextStyle}>
                                             FORGOT PASSWORD
                                         </Text>
                                     </Button>
@@ -130,18 +130,6 @@ const styles = {
         alignItems: 'center',
         flex: 1
     },
-    orStyle: {
-        textAlignVertical: 'center',
-        textAlign: 'center',
-        fontSize: 10
-    },
-    TextStyle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: 'white'
-
-    },
-
     buttonContainedStyle: {
         height: 47,
         justifyContent: 'center',
