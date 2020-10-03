@@ -1,6 +1,8 @@
 import React, {Component} from "react";
 import {ScrollView, View, Text, Alert} from "react-native";
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
+import paperTheme from './common/paperTheme';
+import theme from './common/theme';
 
 class CreateAccount extends Component{
     static navigationOptions = () => {
@@ -41,56 +43,58 @@ class CreateAccount extends Component{
 
     render() {
         return (
-            <PaperProvider>
-                <ScrollView>
-                    <View style={styles.viewStyle}>
-                        <TextInput
-                            style={styles.textInputStyle}
-                            label='First Name'
-                            mode='outlined'
-                            value={this.state.firstName}
-                            onChangeText={textString => this.setState({firstName: textString})}
-                        />
-                        <TextInput
-                            style={styles.textInputStyle}
-                            label='Last Name'
-                            mode='outlined'
-                            value={this.state.lastName}
-                            onChangeText={textString => this.setState({lastName: textString})}
-                        />
-                        <TextInput
-                            style={styles.textInputStyle}
-                            label='Email'
-                            mode='outlined'
-                            value={this.state.email}
-                            onChangeText={textString => this.setState({email: textString})}
+            <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
+                <PaperProvider theme={paperTheme}>
+                    <ScrollView>
+                        <View style={styles.viewStyle}>
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='First Name'
+                                mode='outlined'
+                                value={this.state.firstName}
+                                onChangeText={textString => this.setState({firstName: textString})}
+                            />
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='Last Name'
+                                mode='outlined'
+                                value={this.state.lastName}
+                                onChangeText={textString => this.setState({lastName: textString})}
+                            />
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='Email'
+                                mode='outlined'
+                                value={this.state.email}
+                                onChangeText={textString => this.setState({email: textString})}
 
-                        />
-                        <TextInput
-                            style={styles.textInputStyle}
-                            label='Phone Number'
-                            mode='outlined'
-                            value={this.state.phoneNumber}
-                            keyboardType='numeric'
-                            onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}
+                            />
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='Phone Number'
+                                mode='outlined'
+                                value={this.state.phoneNumber}
+                                keyboardType='numeric'
+                                onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}
 
-                        />
-                        <TextInput
-                            style={styles.textInputStyle}
-                            label='Venmo Username'
-                            mode='outlined'
-                            value={this.state.venmoUsername}
-                            onChangeText={textString => this.setState({venmoUsername: textString})}
-                        />
-                        <Button
-                            style={styles.buttonContainedStyle}
-                            mode="contained"
-                            onPress={this.createUserButtonPressed.bind(this)}>
-                            <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>CREATE USER</Text>
-                        </Button>
-                    </View>
-                </ScrollView>
-            </PaperProvider>
+                            />
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='Venmo Username'
+                                mode='outlined'
+                                value={this.state.venmoUsername}
+                                onChangeText={textString => this.setState({venmoUsername: textString})}
+                            />
+                            <Button
+                                style={styles.buttonContainedStyle}
+                                mode="contained"
+                                onPress={this.createUserButtonPressed.bind(this)}>
+                                <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>CREATE USER</Text>
+                            </Button>
+                        </View>
+                    </ScrollView>
+                </PaperProvider>
+            </View>
         )
     }
 }
