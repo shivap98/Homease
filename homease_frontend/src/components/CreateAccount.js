@@ -4,6 +4,7 @@ import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import {CardSection} from "./common";
+import firebase from 'firebase';
 import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
 
@@ -18,15 +19,18 @@ class CreateAccount extends Component{
     state = {
         firstName: '',
         lastName: '',
-        email: '',
+		email: '',
+		password: '',
         phoneNumber: '',
         venmoUsername: '',
-
     };
 
-    createUserButtonPressed() {
+ 
+
+	async onSignUpButtonPressed() {
+
         if (this.state.email === "" || this.state.firstName === "" || this.state.lastName === "" ||
-            this.state.phoneNumber === "" || this.state.venmoUsername === "") {
+            this.state.phoneNumber === "" || this.state.venmoUsername === "" || this.state.password === "") {
             Alert.alert(
                 'Oops!',
                 'Check the first name, last name, phone number and venmo username',
@@ -43,7 +47,37 @@ class CreateAccount extends Component{
             return;
         }
 
-    }
+        const {email, password, phoneNumber, firstName, lastName, venmoUsername} = this.state;
+        try {
+			console.log("waiting to create")
+			await firebase.auth().createUserWithEmailAndPassword(email, password)
+			console.log(created)
+        } catch (err) {
+            Alert.alert(
+                'Oops!',
+                err.message,
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => console.log('Cancel Pressed'),
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+            console.log(err)
+		}
+
+		this.props.navigation.dispatch(
+			StackActions.popToTop()
+		);
+		this.props.navigation.dispatch(
+			StackActions.replace('Account')
+		);
+	}
+	
+
 
     render() {
         return (
@@ -73,6 +107,15 @@ class CreateAccount extends Component{
                                 onChangeText={textString => this.setState({email: textString})}
 
                             />
+							<TextInput
+                                style={styles.textInputStyle}
+                                label='Password'
+                                mode='outlined'
+								value={this.state.password}
+								secureTextEntry
+                                onChangeText={textString => this.setState({password: textString})}
+
+                            />
                             <TextInput
                                 style={styles.textInputStyle}
                                 label='Phone Number'
@@ -93,14 +136,7 @@ class CreateAccount extends Component{
                                     color={theme.buttonColor}
                                     style={{...styles.buttonContainedStyle}}
                                     mode="contained"
-                                    onPress={() => {
-                                        this.props.navigation.dispatch(
-                                            StackActions.popToTop()
-                                        );
-                                        this.props.navigation.dispatch(
-                                            StackActions.replace('Account')
-                                        );
-                                    }}
+                                    onPress={this.onSignUpButtonPressed.bind(this)}
                                 >
                                 <Text style={componentStyles.bigButtonTextStyle}>
                                     CREATE USER
