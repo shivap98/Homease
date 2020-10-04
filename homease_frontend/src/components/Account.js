@@ -42,6 +42,7 @@ class Account extends Component {
                 <List.Item
                     title={item.name}
                     titleStyle={styles.cardHeaderTextStyle}
+                    key={item.name}
                     right={props =>
                         <View>
                             <CardSection>
@@ -62,9 +63,6 @@ class Account extends Component {
                     <ScrollView>
                         <Card>
                             <Text style = {styles.groupHeadingStyle}>GROUP NAME</Text>
-                            {/*<CardSection style = {styles.cardSectionStyle}>*/}
-                                {/*<Avatar.Image style = {styles.groupPictureStyle} source = {require('../img/logo.png')}/>*/}
-                            {/*</CardSection>*/}
                             <View style={styles.groupPictureStyle}>
                             <Image
                                 style={styles.profilePicStyle}
@@ -88,6 +86,7 @@ class Account extends Component {
                                 label='Phone Number'
                                 mode='outlined'
                                 disabled={this.state.edit}
+                                theme={{ colors: { placeholder: 'white', text: 'white', primary: 'red', underlineColor:'white'}}}
                                 value={this.state.phoneNumber}
                                 keyboardType='numeric'
                                 onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}
@@ -101,13 +100,11 @@ class Account extends Component {
                                 onChangeText={textString => this.setState({venmoUsername: textString})}
                             />
                             <Text style={styles.cardHeaderTextStyle}>GROUP SETTINGS</Text>
-                            {/*<List.Section title = "Members">*/}
                                 <List.Accordion
                                     title="List of members in group"
                                 >
                                     {this.renderListofMembers()}
                                 </List.Accordion>
-                            {/*</List.Section>*/}
                             <CardSection>
                                 <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
                                     <Text>Leave group</Text>
