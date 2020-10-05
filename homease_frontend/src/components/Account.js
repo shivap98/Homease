@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView, Image, LayoutAnimation} from 'react-native';
+import {Text, View, ScrollView, Image, LayoutAnimation, UIManager} from 'react-native';
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
 import {Button, Provider as PaperProvider, TextInput, List, Switch} from 'react-native-paper';
@@ -8,6 +8,14 @@ import componentStyles from './common/componentStyles';
 
 
 class Account extends Component {
+
+    constructor(props) {
+        super(props);
+
+        if (Platform.OS === 'android') {
+            UIManager.setLayoutAnimationEnabledExperimental(true);
+        }
+    }
 
     state = {
         name: 'Temp',
