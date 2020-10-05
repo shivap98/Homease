@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView, Image} from 'react-native';
+import {Text, View, ScrollView, Image, LayoutAnimation} from 'react-native';
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
-import {Button, Provider as PaperProvider, TextInput, Avatar, List, ToggleButton, Switch} from 'react-native-paper';
+import {Button, Provider as PaperProvider, TextInput, List, Switch} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import componentStyles from './common/componentStyles';
 
@@ -15,8 +15,8 @@ class Account extends Component {
         phoneNumber: '1234',
         venmoUsername: 'asdfsa',
         members: [
-            {name: 'User1'},
-            {name: 'User2'}
+            {name: 'User1', admin: true},
+            {name: 'User2', admin: false}
         ]
     };
 
@@ -45,12 +45,10 @@ class Account extends Component {
                     titleStyle={styles.cardHeaderTextStyle}
                     key={item.name}
                     right={props =>
-                        <View>
-                            <CardSection>
-                                <Button onPress={() => {this.onAdminPressed()}}><Text>Admin</Text></Button>
-                                <Button onPress={() => {this.onRemovePressed()}}><Text>Remove</Text></Button>
-                            </CardSection>
-                        </View>
+                        <CardSection>
+                            <Button onPress={() => {this.onAdminPressed()}}><Text>Admin</Text></Button>
+                            <Button onPress={() => {this.onRemovePressed()}}><Text>Remove</Text></Button>
+                        </CardSection>
                     }
                 />
             )
@@ -65,78 +63,103 @@ class Account extends Component {
                         <Card>
                             <Text style = {styles.groupHeadingStyle}>GROUP NAME</Text>
                             <View style={styles.groupPictureStyle}>
-                            <Image
-                                style={styles.profilePicStyle}
-                                source={require('../img/logo.png')}
-                                resizeMode='contain'
-                            />
+                                <Image
+                                    style={styles.profilePicStyle}
+                                    source={require('../img/logo.png')}
+                                    resizeMode='contain'
+                                />
                             </View>
-                            <Text style={styles.cardHeaderTextStyle}>PROFILE SETTINGS</Text>
-                            <Text style={styles.cardHeaderTextStyle}>EDIT</Text>
-                            <Switch
-                                value={this.state.edit}
-                                onValueChange={() => {this.setState({edit: !this.state.edit})}}
-                            />
-                            <TextInput
-                                style={styles.textInputStyle}
-                                label='Name'
-                                mode='outlined'
-                                value={this.state.name}
-                                theme={{
-                                    colors: { 
-                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                        text: this.state.edit ? 'white' : theme.lightColor,
-                                        primary: this.state.edit ? 'white' : theme.lightColor,
-                                    }
-                                }}
-                                editable={this.state.edit}
-                                onChangeText={textString => this.setState({name: textString})}
-                            />
-                            <TextInput
-                                style={styles.textInputStyle}
-                                label='Phone Number'
-                                mode='outlined'
-                                editable={this.state.edit}
-                                value={this.state.phoneNumber}
-                                theme={{
-                                    colors: { 
-                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                        text: this.state.edit ? 'white' : theme.lightColor,
-                                        primary: this.state.edit ? 'white' : theme.lightColor,
-                                    }
-                                }}
-                                keyboardType='numeric'
-                                onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}
-                            />
-                            <TextInput
-                                style={styles.textInputStyle}
-                                label='Venmo Username'
-                                mode='outlined'
-                                editable={this.state.edit}
-                                value={this.state.venmoUsername}
-                                theme={{
-                                    colors: { 
-                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                        text: this.state.edit ? 'white' : theme.lightColor,
-                                        primary: this.state.edit ? 'white' : theme.lightColor,
-                                    }
-                                }}
-                                onChangeText={textString => this.setState({venmoUsername: textString})}
-                            />
-                            <Text style={styles.cardHeaderTextStyle}>GROUP SETTINGS</Text>
-                                <List.Accordion
-                                    title="List of members in group"
-                                >
-                                    {this.renderListofMembers()}
-                                </List.Accordion>
-                            <CardSection>
-                                <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
-                                    <Text>Leave group</Text>
-                                </Button>
-                                <Button style={styles.leaveAndShareButtonStyle} icon={require('../icons/share-variant.png')} onPress={() => {this.onSharePressed()}}>Invite someone</Button>
-                            </CardSection>
+                            <View style={styles.cardSectionStyle}>
+                                <Text style={styles.cardHeaderTextStyle}>PROFILE SETTINGS</Text>
+                                <CardSection>
+                                    <Text style={{
+                                        fontWeight: 'bold',
+                                        flex: 1,
+                                        marginTop: 7,
+                                        marginRight: 15,
+                                        color: 'white',
+                                        textAlign: 'right'
+                                    }}>
+                                        EDIT
+                                    </Text>
+                                    <Switch
+                                        value={this.state.edit}
+                                        onValueChange={() => {this.setState({edit: !this.state.edit})}}
+                                    />
+                                </CardSection>
+                                
+                                <TextInput
+                                    style={styles.textInputStyle}
+                                    label='Name'
+                                    mode='outlined'
+                                    value={this.state.name}
+                                    theme={{
+                                        colors: { 
+                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                            text: this.state.edit ? 'white' : theme.lightColor,
+                                            primary: this.state.edit ? 'white' : theme.lightColor,
+                                        }
+                                    }}
+                                    keyboardAppearance='dark'
+                                    editable={this.state.edit}
+                                    onChangeText={textString => this.setState({name: textString})}
+                                />
+                                <TextInput
+                                    style={styles.textInputStyle}
+                                    label='Phone Number'
+                                    mode='outlined'
+                                    editable={this.state.edit}
+                                    value={this.state.phoneNumber}
+                                    theme={{
+                                        colors: { 
+                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                            text: this.state.edit ? 'white' : theme.lightColor,
+                                            primary: this.state.edit ? 'white' : theme.lightColor,
+                                        }
+                                    }}
+                                    keyboardType='numeric'
+                                    keyboardAppearance='dark'
+                                    onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}
+                                />
+                                <TextInput
+                                    style={styles.textInputStyle}
+                                    label='Venmo Username'
+                                    mode='outlined'
+                                    editable={this.state.edit}
+                                    value={this.state.venmoUsername}
+                                    theme={{
+                                        colors: { 
+                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                            text: this.state.edit ? 'white' : theme.lightColor,
+                                            primary: this.state.edit ? 'white' : theme.lightColor,
+                                        }
+                                    }}
+                                    keyboardAppearance='dark'
+                                    onChangeText={textString => this.setState({venmoUsername: textString})}
+                                />
+                            </View>
+                            <View style={styles.cardSectionStyle}>
+                                <Text style={styles.cardHeaderTextStyle}>GROUP SETTINGS</Text>
+                                    <List.Accordion
+                                        title="List of members in group"
+                                        onPress={() => {LayoutAnimation.easeInEaseOut()}}
+                                    >
+                                        {this.renderListofMembers()}
+                                    </List.Accordion>
+                                <CardSection>
+                                    <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
+                                        Leave Group
+                                    </Button>
+                                    <Button style={styles.leaveAndShareButtonStyle} icon={require('../icons/share-variant.png')} onPress={() => {this.onSharePressed()}}>
+                                        Invite someone
+                                    </Button>
+                                </CardSection>
+                                
+                            </View>
                             <Button style={styles.buttonContainedStyle} color={theme.buttonColor} mode='contained'>
-                                <Text>SIGN OUT</Text>
+                                    <Text style={componentStyles.smallButtonTextStyle}>
+                                            SIGN OUT
+                                    </Text>
                             </Button>
                         </Card>
                     </ScrollView>
@@ -158,8 +181,12 @@ const styles = {
         alignItems: 'center'
     },
     cardSectionStyle: {
-        alignItems: 'center',
-        flex: 1
+        margin: 5,
+        marginBottom: 20,
+        borderWidth: 2,
+        padding: 20,
+        borderColor: '#696969',
+        borderRadius: 20
     },
     profilePicStyle: {
         height: 100,
@@ -169,13 +196,15 @@ const styles = {
     },
     cardHeaderTextStyle: {
         fontWeight: 'bold',
+        marginTop: 10,
         flex: 1,
-        color: theme.buttonTextColor
+        color: theme.buttonTextColor,
+        textAlign: 'center'
     },
     buttonContainedStyle: {
         height: 47,
         justifyContent: 'center',
-        margin: 3,
+        margin: 15,
         flex: 1,
     },
     leaveAndShareButtonStyle: {
@@ -184,6 +213,7 @@ const styles = {
     },
     textInputStyle: {
         flex: 1,
+        marginTop: 10
     },
 };
 

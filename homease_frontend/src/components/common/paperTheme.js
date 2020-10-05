@@ -10,7 +10,7 @@ export default {
 			background: theme.backgroundColor,
 			surface: theme.backgroundColor,
 			error: '#B00020',
-			text: 'white',
+			text: theme.lightColor,
 			disabled: '#000000',
 			placeholder: theme.lightColor,
 			backdrop: '#d20022',
