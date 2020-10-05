@@ -2,17 +2,18 @@ import React, {Component} from 'react';
 import {Text, View, ScrollView, Image} from 'react-native';
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
-import {Button, Provider as PaperProvider, TextInput, Avatar, List, IconButton} from 'react-native-paper';
+import {Button, Provider as PaperProvider, TextInput, Avatar, List, ToggleButton, Switch} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
+import componentStyles from './common/componentStyles';
 
 
 class Account extends Component {
 
     state = {
         name: 'Temp',
-        edit: 'False',
-        phoneNumber: '',
-        venmoUsername: '',
+        edit: false,
+        phoneNumber: '1234',
+        venmoUsername: 'asdfsa',
         members: [
             {name: 'User1'},
             {name: 'User2'}
@@ -71,23 +72,39 @@ class Account extends Component {
                             />
                             </View>
                             <Text style={styles.cardHeaderTextStyle}>PROFILE SETTINGS</Text>
-                            <Button onPress={() => {this.setState({edit: !this.state.edit})}}>
-                                <Text>Edit</Text>
-                            </Button>
+                            <Text style={styles.cardHeaderTextStyle}>EDIT</Text>
+                            <Switch
+                                value={this.state.edit}
+                                onValueChange={() => {this.setState({edit: !this.state.edit})}}
+                            />
                             <TextInput
                                 style={styles.textInputStyle}
                                 label='Name'
                                 mode='outlined'
                                 value={this.state.name}
-                                disabled='true'
+                                theme={{
+                                    colors: { 
+                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                        text: this.state.edit ? 'white' : theme.lightColor,
+                                        primary: this.state.edit ? 'white' : theme.lightColor,
+                                    }
+                                }}
+                                editable={this.state.edit}
+                                onChangeText={textString => this.setState({name: textString})}
                             />
                             <TextInput
                                 style={styles.textInputStyle}
                                 label='Phone Number'
                                 mode='outlined'
-                                disabled={this.state.edit}
-                                theme={{ colors: { placeholder: 'white', text: 'white', primary: 'red', underlineColor:'white'}}}
+                                editable={this.state.edit}
                                 value={this.state.phoneNumber}
+                                theme={{
+                                    colors: { 
+                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                        text: this.state.edit ? 'white' : theme.lightColor,
+                                        primary: this.state.edit ? 'white' : theme.lightColor,
+                                    }
+                                }}
                                 keyboardType='numeric'
                                 onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}
                             />
@@ -95,8 +112,15 @@ class Account extends Component {
                                 style={styles.textInputStyle}
                                 label='Venmo Username'
                                 mode='outlined'
-                                disabled={this.state.edit}
+                                editable={this.state.edit}
                                 value={this.state.venmoUsername}
+                                theme={{
+                                    colors: { 
+                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                        text: this.state.edit ? 'white' : theme.lightColor,
+                                        primary: this.state.edit ? 'white' : theme.lightColor,
+                                    }
+                                }}
                                 onChangeText={textString => this.setState({venmoUsername: textString})}
                             />
                             <Text style={styles.cardHeaderTextStyle}>GROUP SETTINGS</Text>

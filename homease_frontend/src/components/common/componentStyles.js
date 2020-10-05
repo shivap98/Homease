@@ -11,5 +11,5 @@ export default {
         fontSize: theme.bigButtonFontSize,
         fontWeight: 'bold',
         color: theme.buttonTextColor
-	},
+    },
 }
