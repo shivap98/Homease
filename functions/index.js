@@ -30,7 +30,25 @@ exports.dbtest = functions.https.onCall((data, context) => {
 		}
 	}).catch((error) => {
 		return {
+			data: "fail"
+		}
+	})
+});
+
+exports.editUser = functions.https.onCall((data, context) => {
+
+	var userRef = firebase.database().ref("users/" + data.userref + "/");
+	
+	return userRef.set({
+		phoneNumber: data.phoneNumber,
+		venmoUsername: data.venmoUsername,
+	}).then((data) => {
+		return {
 			data: "success"
+		}
+	}).catch((error) => {
+		return {
+			data: "fail"
 		}
 	})
 });
