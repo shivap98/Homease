@@ -25,8 +25,6 @@ class CreateAccount extends Component{
         venmoUsername: '',
     };
 
- 
-
 	async onSignUpButtonPressed() {
 
         if (this.state.email === "" || this.state.firstName === "" || this.state.lastName === "" ||
@@ -49,23 +47,8 @@ class CreateAccount extends Component{
 
         const {email, password, phoneNumber, firstName, lastName, venmoUsername} = this.state;
         try {
-			console.log("waiting to create")
 			await firebase.auth().createUserWithEmailAndPassword(email, password)
-			console.log(created)
         } catch (err) {
-            Alert.alert(
-                'Oops!',
-                err.message,
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => console.log('Cancel Pressed'),
-                        style: 'cancel',
-                    },
-
-                ],
-                {cancelable: false},
-            );
             console.log(err)
 		}
 
