@@ -10,6 +10,7 @@ import paperTheme from './common/paperTheme';
 class Account extends Component {
 
 	async signOut() {
+		console.log(firebase.auth())
         firebase.auth().signOut().then(async function () {
             // if (provider === "password") {
 				
@@ -22,6 +23,8 @@ class Account extends Component {
             //         console.error(error);
             //     }
 			// }
+
+
 			
 			console.log("Signed out!")
 			

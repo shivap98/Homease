@@ -16,40 +16,6 @@ import theme from './common/theme';
 
 
 const Stack = createStackNavigator();
-
-
-// const App: () => React$Node = () => {
-	
-// 	return (
-// 		<NavigationContainer>
-// 			<Stack.Navigator
-// 			screenOptions={{
-// 				headerStyle: {
-// 				  backgroundColor: theme.lightColor,
-// 				},
-// 				headerTintColor: '#fff',
-// 				headerTitleStyle: {
-// 				  fontWeight: 'bold',
-// 				  fontSize: 20
-// 				},
-// 			  }}
-// 			initalRouteName = "Home">
-// 				<Stack.Screen name="Homease" component={LoginPage} />
-// 				<Stack.Screen
-// 					name="SignUp"
-// 					component={CreateAccount}
-// 					options={{ title: 'Sign up' }}
-// 				/>
-// 				<Stack.Screen
-// 					name="Account"
-// 					component={Account}
-// 					options={{ title: 'Account' }}
-// 				/>
-// 			</Stack.Navigator>
-// 		</NavigationContainer>
-// 	);
-// };
-
 class App extends Component<Props> {
 
 
