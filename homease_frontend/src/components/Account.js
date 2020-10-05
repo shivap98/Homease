@@ -2,11 +2,32 @@ import React, {Component} from 'react';
 import {Text, View, ScrollView, Image} from 'react-native';
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
+import firebase from 'firebase';
 import {Button, Provider as PaperProvider, TextInput, Avatar} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 
 
 class Account extends Component {
+
+	async signOut() {
+        firebase.auth().signOut().then(async function () {
+            // if (provider === "password") {
+				
+            // } else {
+            //     try {
+            //         await GoogleSignin.revokeAccess();
+            //         await GoogleSignin.signOut();
+
+            //     } catch (error) {
+            //         console.error(error);
+            //     }
+			// }
+			
+			console.log("Signed out!")
+			
+
+        });
+    };
 
     render() {
         return (
@@ -29,7 +50,12 @@ class Account extends Component {
                             <CardSection>
                                 <Text style={styles.cardHeaderTextStyle}>GROUP</Text>
                             </CardSection>
-                            <Button style={styles.buttonContainedStyle} color={theme.buttonColor} mode='contained'>
+							<Button 
+								style={styles.buttonContainedStyle}
+							 	color={theme.buttonColor} 
+							 	mode='contained'
+								 onPress={this.signOut.bind(this)}
+							>
                                 <Text>SIGN OUT</Text>
                             </Button>
                         </Card>
