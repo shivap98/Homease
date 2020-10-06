@@ -8,14 +8,36 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import LoginPage from './LoginPage';
 import CreateAccount from './CreateAccount';
-import Account from './Account'
+import Account from './Account';
+import Chores from './Chores';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import theme from './common/theme';
 
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
+function Home() {
+	return (
+	  <Tab.Navigator
+		tabBarOptions={{
+			activeTintColor: 'white',
+			inactiveTintColor: theme.darkColor,
+			style: {
+				backgroundColor: theme.lightColor,
+			},
+			labelStyle: {
+				fontSize: 18,
+			},
+		}}
+	>
+		<Tab.Screen name="Chores" component={Chores} />
+		<Tab.Screen name="Account" component={Account} />
+	  </Tab.Navigator>
+	);
+  }
 
 const App: () => React$Node = () => {
 	return (
@@ -31,7 +53,7 @@ const App: () => React$Node = () => {
 				  fontSize: 20
 				},
 			  }}
-			initalRouteName = "Home">
+			initalRouteName = "Login">
 				<Stack.Screen name="Homease" component={LoginPage} />
 				<Stack.Screen
 					name="SignUp"
@@ -39,9 +61,9 @@ const App: () => React$Node = () => {
 					options={{ title: 'Sign up' }}
 				/>
 				<Stack.Screen
-					name="Account"
-					component={Account}
-					options={{ title: 'Account' }}
+					name="Home"
+					component={Home}
+					options={{ title: 'Homease' }}
 				/>
 			</Stack.Navigator>
 		</NavigationContainer>

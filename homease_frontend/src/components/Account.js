@@ -20,8 +20,8 @@ class Account extends Component {
     state = {
         name: 'Temp',
         edit: false,
-        phoneNumber: '1234',
-        venmoUsername: 'asdfsa',
+        phoneNumber: '1234567890',
+        venmoUsername: 'temp',
         members: [
             {name: 'User1', admin: true},
             {name: 'User2', admin: false}

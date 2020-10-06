@@ -70,8 +70,8 @@ class LoginPage extends Component {
                                         mode="contained"
                                         onPress={() => {
                                             this.props.navigation.dispatch(
-                                                StackActions.replace('Account')
-                                              );
+                                                StackActions.replace('Home', {screen: 'Account'})
+                                            );
                                         }}
                                     >
                                         <Text style={componentStyles.bigButtonTextStyle}>

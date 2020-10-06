@@ -98,7 +98,7 @@ class CreateAccount extends Component{
                                             StackActions.popToTop()
                                         );
                                         this.props.navigation.dispatch(
-                                            StackActions.replace('Account')
+                                            StackActions.replace('Home', {screen: 'Account'})
                                         );
                                     }}
                                 >
