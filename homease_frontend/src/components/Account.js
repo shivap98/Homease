@@ -3,6 +3,7 @@ import {Text, View, ScrollView, Image, LayoutAnimation, UIManager} from 'react-n
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
 import {Button, Provider as PaperProvider, TextInput, List, Switch} from 'react-native-paper';
+import firebase from 'firebase';
 import paperTheme from './common/paperTheme';
 import componentStyles from './common/componentStyles';
 
@@ -62,6 +63,29 @@ class Account extends Component {
             )
         })
     }
+
+	async signOut() {
+		console.log(firebase.auth())
+        firebase.auth().signOut().then(async function () {
+            // if (provider === "password") {
+				
+            // } else {
+            //     try {
+            //         await GoogleSignin.revokeAccess();
+            //         await GoogleSignin.signOut();
+
+            //     } catch (error) {
+            //         console.error(error);
+            //     }
+			// }
+
+
+			
+			console.log("Signed out!")
+			
+
+        });
+    };
 
     render() {
         return (

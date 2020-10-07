@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1089297007765-6030uv90ouj3p078a98d65cme0s4j7p5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1089297007765-6030uv90ouj3p078a98d65cme0s4j7p5</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1089297007765-kv2c9qg2hosqmfunp883510rsrscj07s.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAZc24KDymmvVz66YSEyKum8QVnoOpjN3Q</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1089297007765</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>org.reactjs.native.example.homease-frontend</string>
+	<key>PROJECT_ID</key>
+	<string>homease-9de86</string>
+	<key>STORAGE_BUCKET</key>
+	<string>homease-9de86.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1089297007765:ios:b72524d9d8f6df5746c79c</string>
+	<key>DATABASE_URL</key>
+	<string>https://homease-9de86.firebaseio.com</string>
+</dict>
+</plist>

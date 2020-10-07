@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1089297007765",
+    "firebase_url": "https://homease-9de86.firebaseio.com",
+    "project_id": "homease-9de86",
+    "storage_bucket": "homease-9de86.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089297007765:android:e84ec88aacf240d846c79c",
+        "android_client_info": {
+          "package_name": "com.homease_frontend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1089297007765-rmef63cdjmb0npbrii82eo0osgtpebh6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEzMt48KVuhQdweylpsPEkHzMFHd7Ocvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1089297007765-rmef63cdjmb0npbrii82eo0osgtpebh6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
