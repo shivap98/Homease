@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {Image, ScrollView, Text, View} from 'react-native';
+import {Image, ScrollView, Text, View, Platform} from 'react-native';
 import {Card, CardSection} from "./common";
 import paperTheme from './common/paperTheme';
 import auth from '@react-native-firebase/auth';
 import theme from './common/theme';
 import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-community/google-signin';
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
+import { LoginManager, AccessToken } from 'react-native-fbsdk';
 import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
 import firebase from 'firebase';
@@ -18,6 +19,8 @@ class LoginPage extends Component {
         headerBackTitle: 'Login'
 	};
 
+	
+
 	componentDidMount(){
 		GoogleSignin.configure({
 			webClientId: '1089297007765-rmef63cdjmb0npbrii82eo0osgtpebh6.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
@@ -25,6 +28,20 @@ class LoginPage extends Component {
 			hostedDomain: '',
 			forceConsentPrompt: true
 		});
+
+		// if (Platform.OS === "android") {
+		// 	LoginManager.setLoginBehavior("web_only")
+		// }
+		auth().onAuthStateChanged(user => {
+			if (user) {
+				console.log('This is the user: ', user)
+			} else {
+				// No user is signed in.
+				console.log('There is no logged in user');
+			}
+		});
+
+		
 	}
 
     constructor(props) {
@@ -71,12 +88,13 @@ class LoginPage extends Component {
 			firebaseCred = auth().signInWithCredential(credential)
 			console.log("hey")
 			console.log(firebaseCred)
-			this.props.navigation.dispatch(
-				StackActions.popToTop()
-			);
-			this.props.navigation.dispatch(
-				StackActions.replace('Account')
-			);
+			console.log("user", firebase.auth().currentUser)
+			// this.props.navigation.dispatch(
+			// 	StackActions.popToTop()
+			// );
+			// this.props.navigation.dispatch(
+			// 	StackActions.replace('Account')
+			// );
 		} catch (error) {
 			console.log("error")
 			console.log(error)
@@ -85,14 +103,26 @@ class LoginPage extends Component {
 	};
 
 	fbSignIn = async () => {
-		provider = new firebase.auth.FacebookAuthProvider();
-		provider.addScope('user_birthday');
-		firebase.auth().signInWithRedirect(provider);
-		firebase.auth().getRedirectResult().then(function(result) {
-			console.log(result)
-		  }).catch(function(error) {
-			console.log(error)
-		  });
+	
+		const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+
+		if (result.isCancelled) {
+			throw 'User cancelled the login process';
+		}
+
+		// Once signed in, get the users AccesToken
+		const data = await AccessToken.getCurrentAccessToken();
+
+		if (!data) {
+			throw 'Something went wrong obtaining access token';
+		}
+
+		// Create a Firebase credential with the AccessToken
+		const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
+
+		// Sign-in the user with the credential
+		return auth().signInWithCredential(facebookCredential);
+
 	};
 
 
@@ -194,7 +224,7 @@ class LoginPage extends Component {
                                         onPress={this.fbSignIn}
                                     >
                                         <Text style={componentStyles.smallButtonTextStyle}>
-                                            FB SIGN-IN
+                                            FB SIGN-IN 
                                         </Text>
                                     </Button>
                             	</CardSection>
@@ -228,7 +258,7 @@ const styles = {
     buttonContainedStyle: {
         height: 47,
         justifyContent: 'center',
-        margin: 3,
+        margin: 6,
         flex: 1,
     },
 }
