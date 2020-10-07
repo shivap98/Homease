@@ -8,6 +8,7 @@ target 'homease_frontend' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+
   target 'homease_frontendTests' do
     inherit! :complete
     # Pods for testing
