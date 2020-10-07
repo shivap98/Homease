@@ -11,8 +11,6 @@ import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
 import firebase from 'firebase';
 
-
-
 class LoginPage extends Component {
     static navigationOptions = {
         title: 'Homease',
@@ -20,28 +18,13 @@ class LoginPage extends Component {
 	};
 
 	
-
 	componentDidMount(){
 		GoogleSignin.configure({
 			webClientId: '1089297007765-rmef63cdjmb0npbrii82eo0osgtpebh6.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
 			offlineAccess: true,
 			hostedDomain: '',
 			forceConsentPrompt: true
-		});
-
-		// if (Platform.OS === "android") {
-		// 	LoginManager.setLoginBehavior("web_only")
-		// }
-		auth().onAuthStateChanged(user => {
-			if (user) {
-				console.log('This is the user: ', user)
-			} else {
-				// No user is signed in.
-				console.log('There is no logged in user');
-			}
-		});
-
-		
+        });
 	}
 
     constructor(props) {
@@ -82,22 +65,10 @@ class LoginPage extends Component {
 		try {
 			await GoogleSignin.hasPlayServices();
 			const userInfo = await GoogleSignin.signIn();
-			console.log("hii")
-			console.log(userInfo);
-			var credential = auth.GoogleAuthProvider.credential(userInfo.idToken);
+            var credential = auth.GoogleAuthProvider.credential(userInfo.idToken);
 			firebaseCred = auth().signInWithCredential(credential)
-			console.log("hey")
-			console.log(firebaseCred)
-			console.log("user", firebase.auth().currentUser)
-			// this.props.navigation.dispatch(
-			// 	StackActions.popToTop()
-			// );
-			// this.props.navigation.dispatch(
-			// 	StackActions.replace('Account')
-			// );
 		} catch (error) {
-			console.log("error")
-			console.log(error)
+			console.log("error in google sign in", error)
 		}
         
 	};
@@ -119,10 +90,9 @@ class LoginPage extends Component {
 
 		// Create a Firebase credential with the AccessToken
 		const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
-
 		// Sign-in the user with the credential
-		return auth().signInWithCredential(facebookCredential);
-
+        val = auth().signInWithCredential(facebookCredential);
+        return val;
 	};
 
 

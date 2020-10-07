@@ -14,13 +14,12 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import theme from './common/theme';
 
-
 const Stack = createStackNavigator();
+
 class App extends Component<Props> {
 
-
-    componentWillMount(): void {
-        firebase.initializeApp({
+	componentDidMount() {
+		firebase.initializeApp({
 			apiKey: "AIzaSyDifrMqo7F-1AqDzwzWxwKdH_5Ge_TboRc",
 			authDomain: "homease-9de86.firebaseapp.com",
 			databaseURL: "https://homease-9de86.firebaseio.com",
@@ -30,9 +29,8 @@ class App extends Component<Props> {
 			appId: "1:1089297007765:web:b9ebd88fb7f4f30a46c79c",
 			measurementId: "G-6WEMEMJBH4"
 		  }
-        );
-    }
-
+		);
+	}
 
     render() {
         return (
@@ -65,6 +63,5 @@ class App extends Component<Props> {
 		)
 	}
 }
-
 
 export default App;
