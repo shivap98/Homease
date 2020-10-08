@@ -147,6 +147,17 @@ class LoginPage extends Component {
                                     </Button>
                                 </CardSection>
 
+                                <Button
+                                    color={theme.buttonColor}
+                                    style={styles.buttonContainedStyle}
+                                    mode="contained"
+                                    onPress={() => {
+                                        this.props.navigation.navigate('CreateOrJoin')
+                                    }}
+                                >
+                                    Go
+                                </Button>
+
 
                                 <CardSection style={{justifyContent: 'space-around'}}>
                                     <Button
