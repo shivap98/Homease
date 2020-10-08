@@ -79,19 +79,6 @@ class LoginPage extends Component {
                                         </Text>
                                     </Button>
                                 </CardSection>
-
-                                <Button
-                                    color={theme.buttonColor}
-                                    style={styles.buttonContainedStyle}
-                                    mode="contained"
-                                    onPress={() => {
-                                        this.props.navigation.navigate('CreateOrJoin')
-                                    }}
-                                >
-                                    Go
-                                </Button>
-
-
                                 <CardSection style={{justifyContent: 'space-around'}}>
                                     <Button
                                         color={theme.buttonColor}
@@ -115,6 +102,16 @@ class LoginPage extends Component {
                                         </Text>
                                     </Button>
                                 </CardSection>
+                                <Button
+                                    color={theme.buttonColor}
+                                    style={styles.buttonContainedStyle}
+                                    mode="contained"
+                                    onPress={() => {
+                                        this.props.navigation.navigate('CreateOrJoin')
+                                    }}
+                                >
+                                    Group options
+                                </Button>
                             </Card>
                         </View>
                     </ScrollView>
