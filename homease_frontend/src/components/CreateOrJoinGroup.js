@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Image, ScrollView, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 import paperTheme from './common/paperTheme';
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
 import theme from './common/theme';
@@ -26,7 +26,7 @@ class CreateOrJoinGroup extends Component{
                                     style={{...styles.buttonContainedStyle, margin: 0}}
                                     mode="contained"
                                     onPress={() => {
-                                        // this.props.navigation.navigate('SignUp')
+                                        this.props.navigation.navigate('CreateGroup')
                                     }}
                                 >
                                     <Text style={componentStyles.bigButtonTextStyle}>
@@ -40,7 +40,7 @@ class CreateOrJoinGroup extends Component{
                                     style={{...styles.buttonContainedStyle, margin: 0}}
                                     mode="contained"
                                     onPress={() => {
-                                        // this.props.navigation.navigate('SignUp')
+                                        this.props.navigation.navigate('JoinGroup')
                                     }}
                                 >
                                     <Text style={componentStyles.bigButtonTextStyle}>
@@ -64,7 +64,7 @@ const styles = {
         justifyContent: 'center',
         margin: 3,
         flex: 1,
-    },
+    }
 }
 
 export default CreateOrJoinGroup;

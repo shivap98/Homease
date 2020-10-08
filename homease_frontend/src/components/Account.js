@@ -193,6 +193,16 @@ class Account extends Component {
                                             SIGN OUT
                                     </Text>
                             </Button>
+                            <Button
+                                    color={theme.buttonColor}
+                                    style={styles.buttonContainedStyle}
+                                    mode="contained"
+                                    onPress={() => {
+                                        this.props.navigation.navigate('CreateOrJoin')
+                                    }}
+                                >
+                                    Group options
+                            </Button>
                         </Card>
                     </ScrollView>
                 </PaperProvider>

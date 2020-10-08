@@ -12,6 +12,8 @@ import CreateAccount from './CreateAccount';
 import Account from './Account';
 import Chores from './Chores';
 import CreateOrJoin from './CreateOrJoinGroup';
+import CreateGroup from './CreateGroup';
+import JoinGroup from './JoinGroup';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -86,6 +88,16 @@ class App extends Component<Props> {
 						name="CreateOrJoin"
 						component={CreateOrJoin}
 						option={{title: 'Create or Join a Group'}}
+					/>
+					<Stack.Screen
+						name="CreateGroup"
+						component={CreateGroup}
+						option={{title: 'Create a Group'}}
+					/>
+					<Stack.Screen
+						name="JoinGroup"
+						component={JoinGroup}
+						option={{title: 'Join a Group'}}
 					/>
 				</Stack.Navigator>
 			</NavigationContainer>
