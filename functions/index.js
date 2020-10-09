@@ -31,6 +31,10 @@ exports.editUser = functions.https.onCall((data, context) => {
 
 exports.createUser = functions.https.onCall((data, context) => {
 
+	if(data.uid == "" || data.uid == null) {
+		return "fail"
+	}
+
 	var userRef = firebase.database().ref("users/" + data.uid + "/");
 
 	return userRef.set({
