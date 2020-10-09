@@ -3,10 +3,12 @@ import {ScrollView, View, Text, Alert} from "react-native";
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
+import api from './common/api';
 import {CardSection} from "./common";
 import firebase from 'firebase';
 import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
+import sendUserToDB from './Cloud';
 
 
 class CreateAccount extends Component{
@@ -23,6 +25,7 @@ class CreateAccount extends Component{
 		password: '',
         phoneNumber: '',
         venmoUsername: '',
+        uid: ''
     };
 
 	onSignUpButtonPressed = async () => {
@@ -50,7 +53,11 @@ class CreateAccount extends Component{
 			await firebase.auth().createUserWithEmailAndPassword(email, password)
         } catch (err) {
             console.log(err)
-		}
+        }
+
+        this.setState({uid: firebase.auth().currentUser.uid})
+        
+        sendUserToDB({ data: this.state });
 
         this.props.navigation.dispatch(
             StackActions.popToTop()

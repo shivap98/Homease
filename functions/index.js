@@ -52,3 +52,26 @@ exports.editUser = functions.https.onCall((data, context) => {
 		}
 	})
 });
+
+exports.createUser = functions.https.onCall((data, context) => {
+
+	var userRef = firebase.database().ref("users/" + data.uid + "/");
+
+	return userRef.set({
+
+		firstName: data.firstName,
+		lastName: data.lastName,
+		email: data.email,
+		phoneNumber: data.phoneNumber,
+		venmoUsername: data.phoneNumber,
+
+	}).then((data) => {
+		return {
+			data: "success"
+		}
+	}).catch((error) => {
+		return {
+			data: "fail"
+		}
+	})
+});
