@@ -10,6 +10,7 @@ import { LoginManager, AccessToken } from 'react-native-fbsdk';
 import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
 import firebase from 'firebase';
+import getDB from './Cloud';
 
 class LoginPage extends Component {
     static navigationOptions = {
@@ -90,7 +91,18 @@ class LoginPage extends Component {
 		val = auth().signInWithCredential(facebookCredential);
 		console.log(auth().currentUser)
 
-		this.props.navigation.navigate('SignUp', params = {facebook: auth().currentUser})
+		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
+
+		if(!res.data){
+			this.props.navigation.navigate('SignUp', params = {facebook: auth().currentUser})
+		}else{
+			this.props.navigation.dispatch(
+                StackActions.replace('Home', { screen: 'Account' })
+            );
+		}
+		
+
+
         return val;
 	};
 

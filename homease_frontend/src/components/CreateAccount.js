@@ -8,7 +8,7 @@ import {CardSection} from "./common";
 import firebase from 'firebase';
 import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
-import sendUserToDB from './Cloud';
+import getDB from './Cloud';
 
 
 class CreateAccount extends Component{
@@ -26,11 +26,11 @@ class CreateAccount extends Component{
         phoneNumber: '',
         venmoUsername: '',
 		uid: '',
-		firstNameField: true,
-		lastNameField: true,
-		emailField: true,
-		phoneNumberField: true,
-		passwordField: true
+		firstNameDisabled: false,
+		lastNameDisabled: false,
+		emailDisabled: false,
+		phoneNumberDisabled: false,
+		passwordDisabled: false
 	};
 	
 	constructor(props) {
@@ -41,16 +41,18 @@ class CreateAccount extends Component{
 		if(this.props.route.params.facebook){
 			var data = this.props.route.params.facebook
 			var name = data.displayName.split(" ")
-			this.setState({firstName: name[0], firstNameField: (name[0])?false:true, lastName: name[1], lastNameField: (name[1])?false:true,
-				 email: data.email, emailField: (data.email)?false:true, phoneNumber: data.metadata.phoneNumber,
-				passwordField: false, phoneNumberField: (data.metadata.phoneNumber)?false:true})
+			this.setState({firstName: name[0], firstNameDisabled: (name[0])?true:false, lastName: name[1], lastNameDisabled: (name[1])?true:false,
+				 email: data.email, emailDisabled: (data.email)?true:false, phoneNumber: data.metadata.phoneNumber,
+				passwordDisabled: true, phoneNumberDisabled: (data.metadata.phoneNumber)?true:false, uid: data.uid})
 		}
 	}
+
 
 	onSignUpButtonPressed = async () => {
 
         if (this.state.email === "" || this.state.firstName === "" || this.state.lastName === "" ||
-            this.state.phoneNumber === "" || this.state.venmoUsername === "" || this.state.password === "") {
+			this.state.phoneNumber === "" || this.state.venmoUsername === "" || (this.state.password === ""  
+			&& this.state.passwordDisabled==false)) {
             Alert.alert(
                 'Oops!',
                 'Check the first name, last name, phone number and venmo username',
@@ -67,23 +69,29 @@ class CreateAccount extends Component{
             return;
         }
 
-        const {email, password, phoneNumber, firstName, lastName, venmoUsername} = this.state;
-        try {
-			await firebase.auth().createUserWithEmailAndPassword(email, password)
-        } catch (err) {
-            console.log(err)
-        }
+		const {email, password, phoneNumber, firstName, lastName, venmoUsername} = this.state;
+		
+		if(!this.props.route.params.facebook){
+			try {
+				await firebase.auth().createUserWithEmailAndPassword(email, password)
+			} catch (err) {
+				console.log(err)
+			}
+			this.setState({uid: firebase.auth().currentUser.uid})
+			getDB({ data: this.state }, "createUser");
+		}else{
+			console.log("hey " + this.state.uid)
+			getDB({ data: this.state }, "createUser");
+		}
 
-        this.setState({uid: firebase.auth().currentUser.uid})
+
+		this.props.navigation.dispatch(
+			StackActions.popToTop()
+		);
+		this.props.navigation.dispatch(
+			StackActions.replace('Home', { screen: 'Account' })
+		);
         
-        sendUserToDB({ data: this.state });
-
-        this.props.navigation.dispatch(
-            StackActions.popToTop()
-        );
-        this.props.navigation.dispatch(
-            StackActions.replace('Home', { screen: 'Account' })
-        );
 	}
 	
 
@@ -98,7 +106,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='First Name'
 								mode='outlined'
-								disabled={!this.state.firstNameField}
+								disabled={this.state.firstNameDisabled}
                                 value={this.state.firstName}
                                 onChangeText={textString => this.setState({firstName: textString})}
                             />
@@ -106,7 +114,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='Last Name'
 								mode='outlined'
-								disabled={!this.state.lastNameField}
+								disabled={this.state.lastNameDisabled}
                                 value={this.state.lastName}
                                 onChangeText={textString => this.setState({lastName: textString})}
                             />
@@ -114,7 +122,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='Email'
 								mode='outlined'
-								disabled={!this.state.emailField}
+								disabled={this.state.emailDisabled}
                                 value={this.state.email}
                                 onChangeText={textString => this.setState({email: textString})}
 
@@ -123,7 +131,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='Password'
 								mode='outlined'
-								disabled={!this.state.passwordField}
+								disabled={this.state.passwordDisabled}
 								value={this.state.password}
 								secureTextEntry
                                 onChangeText={textString => this.setState({password: textString})}
@@ -133,7 +141,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='Phone Number'
 								mode='outlined'
-								disabled={!this.state.phoneNumberField}
+								disabled={this.state.phoneNumberDisabled}
                                 value={this.state.phoneNumber}
                                 keyboardType='numeric'
                                 onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}
