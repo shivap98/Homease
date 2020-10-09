@@ -14,6 +14,18 @@ import auth from '@react-native-firebase/auth';
 
 class Account extends Component {
 
+    state = {
+        uid: '',
+        group: {},
+        name: '',
+        edit: false,
+        phoneNumber: '',
+        venmoUsername: '',
+        members: [],
+        groupName: 'TempName',
+		admin: false,
+    }
+
     constructor(props) {
         super(props);
 
@@ -23,7 +35,16 @@ class Account extends Component {
 	}
 	
 	async componentDidMount(){
-		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
+        var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
+
+            this.setState({uid: auth().currentUser.uid})
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({uid: firebase.auth().currentUser.uid})
+        }
+		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result){
 			this.setState({
@@ -114,10 +135,15 @@ class Account extends Component {
     }
 
 	async signOut() {
-		console.log(firebase.auth())
         firebase.auth().signOut().then(async function () {
-			console.log("Signed out!")
+			console.log("Signed out fire")
         });
+        auth().signOut().then(async function () {
+			console.log("Signed out auth")
+        });
+		this.props.navigation.dispatch(
+			StackActions.replace('Homease')
+		);
     };
 
     render() {
@@ -147,7 +173,15 @@ class Account extends Component {
                                 </Text>
                                 <Switch
                                     value={this.state.edit}
-                                    onValueChange={() => {this.setState({edit: !this.state.edit})}}
+                                    onValueChange={async = () => {
+                                        getDB({ data: {
+                                            uid: this.state.uid,
+                                            phoneNumber: this.state.phoneNumber,
+                                            venmoUsername: this.state.venmoUsername
+                                        }}, "editUser");
+                                        this.setState({edit: !this.state.edit})
+
+                                    }}
                                 />
                             </CardSection>
                             <View style={styles.cardSectionStyle}>
@@ -253,10 +287,14 @@ class Account extends Component {
                                 </CardSection>
 
                             </View>
-                            <Button style={styles.buttonContainedStyle} color={theme.buttonColor} mode='contained'>
-                                    <Text style={componentStyles.smallButtonTextStyle}>
-                                            SIGN OUT
-                                    </Text>
+                            <Button 
+                                style={styles.buttonContainedStyle} color={theme.buttonColor} 
+                                mode='contained'
+                                onPress={() => {this.signOut()}}
+                            >
+                                <Text style={componentStyles.smallButtonTextStyle}>
+                                        SIGN OUT
+                                </Text>
                             </Button>
                             <Button
                                     color={theme.buttonColor}

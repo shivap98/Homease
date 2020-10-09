@@ -14,7 +14,24 @@ class CreateGroup extends Component{
         super(props);
     }
 
-    state={groupName: '', groupCode: '', verifyGroupCode: '', buttonEnabled: false, uid: auth().currentUser.uid};
+    state = {
+        groupName: '', 
+        groupCode: '', 
+        verifyGroupCode: '', 
+        buttonEnabled: false, 
+        uid: ''
+    };
+
+    componentDidMount() {
+        var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
+            this.setState({uid: auth().currentUser.uid})
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({uid: firebase.auth().currentUser.uid})
+        }
+    }
 
     onNameChange(textString){
         if(textString === '' || this.state.groupCode !== this.state.verifyGroupCode || this.state.groupCode.length === 0){

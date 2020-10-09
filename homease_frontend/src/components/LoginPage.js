@@ -58,11 +58,11 @@ class LoginPage extends Component {
 			await GoogleSignin.hasPlayServices();
 			const userInfo = await GoogleSignin.signIn();
             var credential = auth.GoogleAuthProvider.credential(userInfo.idToken);
-            firebaseCred = auth().signInWithCredential(credential)
+            await auth().signInWithCredential(credential)
 		} catch (error) {
 			console.log("error in google sign in", error)
-		}
-
+        }
+        
 		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
 
 		if(!res.result){
@@ -105,13 +105,8 @@ class LoginPage extends Component {
             );
 		}
 		
-
-
         return val;
 	};
-
-
-	
     render() {
 
         return (
