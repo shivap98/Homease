@@ -146,15 +146,8 @@ class Account extends Component {
                                     label='Name'
                                     mode='outlined'
                                     value={this.state.name}
-                                    theme={{
-                                        colors: { 
-                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                            text: this.state.edit ? 'white' : theme.lightColor,
-                                            primary: this.state.edit ? 'white' : theme.lightColor,
-                                        }
-                                    }}
                                     keyboardAppearance='dark'
-                                    editable={this.state.edit}
+                                    editable={false}
                                     onChangeText={textString => this.setState({name: textString})}
                                 />
                                 <TextInput
