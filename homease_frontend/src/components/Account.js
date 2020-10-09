@@ -34,14 +34,17 @@ class Account extends Component {
             })
 		}
 
-		res = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
-		mems = res.result.users
-		values = []
-		for (var key in mems) {
-			var user = await getDB({data: {uid: mems[key]} }, "getUser")
-			values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
+		if(res){
+			res = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+			mems = res.result.users
+			values = []
+			for (var key in mems) {
+				var user = await getDB({data: {uid: mems[key]} }, "getUser")
+				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
+			}
+			this.setState({members: values, group: res.result, groupName: res.result.groupName})
 		}
-		this.setState({members: values, group: res.result, groupName: res.result.groupName})
+		
 	}
 
     state = {
@@ -52,7 +55,7 @@ class Account extends Component {
         venmoUsername: '',
         members: [],
         groupName: 'TempName',
-        admin: false,
+		admin: false,
     };
 
     onSharePressed = async () => {
@@ -79,7 +82,7 @@ class Account extends Component {
     }
 
     renderListofMembers (){
-        let members = this.state.members;
+		let members = this.state.members;
         return members.map((item)=>{
             return(
                 <List.Item
