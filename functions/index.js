@@ -83,8 +83,6 @@ exports.createGroup = functions.https.onCall((data, context) => {
 
 	}).then(() => {
 
-		console.log("1")
-
 		var userRef = firebase.database().ref("users/" + data.uid + "/");
 
 		var usersInGroupRef = firebase.database().ref("groups/" + groupid + "/users/");
@@ -127,13 +125,11 @@ exports.joinGroup = functions.https.onCall((data, context) => {
 	return ref.once("value")
 		.then(function (snapshot) {
 			
+			var usersInGroupRef = firebase.database().ref("groups/" + groupid + "/users/");
+
 			if(snapshot.val() != null) {
 
-				return ref.update({
-
-					users: [data.uid]
-
-				}).then(() => {
+				return usersInGroupRef.push(data.uid).then(() => {
 
 					var ref = firebase.database().ref("users/" + data.uid + "/");
 
