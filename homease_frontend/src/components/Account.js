@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView, Image, LayoutAnimation, UIManager, Share} from 'react-native';
+import {Text, View, ScrollView, Image, LayoutAnimation, UIManager, Share, ActionSheetIOS} from 'react-native';
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
 import {Button, Provider as PaperProvider, TextInput, List, Switch} from 'react-native-paper';
@@ -15,16 +15,15 @@ import auth from '@react-native-firebase/auth';
 class Account extends Component {
 
     state = {
-        uid: '',
-        group: {},
-        name: '',
+		group: {},
+		user: {},
         edit: false,
-        phoneNumber: '',
-        venmoUsername: '',
-        members: [],
-        groupName: 'TempName',
-		admin: false,
-    }
+		members: [],
+		name: '',
+		groupName: '',
+		phoneNumber: '',
+		venmoUsername: ''
+    };
 
     constructor(props) {
         super(props);
@@ -63,21 +62,15 @@ class Account extends Component {
 				var user = await getDB({data: {uid: mems[key]} }, "getUser")
 				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
 			}
-			this.setState({members: values, group: res.result, groupName: res.result.groupName})
+			this.setState(
+                {
+                    members: values, group: res.result, 
+                    groupName: res.result.groupName,
+                })
 		}
 		
 	}
 
-    state = {
-		group: {},
-		user: {},
-        edit: false,
-		members: [],
-		name: '',
-		groupName: '',
-		phoneNumber: '',
-		venmoUsername: ''
-    };
 
     onSharePressed = async () => {
         try {
@@ -98,8 +91,30 @@ class Account extends Component {
         console.log("Pressed remove button");
     }
 
-    onLeaveGroupPressed (){
+    async onLeaveGroupPressed (){
         console.log("Pressed leave group button")
+
+        if(this.state.groupid !== '') {
+            
+            var res = await getDB({
+                data: {
+                    uid: this.state.uid,
+                    groupid: this.state.groupid
+                }
+            }, "leaveGroup");
+
+            //TODO fix admin when leaving group
+
+            if(res.result == 'success') {
+                this.setState({
+                    group: {},
+                    members: [],
+                    groupName: 'No Group',
+                    admin: false,
+                    groupid: ''
+                });
+            }
+        }
     }
 
     renderListofMembers (){
@@ -120,7 +135,7 @@ class Account extends Component {
 					/>
 				)
 			})
-		}else{
+		} else {
 			return members.map((item)=>{
 				return(
 					<List.Item
@@ -201,7 +216,7 @@ class Account extends Component {
                                         value={this.state.edit}
                                         onValueChange={async = () => {
 											getDB({ data: {
-												uid: auth().currentUser.uid,
+												uid: this.state.uid,
 												phoneNumber: this.state.phoneNumber,
 												venmoUsername: this.state.venmoUsername
 											}}, "editUser");
