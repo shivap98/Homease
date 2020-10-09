@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView, Image, LayoutAnimation, UIManager} from 'react-native';
+import {Text, View, ScrollView, Image, LayoutAnimation, UIManager, Share} from 'react-native';
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
 import {Button, Provider as PaperProvider, TextInput, List, Switch} from 'react-native-paper';
@@ -29,6 +29,17 @@ class Account extends Component {
         ]
     };
 
+    onSharePressed = async () => {
+        try {
+          const result = await Share.share({
+            message:
+              'Sample share message',
+          });
+        } catch (error) {
+          alert(error.message);
+        }
+      };
+
     onAdminPressed (){
         console.log("Pressed admin button");
     }
@@ -39,10 +50,6 @@ class Account extends Component {
 
     onLeaveGroupPressed (){
         console.log("Pressed leave group button")
-    }
-
-    onSharePressed (){
-        console.log("Pressed share button");
     }
 
     renderListofMembers (){
@@ -67,23 +74,7 @@ class Account extends Component {
 	async signOut() {
 		console.log(firebase.auth())
         firebase.auth().signOut().then(async function () {
-            // if (provider === "password") {
-				
-            // } else {
-            //     try {
-            //         await GoogleSignin.revokeAccess();
-            //         await GoogleSignin.signOut();
-
-            //     } catch (error) {
-            //         console.error(error);
-            //     }
-			// }
-
-
-			
 			console.log("Signed out!")
-			
-
         });
     };
 
@@ -182,7 +173,7 @@ class Account extends Component {
                                     <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
                                         Leave Group
                                     </Button>
-                                    <Button style={styles.leaveAndShareButtonStyle} icon={require('../icons/share-variant.png')} onPress={() => {this.onSharePressed()}}>
+                                    <Button style={styles.leaveAndShareButtonStyle} icon={require('../icons/share-variant.png')} onPress={this.onSharePressed}>
                                         Invite someone
                                     </Button>
                                 </CardSection>
