@@ -8,6 +8,7 @@ import {Card, CardSection} from "./common";
 import getDB from './Cloud';
 import { StackActions } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
+import firebase from 'firebase';
 
 class CreateGroup extends Component{
     constructor(props){
