@@ -3,7 +3,6 @@ const firebase = require('firebase');
 const api = require('./api.js');
 
 firebase.initializeApp(api.data.firebaseConfig);
-var db = firebase.database();
 
 exports.helloWorld = functions.https.onRequest((request, response) => {
   functions.logger.info("Hello logs!", {structuredData: true});
@@ -74,4 +73,16 @@ exports.createUser = functions.https.onCall((data, context) => {
 			data: "fail"
 		}
 	})
+});
+
+exports.getUser = functions.https.onCall((data, context) => {
+
+	var ref = firebase.database().ref("users/" + data.uid);
+
+	return ref.once("value")
+		.then(function (snapshot) {
+			return {
+				data: snapshot.val()
+			}
+		})
 });
