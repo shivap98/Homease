@@ -26,7 +26,8 @@ class Account extends Component {
         members: [
             {name: 'User1', admin: true},
             {name: 'User2', admin: false}
-        ]
+        ],
+        groupName: 'TempName'
     };
 
     onSharePressed = async () => {
@@ -84,7 +85,7 @@ class Account extends Component {
                 <PaperProvider theme={paperTheme}>
                     <ScrollView>
                         <Card>
-                            <Text style = {styles.groupHeadingStyle}>GROUP NAME</Text>
+                            <Text style = {styles.groupHeadingStyle}>{this.state.groupName}</Text>
                             <View style={styles.groupPictureStyle}>
                                 <Image
                                     style={styles.profilePicStyle}
@@ -92,32 +93,33 @@ class Account extends Component {
                                     resizeMode='contain'
                                 />
                             </View>
+                            <CardSection>
+                                <Text style={{
+                                    fontWeight: 'bold',
+                                    flex: 1,
+                                    marginTop: 7,
+                                    marginRight: 15,
+                                    color: 'white',
+                                    textAlign: 'right'
+                                }}>
+                                    EDIT
+                                </Text>
+                                <Switch
+                                    value={this.state.edit}
+                                    onValueChange={() => {this.setState({edit: !this.state.edit})}}
+                                />
+                            </CardSection>
                             <View style={styles.cardSectionStyle}>
                                 <Text style={styles.cardHeaderTextStyle}>PROFILE SETTINGS</Text>
-                                <CardSection>
-                                    <Text style={{
-                                        fontWeight: 'bold',
-                                        flex: 1,
-                                        marginTop: 7,
-                                        marginRight: 15,
-                                        color: 'white',
-                                        textAlign: 'right'
-                                    }}>
-                                        EDIT
-                                    </Text>
-                                    <Switch
-                                        value={this.state.edit}
-                                        onValueChange={() => {this.setState({edit: !this.state.edit})}}
-                                    />
-                                </CardSection>
-                                
+
+
                                 <TextInput
                                     style={styles.textInputStyle}
                                     label='Name'
                                     mode='outlined'
                                     value={this.state.name}
                                     theme={{
-                                        colors: { 
+                                        colors: {
                                             placeholder: this.state.edit ? 'white' : theme.lightColor,
                                             text: this.state.edit ? 'white' : theme.lightColor,
                                             primary: this.state.edit ? 'white' : theme.lightColor,
@@ -134,7 +136,7 @@ class Account extends Component {
                                     editable={this.state.edit}
                                     value={this.state.phoneNumber}
                                     theme={{
-                                        colors: { 
+                                        colors: {
                                             placeholder: this.state.edit ? 'white' : theme.lightColor,
                                             text: this.state.edit ? 'white' : theme.lightColor,
                                             primary: this.state.edit ? 'white' : theme.lightColor,
@@ -151,7 +153,7 @@ class Account extends Component {
                                     editable={this.state.edit}
                                     value={this.state.venmoUsername}
                                     theme={{
-                                        colors: { 
+                                        colors: {
                                             placeholder: this.state.edit ? 'white' : theme.lightColor,
                                             text: this.state.edit ? 'white' : theme.lightColor,
                                             primary: this.state.edit ? 'white' : theme.lightColor,
@@ -169,6 +171,22 @@ class Account extends Component {
                                     >
                                         {this.renderListofMembers()}
                                     </List.Accordion>
+                                <TextInput
+                                    style={styles.textInputStyle}
+                                    label='Group Name'
+                                    mode='outlined'
+                                    value={this.state.groupName}
+                                    theme={{
+                                        colors: {
+                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                            text: this.state.edit ? 'white' : theme.lightColor,
+                                            primary: this.state.edit ? 'white' : theme.lightColor,
+                                        }
+                                    }}
+                                    keyboardAppearance='dark'
+                                    editable={this.state.edit}
+                                    onChangeText={textString => this.setState({groupName: textString})}
+                                />
                                 <CardSection>
                                     <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
                                         Leave Group
@@ -177,7 +195,7 @@ class Account extends Component {
                                         Invite someone
                                     </Button>
                                 </CardSection>
-                                
+
                             </View>
                             <Button style={styles.buttonContainedStyle} color={theme.buttonColor} mode='contained'>
                                     <Text style={componentStyles.smallButtonTextStyle}>
