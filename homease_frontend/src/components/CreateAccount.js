@@ -25,8 +25,27 @@ class CreateAccount extends Component{
 		password: '',
         phoneNumber: '',
         venmoUsername: '',
-        uid: ''
-    };
+		uid: '',
+		firstNameField: true,
+		lastNameField: true,
+		emailField: true,
+		phoneNumberField: true,
+		passwordField: true
+	};
+	
+	constructor(props) {
+		super(props);
+	}
+
+	componentDidMount(){
+		if(this.props.route.params.facebook){
+			var data = this.props.route.params.facebook
+			var name = data.displayName.split(" ")
+			this.setState({firstName: name[0], firstNameField: (name[0])?false:true, lastName: name[1], lastNameField: (name[1])?false:true,
+				 email: data.email, emailField: (data.email)?false:true, phoneNumber: data.metadata.phoneNumber,
+				passwordField: false, phoneNumberField: (data.metadata.phoneNumber)?false:true})
+		}
+	}
 
 	onSignUpButtonPressed = async () => {
 
@@ -78,21 +97,24 @@ class CreateAccount extends Component{
                             <TextInput
                                 style={styles.textInputStyle}
                                 label='First Name'
-                                mode='outlined'
+								mode='outlined'
+								editable={this.state.firstNameField}
                                 value={this.state.firstName}
                                 onChangeText={textString => this.setState({firstName: textString})}
                             />
                             <TextInput
                                 style={styles.textInputStyle}
                                 label='Last Name'
-                                mode='outlined'
+								mode='outlined'
+								editable={this.state.lastNameField}
                                 value={this.state.lastName}
                                 onChangeText={textString => this.setState({lastName: textString})}
                             />
                             <TextInput
                                 style={styles.textInputStyle}
                                 label='Email'
-                                mode='outlined'
+								mode='outlined'
+								editable={this.state.emailField}
                                 value={this.state.email}
                                 onChangeText={textString => this.setState({email: textString})}
 
@@ -100,7 +122,8 @@ class CreateAccount extends Component{
 							<TextInput
                                 style={styles.textInputStyle}
                                 label='Password'
-                                mode='outlined'
+								mode='outlined'
+								editable={this.state.passwordField}
 								value={this.state.password}
 								secureTextEntry
                                 onChangeText={textString => this.setState({password: textString})}
@@ -109,7 +132,8 @@ class CreateAccount extends Component{
                             <TextInput
                                 style={styles.textInputStyle}
                                 label='Phone Number'
-                                mode='outlined'
+								mode='outlined'
+								editable={this.state.phoneNumberField}
                                 value={this.state.phoneNumber}
                                 keyboardType='numeric'
                                 onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}

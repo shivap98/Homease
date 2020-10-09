@@ -87,7 +87,10 @@ class LoginPage extends Component {
 		// Create a Firebase credential with the AccessToken
 		const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
 		// Sign-in the user with the credential
-        val = auth().signInWithCredential(facebookCredential);
+		val = auth().signInWithCredential(facebookCredential);
+		console.log(auth().currentUser)
+
+		this.props.navigation.navigate('SignUp', params = {facebook: auth().currentUser})
         return val;
 	};
 
