@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView, Image, LayoutAnimation, UIManager, Share, ActionSheetIOS} from 'react-native';
+import {Text, View, ScrollView, Image, LayoutAnimation, UIManager, Share} from 'react-native';
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
 import {Button, Provider as PaperProvider, TextInput, List, Switch} from 'react-native-paper';
@@ -125,7 +125,6 @@ class Account extends Component {
                 });
             } else if (res.result == 'success' && uid) {
                 newMembers = []
-                console.log("state", this.state.members)
                 this.state.members.map((member)=> {
                     if (member.uid != uid) {
                         newMembers.push(member)
@@ -139,7 +138,6 @@ class Account extends Component {
 
     renderListofMembers (){
         let members = this.state.members;
-        console.log("mems", members);
 		if(this.state.user.admin){
 			return members.map((item)=>{
 				return(

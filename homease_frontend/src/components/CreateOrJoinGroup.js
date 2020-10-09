@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Text, View} from 'react-native';
 import paperTheme from './common/paperTheme';
-import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
+import {Button, Provider as PaperProvider} from 'react-native-paper';
 import theme from './common/theme';
 import componentStyles from './common/componentStyles';
 import {Card, CardSection} from "./common";

@@ -4,7 +4,7 @@ import {Card, CardSection} from "./common";
 import paperTheme from './common/paperTheme';
 import auth from '@react-native-firebase/auth';
 import theme from './common/theme';
-import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-community/google-signin';
+import {GoogleSignin, GoogleSigninButton} from '@react-native-community/google-signin';
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
 import { LoginManager, AccessToken } from 'react-native-fbsdk';
 import componentStyles from './common/componentStyles';

@@ -3,8 +3,6 @@ import {ScrollView, View, Text, Alert} from "react-native";
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
-import api from './common/api';
-import {CardSection} from "./common";
 import firebase from 'firebase';
 import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
@@ -85,7 +83,7 @@ class CreateAccount extends Component{
 			
 		}
 
-        
+        //TODO: goto next screen only when created user        
 		this.props.navigation.dispatch(
 			StackActions.popToTop()
 		);
