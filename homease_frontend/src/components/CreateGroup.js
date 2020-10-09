@@ -1,17 +1,19 @@
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Alert, Text, View} from 'react-native';
 import paperTheme from './common/paperTheme';
 import {Button, Provider as PaperProvider, TextInput} from 'react-native-paper';
 import theme from './common/theme';
 import componentStyles from './common/componentStyles';
 import {Card, CardSection} from "./common";
+import getDB from './Cloud';
+import { StackActions } from '@react-navigation/native';
 
 class CreateGroup extends Component{
     constructor(props){
         super(props);
     }
 
-    state={groupName: '', groupCode: '', verifyGroupCode: '', buttonEnabled: false};
+    state={groupName: '', groupCode: '', verifyGroupCode: '', buttonEnabled: false, uid: 'z5uYYzYSLCUOEiaN9t1nEYLMgTA2'};
 
     onNameChange(textString){
         if(textString === '' || this.state.groupCode !== this.state.verifyGroupCode || this.state.groupCode.length === 0){
@@ -48,13 +50,36 @@ class CreateGroup extends Component{
         }
     }
 
-    onCreatePressed(){
-        if(this.state.groupCode !== this.state.verifyGroupCode){
+    async onCreatePressed() {
+        if (this.state.groupCode !== this.state.verifyGroupCode || this.state.groupName === '') {
             console.log("Group code not verified correctly");
-        }else if(this.state.groupName === ''){
-            console.log("Group name is empty");
-        }else{
+            Alert.alert(
+                'Oops!',
+                'Check the Group Name and verify the Group Code!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                        },
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+            return;
+        } else {
             console.log("Create pressed");
+            const {groupName, groupCode, uid} = this.state;
+
+            let resp = await getDB({data: this.state}, 'createGroup')
+
+            this.props.navigation.dispatch(
+                StackActions.popToTop()
+            );
+            this.props.navigation.dispatch(
+                StackActions.replace('Home', {screen: 'Account'})
+            );
         }
     }
 
