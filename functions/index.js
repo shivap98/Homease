@@ -170,3 +170,36 @@ exports.getMembersFromGroup = functions.https.onCall((data, context) => {
 			return snapshot.val()
 		})
 });
+
+exports.leaveGroup = functions.https.onCall((data, context) => {
+
+	if (data.uid == "" || data.uid == null || data.groupid == "" || data.groupid == null ) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var usersInGroupRef = firebase.database().ref("groups/" + groupid + "/users/");
+
+	return usersInGroupRef.once("value")
+		.then(function (snapshot) {
+			
+
+			if(snapshot.val() != null) {
+
+				for (entry in snapshot.val()) {
+					var userID = snapshot.val()[entry];
+
+					if (userID == data.uid) {
+						usersInGroupRef.child(entry).remove();
+						return "success"
+					}
+				}
+
+				return "user was not in the group"
+			}
+			else {
+				return "group not found"
+			}
+		})
+});
+
