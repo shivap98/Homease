@@ -47,7 +47,7 @@ exports.createUser = functions.https.onCall((data, context) => {
 		lastName: data.lastName,
 		email: data.email,
 		phoneNumber: data.phoneNumber,
-		venmoUsername: data.phoneNumber,
+		venmoUsername: data.venmoUsername,
 		admin: false
 
 	}).then((data) => {
@@ -139,7 +139,8 @@ exports.joinGroup = functions.https.onCall((data, context) => {
 
 					return ref.update({
 
-						groupid: groupid
+						groupid: groupid,
+						admin: false
 
 					}).then((data) => {
 						
