@@ -38,8 +38,8 @@ class CreateAccount extends Component{
 	}
 
 	componentDidMount(){
-		if(this.props.route.params.facebook){
-			var data = this.props.route.params.facebook
+		if(this.props.route.params.facebook || this.props.route.params.google){
+			var data = (this.props.route.params.facebook)?this.props.route.params.facebook:this.props.route.params.google
 			var name = data.displayName.split(" ")
 			this.setState({firstName: name[0], firstNameDisabled: (name[0])?true:false, lastName: name[1], lastNameDisabled: (name[1])?true:false,
 				 email: data.email, emailDisabled: (data.email)?true:false, phoneNumber: data.metadata.phoneNumber,
@@ -71,16 +71,15 @@ class CreateAccount extends Component{
 
 		const {email, password, phoneNumber, firstName, lastName, venmoUsername} = this.state;
 		
-		if(!this.props.route.params.facebook){
+		if(this.props.route.params.facebook){
+			getDB({ data: this.state }, "createUser");
+		}else{
 			try {
 				await firebase.auth().createUserWithEmailAndPassword(email, password)
 			} catch (err) {
 				console.log(err)
 			}
 			this.setState({uid: firebase.auth().currentUser.uid})
-			getDB({ data: this.state }, "createUser");
-		}else{
-			console.log("hey " + this.state.uid)
 			getDB({ data: this.state }, "createUser");
 		}
 
