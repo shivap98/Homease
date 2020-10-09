@@ -11,7 +11,7 @@ class JoinGroup extends Component{
         super(props);
     }
 
-    state = {groupId: '', groupCode: '', buttonEnabled: 'false'};
+    state = {groupId: '', groupCode: '', buttonEnabled: false};
 
     onIdChange(textString){
         if(textString === '' || this.state.groupCode.length === 0){
@@ -54,52 +54,46 @@ class JoinGroup extends Component{
         return (
             <View style={{flexDirection: 'column' ,flex: 1, backgroundColor: theme.backgroundColor, justifyContent: 'center'}}>
                 <PaperProvider theme={paperTheme}>
-                    <View style={{flex: 0.33}}>
-                    </View>
-                    <View style={{flex: 0.33}}>
-                        <Card>
-                            <CardSection>
-                                <TextInput
-                                    style={styles.textInputStyle}
-                                    label='Group ID'
-                                    mode='outlined'
-                                    value={this.state.groupId}
-                                    onChangeText={(textString) => {
-                                        // this.setState({groupId: textString})
-                                        this.onIdChange(textString);
-                                    }}
-                                />
-                            </CardSection>
-                            <CardSection>
-                                <TextInput
-                                    style={styles.textInputStyle}
-                                    label='Group Code'
-                                    mode='outlined'
-                                    value={this.state.groupCode}
-                                    onChangeText={(textString) => {
-                                        // this.setState({groupCode: textString})
-                                        this.onCodeChange(textString);
-                                    }}
-                                />
-                            </CardSection>
-                            <CardSection>
-                                <Button
-                                    color={this.buttonColor()}
-                                    style={{...styles.buttonContainedStyle, margin: 0}}
-                                    mode="contained"
-                                    onPress={() => {
-                                        {this.onJoinPressed()}
-                                    }}
-                                >
-                                    <Text style={componentStyles.bigButtonTextStyle}>
-                                        Join Group
-                                    </Text>
-                                </Button>
-                            </CardSection>
-                        </Card>
-                    </View>
-                    <View style={{flex: 0.33}}>
-                    </View>
+                    <Card>
+                        <CardSection>
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='Group ID'
+                                mode='outlined'
+                                value={this.state.groupId}
+                                onChangeText={(textString) => {
+                                    // this.setState({groupId: textString})
+                                    this.onIdChange(textString);
+                                }}
+                            />
+                        </CardSection>
+                        <CardSection>
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='Group Code'
+                                mode='outlined'
+                                value={this.state.groupCode}
+                                onChangeText={(textString) => {
+                                    // this.setState({groupCode: textString})
+                                    this.onCodeChange(textString);
+                                }}
+                            />
+                        </CardSection>
+                        <CardSection>
+                            <Button
+                                color={this.buttonColor()}
+                                style={{...styles.buttonContainedStyle, margin: 0}}
+                                mode="contained"
+                                onPress={() => {
+                                    {this.onJoinPressed()}
+                                }}
+                            >
+                                <Text style={componentStyles.bigButtonTextStyle}>
+                                    Join Group
+                                </Text>
+                            </Button>
+                        </CardSection>
+                    </Card>
                 </PaperProvider>
             </View>
         );
