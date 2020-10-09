@@ -74,8 +74,6 @@ exports.createGroup = functions.https.onCall((data, context) => {
 
 	var groupRef = firebase.database().ref("groups/" + groupid + "/");
 
-	var key = groupRef.push().getKey();
-
 	return groupRef.set({
 
 		groupName: data.groupName,
@@ -91,7 +89,8 @@ exports.createGroup = functions.https.onCall((data, context) => {
 
 			return userRef.update({
 
-				groupid: groupid
+				groupid: groupid,
+				admin: true
 
 			}).then((data) => {
 
@@ -157,7 +156,6 @@ exports.joinGroup = functions.https.onCall((data, context) => {
 		})
 });
 
-
 exports.getMembersFromGroup = functions.https.onCall((data, context) => {
 
 	if (data.groupid == "") {
@@ -172,7 +170,3 @@ exports.getMembersFromGroup = functions.https.onCall((data, context) => {
 			return snapshot.val()
 		})
 });
-
-
-
-
