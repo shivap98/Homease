@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView, Image, LayoutAnimation, UIManager, Share} from 'react-native';
+import {Text, View, ScrollView, Image, LayoutAnimation, UIManager, Share, ActionSheetIOS} from 'react-native';
 import {Card, CardSection} from "./common";
 import theme from './common/theme';
 import {Button, Provider as PaperProvider, TextInput, List, Switch} from 'react-native-paper';
@@ -23,18 +23,23 @@ class Account extends Component {
 	}
 	
 	async componentDidMount(){
-		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
+        var uid = auth().currentUser.uid;
+
+        this.setState({uid: uid});
+
+        res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result){
 			this.setState({
                 name: res.result.firstName + " " + res.result.lastName, 
                 phoneNumber: res.result.phoneNumber, 
                 venmoUsername: res.result.venmoUsername,
-                admin: res.result.admin
+                admin: res.result.admin,
+                groupid: res.result.groupid
             })
 		}
 
-		if(res){
+		if(res.result.groupid){
 			res = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
 			mems = res.result.users
 			values = []
@@ -42,7 +47,11 @@ class Account extends Component {
 				var user = await getDB({data: {uid: mems[key]} }, "getUser")
 				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
 			}
-			this.setState({members: values, group: res.result, groupName: res.result.groupName})
+			this.setState(
+                {
+                    members: values, group: res.result, 
+                    groupName: res.result.groupName,
+                })
 		}
 		
 	}
@@ -55,7 +64,9 @@ class Account extends Component {
         venmoUsername: '',
         members: [],
         groupName: 'TempName',
-		admin: false,
+        admin: false,
+        uid: '',
+        groupid: ''
     };
 
     onSharePressed = async () => {
@@ -77,13 +88,35 @@ class Account extends Component {
         console.log("Pressed remove button");
     }
 
-    onLeaveGroupPressed (){
+    async onLeaveGroupPressed (){
         console.log("Pressed leave group button")
+
+        if(this.state.groupid !== '') {
+            
+            var res = await getDB({
+                data: {
+                    uid: this.state.uid,
+                    groupid: this.state.groupid
+                }
+            }, "leaveGroup");
+
+            //TODO fix admin when leaving group
+
+            if(res.result == 'success') {
+                this.setState({
+                    group: {},
+                    members: [],
+                    groupName: 'No Group',
+                    admin: false,
+                    groupid: ''
+                });
+            }
+        }
     }
 
     renderListofMembers (){
-		let members = this.state.members;
-        return members.map((item)=>{
+
+        return this.state.members.map((item)=>{
             return(
                 <List.Item
                     title={item.name}
@@ -154,7 +187,7 @@ class Account extends Component {
                                         value={this.state.edit}
                                         onValueChange={async = () => {
 											getDB({ data: {
-												uid: auth().currentUser.uid,
+												uid: this.state.uid,
 												phoneNumber: this.state.phoneNumber,
 												venmoUsername: this.state.venmoUsername
 											}}, "editUser");
