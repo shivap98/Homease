@@ -66,7 +66,8 @@ class Account extends Component {
 				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
 			}
 			this.setState({
-                    members: values, group: grp.result, 
+                    members: values, 
+                    group: grp.result, 
                     groupName: grp.result.groupName,
                     groupCode: grp.result.groupCode
                 })
@@ -92,25 +93,29 @@ class Account extends Component {
         console.log("Pressed admin button");
     }
 
-    onRemovePressed (){
-        console.log("Pressed remove button");
+    onRemovePressed (uid){
+        if (uid == this.state.uid) {
+            this.onLeaveGroupPressed(null);
+        } else {
+            this.onLeaveGroupPressed(uid);
+        }
     }
 
-    async onLeaveGroupPressed (){
+    async onLeaveGroupPressed (uid){
         console.log("Pressed leave group button")
 
         if(this.state.user.groupid !== '') {
             
             var res = await getDB({
                 data: {
-                    uid: this.state.uid,
+                    uid: uid || this.state.uid,
                     groupid: this.state.user.groupid
                 }
             }, "leaveGroup");
 
             //TODO fix admin when leaving group
 
-            if(res.result == 'success') {
+            if(res.result == 'success' && !uid) {
                 this.setState({
                     group: {},
                     members: [],
@@ -118,23 +123,34 @@ class Account extends Component {
                     admin: false,
                     groupid: ''
                 });
+            } else if (res.result == 'success' && uid) {
+                newMembers = []
+                console.log("state", this.state.members)
+                this.state.members.map((member)=> {
+                    if (member.uid != uid) {
+                        newMembers.push(member)
+                    }
+                })
+                this.setState({members: newMembers})
             }
         }
     }
 
+
     renderListofMembers (){
-		let members = this.state.members;
+        let members = this.state.members;
+        console.log("mems", members);
 		if(this.state.user.admin){
 			return members.map((item)=>{
 				return(
 					<List.Item
 						title={(item.admin)?"* "+item.name:item.name}
 						titleStyle={styles.cardHeaderTextStyle}
-						key={item.name}
+						key={item.uid}
 						right={props =>
 							<CardSection>
 								<Button onPress={() => {this.onAdminPressed()}}><Text>Admin</Text></Button>
-								<Button onPress={() => {this.onRemovePressed()}}><Text>Remove</Text></Button>
+								<Button onPress={() => {this.onRemovePressed(item.uid)}}><Text>Remove</Text></Button>
 							</CardSection>
 						}
 					/>
@@ -167,7 +183,6 @@ class Account extends Component {
     };
 
     groupSectionVisibility() {
-        console.log("here", this.state.groupid)
         if (this.state.groupid == '' || !this.state.groupid) {
             return (
                 <Button
@@ -208,7 +223,7 @@ class Account extends Component {
                         onChangeText={textString => {}}
                     />
                     <CardSection>
-                        <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
+                        <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed(null)}}>
                             Leave Group
                         </Button>
                         <Button style={styles.leaveAndShareButtonStyle} icon={require('../icons/share-variant.png')} onPress={this.onSharePressed}>
