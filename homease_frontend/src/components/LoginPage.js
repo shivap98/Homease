@@ -93,7 +93,7 @@ class LoginPage extends Component {
 		// Create a Firebase credential with the AccessToken
 		const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
 		// Sign-in the user with the credential
-		val = auth().signInWithCredential(facebookCredential);
+		val = await auth().signInWithCredential(facebookCredential);
 
 		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
 

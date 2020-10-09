@@ -72,12 +72,12 @@ class CreateAccount extends Component{
 		const {email, password, phoneNumber, firstName, lastName, venmoUsername} = this.state;
 		
 		if(this.props.route.params && (this.props.route.params.facebook || this.props.route.params.google)) {
-			getDB({ data: this.state }, "createUser");
+			await getDB({ data: this.state }, "createUser");
 		} else {
 			try {
                 await firebase.auth().createUserWithEmailAndPassword(email, password)
                 this.setState({uid: firebase.auth().currentUser.uid})
-			    getDB({ data: this.state }, "createUser");
+			    await getDB({ data: this.state }, "createUser");
 			} catch (err) {
                 // TODO: show pop and not proceed
 				console.log(err)
