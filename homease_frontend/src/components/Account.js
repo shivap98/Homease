@@ -129,7 +129,15 @@ class Account extends Component {
                                     </Text>
                                     <Switch
                                         value={this.state.edit}
-                                        onValueChange={() => {this.setState({edit: !this.state.edit})}}
+                                        onValueChange={async = () => {
+											getDB({ data: {
+												uid: auth().currentUser.uid,
+												phoneNumber: this.state.phoneNumber,
+												venmoUsername: this.state.venmoUsername
+											}}, "editUser");
+											this.setState({edit: !this.state.edit})
+
+										}}
                                     />
                                 </CardSection>
                                 
