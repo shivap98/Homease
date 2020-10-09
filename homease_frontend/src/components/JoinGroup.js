@@ -14,7 +14,23 @@ class JoinGroup extends Component{
         super(props);
     }
 
-    state = {groupid: '', groupCode: '', buttonEnabled: false, uid: auth().currentUser.uid};
+    state = {
+        uid: '', 
+        groupid: '', 
+        groupCode: '', 
+        buttonEnabled: false, 
+    };
+
+    componentDidMount() {
+        var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
+            this.setState({uid: auth().currentUser.uid})
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({uid: firebase.auth().currentUser.uid})
+        }
+    }
 
     onIdChange(textString){
         if(textString === '' || this.state.groupCode.length === 0){
@@ -52,9 +68,7 @@ class JoinGroup extends Component{
             );
             return;
         } else {
-            // console.log("Join pressed");
-            const {groupid, uid} = this.state;
-
+        
             let resp = await getDB({data: this.state}, 'joinGroup');
 
             this.props.navigation.dispatch(

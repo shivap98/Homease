@@ -15,7 +15,15 @@ import auth from '@react-native-firebase/auth';
 class Account extends Component {
 
     state = {
-        uid: ''
+        uid: '',
+        group: {},
+        name: '',
+        edit: false,
+        phoneNumber: '',
+        venmoUsername: '',
+        members: [],
+        groupName: 'TempName',
+		admin: false,
     }
 
     constructor(props) {
@@ -30,12 +38,12 @@ class Account extends Component {
         var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid
+
             this.setState({uid: auth().currentUser.uid})
         } else {
             uid = firebase.auth().currentUser.uid
             this.setState({uid: firebase.auth().currentUser.uid})
         }
-        console.log("uid", uid);
 		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result){
@@ -59,17 +67,6 @@ class Account extends Component {
 		}
 		
 	}
-
-    state = {
-		group: {},
-        name: '',
-        edit: false,
-        phoneNumber: '',
-        venmoUsername: '',
-        members: [],
-        groupName: 'TempName',
-		admin: false,
-    };
 
     onSharePressed = async () => {
         try {
@@ -127,16 +124,12 @@ class Account extends Component {
     }
 
 	async signOut() {
-		console.log(firebase.auth())
         firebase.auth().signOut().then(async function () {
 			console.log("Signed out fire")
         });
         auth().signOut().then(async function () {
 			console.log("Signed out auth")
         });
-        // this.props.navigation.dispatch(
-		// 	StackActions.popToTop()
-		// );
 		this.props.navigation.dispatch(
 			StackActions.replace('Homease')
 		);
@@ -169,36 +162,19 @@ class Account extends Component {
                                 </Text>
                                 <Switch
                                     value={this.state.edit}
-                                    onValueChange={() => {this.setState({edit: !this.state.edit})}}
+                                    onValueChange={async = () => {
+                                        getDB({ data: {
+                                            uid: this.state.uid,
+                                            phoneNumber: this.state.phoneNumber,
+                                            venmoUsername: this.state.venmoUsername
+                                        }}, "editUser");
+                                        this.setState({edit: !this.state.edit})
+
+                                    }}
                                 />
                             </CardSection>
                             <View style={styles.cardSectionStyle}>
-                                <Text style={styles.cardHeaderTextStyle}>PROFILE SETTINGS</Text>
-                                <CardSection>
-                                    <Text style={{
-                                        fontWeight: 'bold',
-                                        flex: 1,
-                                        marginTop: 7,
-                                        marginRight: 15,
-                                        color: 'white',
-                                        textAlign: 'right'
-                                    }}>
-                                        EDIT
-                                    </Text>
-                                    <Switch
-                                        value={this.state.edit}
-                                        onValueChange={async = () => {
-											getDB({ data: {
-												uid: this.state.uid,
-												phoneNumber: this.state.phoneNumber,
-												venmoUsername: this.state.venmoUsername
-											}}, "editUser");
-											this.setState({edit: !this.state.edit})
-
-										}}
-                                    />
-                                </CardSection>
-                                
+                                <Text style={styles.cardHeaderTextStyle}>PROFILE SETTINGS</Text>                                
                                 <TextInput
                                     style={styles.textInputStyle}
                                     label='Name'

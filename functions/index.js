@@ -177,7 +177,21 @@ exports.leaveGroup = functions.https.onCall((data, context) => {
 
 					if (userID == data.uid) {
 						usersInGroupRef.child(entry).remove();
-						return "success"
+
+						var ref = firebase.database().ref("users/" + data.uid + "/");
+
+						return ref.update({
+
+							groupid: {}
+
+						}).then((data) => {
+							
+							return "success"
+
+						}).catch((error) => {
+							
+							return "fail1"
+						})
 					}
 				}
 
