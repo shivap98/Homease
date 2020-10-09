@@ -29,6 +29,11 @@ class Account extends Component {
 			this.setState({name: res.result.firstName + " " + res.result.lastName, phoneNumber: res.result.phoneNumber, 
 			venmoUsername: res.result.venmoUsername})
 		}
+
+		res = await getDB({data: {groupid: res.result.groupid} }, "getMembersFromGroup")
+
+		console.log("in account " + res)
+
 	}
 
     state = {

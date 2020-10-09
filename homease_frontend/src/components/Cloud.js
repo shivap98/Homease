@@ -11,6 +11,7 @@ export default getDB = async (tosend, fnname) => {
 			},
 			body: JSON.stringify(tosend)
 		});
+		console.log("in cloud" + response)
 		let json = await response.json();
 		
 		return json;

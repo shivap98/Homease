@@ -71,7 +71,7 @@ class CreateAccount extends Component{
 
 		const {email, password, phoneNumber, firstName, lastName, venmoUsername} = this.state;
 		
-		if(this.props.route.params.facebook){
+		if(this.props.route.params.facebook || this.props.route.params.google){
 			getDB({ data: this.state }, "createUser");
 		}else{
 			try {
