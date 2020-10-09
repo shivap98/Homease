@@ -7,13 +7,14 @@ import componentStyles from './common/componentStyles';
 import {Card, CardSection} from "./common";
 import getDB from './Cloud';
 import { StackActions } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 class CreateGroup extends Component{
     constructor(props){
         super(props);
     }
 
-    state={groupName: '', groupCode: '', verifyGroupCode: '', buttonEnabled: false, uid: 'z5uYYzYSLCUOEiaN9t1nEYLMgTA2'};
+    state={groupName: '', groupCode: '', verifyGroupCode: '', buttonEnabled: false, uid: auth().currentUser.uid};
 
     onNameChange(textString){
         if(textString === '' || this.state.groupCode !== this.state.verifyGroupCode || this.state.groupCode.length === 0){

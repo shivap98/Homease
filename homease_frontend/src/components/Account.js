@@ -30,9 +30,19 @@ class Account extends Component {
 			venmoUsername: res.result.venmoUsername})
 		}
 
+		console.log(res.result)
+
 		res = await getDB({data: {groupid: res.result.groupid} }, "getMembersFromGroup")
 
+		values = []
+		for (var key in res) {
+			values.push(res[key]);
+		}
+
+		
+
 		console.log("in account " + res)
+		console.log(values)
 
 	}
 

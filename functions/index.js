@@ -89,7 +89,7 @@ exports.createGroup = functions.https.onCall((data, context) => {
 
 		return usersInGroupRef.push(data.uid).then((data) => {
 
-			return ref.update({
+			return userRef.update({
 
 				groupid: groupid
 

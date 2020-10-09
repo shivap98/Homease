@@ -7,13 +7,14 @@ import componentStyles from './common/componentStyles';
 import {Card, CardSection} from "./common";
 import getDB from './Cloud';
 import { StackActions } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 class JoinGroup extends Component{
     constructor(props){
         super(props);
     }
 
-    state = {groupid: '', groupCode: '', buttonEnabled: false, uid: 'z5uYYzYSLCUOEiaN9t1nEYLMgTA2'};
+    state = {groupid: '', groupCode: '', buttonEnabled: false, uid: auth().currentUser.uid};
 
     onIdChange(textString){
         if(textString === '' || this.state.groupCode.length === 0){
