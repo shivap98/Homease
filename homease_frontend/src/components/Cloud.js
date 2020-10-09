@@ -1,9 +1,9 @@
 import api from './common/api';
 
-export default sendUserToDB = async (tosend) => {
+export default getDB = async (tosend, fnname) => {
 
 	try {
-		let response = await fetch(api.backurl + 'createUser/', {
+		let response = await fetch(api.backurl + fnname + '/', {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json',
@@ -12,8 +12,11 @@ export default sendUserToDB = async (tosend) => {
 			body: JSON.stringify(tosend)
 		});
 		let json = await response.json();
-		console.log(json);
+		
+		return json;
 	} catch (error) {
 		console.error(error);
 	}
+
+
 }

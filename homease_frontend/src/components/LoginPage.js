@@ -10,6 +10,7 @@ import { LoginManager, AccessToken } from 'react-native-fbsdk';
 import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
 import firebase from 'firebase';
+import getDB from './Cloud';
 
 class LoginPage extends Component {
     static navigationOptions = {
@@ -53,18 +54,23 @@ class LoginPage extends Component {
 	}
 
 	signIn = async () => {
-        console.log("g sign in attempt")
 		try {
 			await GoogleSignin.hasPlayServices();
 			const userInfo = await GoogleSignin.signIn();
             var credential = auth.GoogleAuthProvider.credential(userInfo.idToken);
             firebaseCred = auth().signInWithCredential(credential)
-            console.log(auth().currentUser)
-            this.props.navigation.dispatch(
-                StackActions.replace('Home', { screen: 'Account' })
-            );
 		} catch (error) {
 			console.log("error in google sign in", error)
+		}
+
+		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
+
+		if(!res.result){
+			this.props.navigation.navigate('SignUp', params = {google: auth().currentUser})
+		}else{
+			this.props.navigation.dispatch(
+				StackActions.replace('Home', { screen: 'Account' })
+            );
 		}
         
 	};
@@ -87,7 +93,20 @@ class LoginPage extends Component {
 		// Create a Firebase credential with the AccessToken
 		const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
 		// Sign-in the user with the credential
-        val = auth().signInWithCredential(facebookCredential);
+		val = auth().signInWithCredential(facebookCredential);
+
+		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
+
+		if(!res.result){
+			this.props.navigation.navigate('SignUp', params = {facebook: auth().currentUser})
+		}else{
+			this.props.navigation.dispatch(
+				StackActions.replace('Home', { screen: 'Account' })
+            );
+		}
+		
+
+
         return val;
 	};
 
