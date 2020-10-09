@@ -165,8 +165,6 @@ class LoginPage extends Component {
                                         </Text>
                                     </Button>
                                 </CardSection>
-
-
                                 <CardSection style={{justifyContent: 'space-around'}}>
                                     <Button
                                         color={theme.buttonColor}
