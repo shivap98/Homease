@@ -12,26 +12,7 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 });
 
 exports.yoyo = functions.https.onCall((data, context) => {
-	return {
-		data: data
-	}
-});
-
-exports.dbtest = functions.https.onCall((data, context) => {
-
-	var ref = firebase.database().ref("/");
-
-	return ref.set({
-		test: "heyo from the cloud",
-	}).then((data) => {
-		return {
-			data: "success"
-		}
-	}).catch((error) => {
-		return {
-			data: "fail"
-		}
-	})
+	return data
 });
 
 exports.editUser = functions.https.onCall((data, context) => {
@@ -42,13 +23,9 @@ exports.editUser = functions.https.onCall((data, context) => {
 		phoneNumber: data.phoneNumber,
 		venmoUsername: data.venmoUsername,
 	}).then((data) => {
-		return {
-			data: "success"
-		}
+		return "succes"
 	}).catch((error) => {
-		return {
-			data: "fail"
-		}
+		return "fail"
 	})
 });
 
@@ -65,13 +42,9 @@ exports.createUser = functions.https.onCall((data, context) => {
 		venmoUsername: data.phoneNumber,
 
 	}).then((data) => {
-		return {
-			data: "success"
-		}
+		return "success"
 	}).catch((error) => {
-		return {
-			data: "fail"
-		}
+		return "fail"
 	})
 });
 
@@ -81,8 +54,6 @@ exports.getUser = functions.https.onCall((data, context) => {
 
 	return ref.once("value")
 		.then(function (snapshot) {
-			return {
-				data: snapshot.val()
-			}
+			return snapshot.val()
 		})
 });
