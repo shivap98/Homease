@@ -62,7 +62,7 @@ class LoginPage extends Component {
 		} catch (error) {
 			console.log("error in google sign in", error)
         }
-        
+
 		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
 
 		if(!res.result){

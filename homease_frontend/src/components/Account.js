@@ -22,7 +22,9 @@ class Account extends Component {
 		name: '',
 		groupName: '',
 		phoneNumber: '',
-		venmoUsername: ''
+        venmoUsername: '',
+        groupid: '',
+        groupCode: ''
     };
 
     constructor(props) {
@@ -50,7 +52,8 @@ class Account extends Component {
 				user: res.result,
 				venmoUsername: res.result.venmoUsername,
 				phoneNumber: res.result.phoneNumber,
-				name: res.result.firstName + " " + res.result.lastName
+                name: res.result.firstName + " " + res.result.lastName,
+                groupid: res.result.groupid
             })
 		}
 
@@ -62,10 +65,10 @@ class Account extends Component {
 				var user = await getDB({data: {uid: mems[key]} }, "getUser")
 				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
 			}
-			this.setState(
-                {
-                    members: values, group: res.result, 
-                    groupName: res.result.groupName,
+			this.setState({
+                    members: values, group: grp.result, 
+                    groupName: grp.result.groupName,
+                    groupCode: grp.result.groupCode
                 })
 		}
 		
@@ -73,10 +76,12 @@ class Account extends Component {
 
 
     onSharePressed = async () => {
+
+        const str = "Group ID: " + this.state.groupid.replace("*", "#") + "\nGroup Code: " + this.state.groupCode;
         try {
           const result = await Share.share({
             message:
-              this.state.user.groupid,
+              str
           });
         } catch (error) {
           alert(error.message);
@@ -94,12 +99,12 @@ class Account extends Component {
     async onLeaveGroupPressed (){
         console.log("Pressed leave group button")
 
-        if(this.state.groupid !== '') {
+        if(this.state.user.groupid !== '') {
             
             var res = await getDB({
                 data: {
                     uid: this.state.uid,
-                    groupid: this.state.groupid
+                    groupid: this.state.user.groupid
                 }
             }, "leaveGroup");
 
@@ -161,6 +166,60 @@ class Account extends Component {
 		);
     };
 
+    groupSectionVisibility() {
+        console.log("here", this.state.groupid)
+        if (this.state.groupid == '' || !this.state.groupid) {
+            return (
+                <Button
+                    color={theme.buttonColor}
+                    style={styles.buttonContainedStyle}
+                    mode="contained"
+                    onPress={() => {
+                        this.props.navigation.navigate('CreateOrJoin')
+                    }}
+                >
+                    Group options
+                </Button>
+            )
+        } else {
+            return (
+                <View style={styles.cardSectionStyle}>
+                    <Text style={styles.cardHeaderTextStyle}>GROUP SETTINGS</Text>
+                        <List.Accordion
+                            title="List of members in group"
+                            onPress={() => {LayoutAnimation.easeInEaseOut()}}
+                        >
+                            {this.renderListofMembers()}
+                        </List.Accordion>
+                    <TextInput
+                        style={styles.textInputStyle}
+                        label='Group Name'
+                        mode='outlined'
+                        value={this.state.groupName}
+                        theme={{
+                            colors: {
+                                placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                text: this.state.edit ? 'white' : theme.lightColor,
+                                primary: this.state.edit ? 'white' : theme.lightColor,
+                            }
+                        }}
+                        keyboardAppearance='dark'
+                        editable={false}
+                        onChangeText={textString => {}}
+                    />
+                    <CardSection>
+                        <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
+                            Leave Group
+                        </Button>
+                        <Button style={styles.leaveAndShareButtonStyle} icon={require('../icons/share-variant.png')} onPress={this.onSharePressed}>
+                            Invite someone
+                        </Button>
+                    </CardSection>
+                </View>
+            );
+        }
+    }
+
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
@@ -201,30 +260,6 @@ class Account extends Component {
                             </CardSection>
                             <View style={styles.cardSectionStyle}>
                                 <Text style={styles.cardHeaderTextStyle}>PROFILE SETTINGS</Text>
-                                <CardSection>
-                                    <Text style={{
-                                        fontWeight: 'bold',
-                                        flex: 1,
-                                        marginTop: 7,
-                                        marginRight: 15,
-                                        color: 'white',
-                                        textAlign: 'right'
-                                    }}>
-                                        EDIT
-                                    </Text>
-                                    <Switch
-                                        value={this.state.edit}
-                                        onValueChange={async = () => {
-											getDB({ data: {
-												uid: this.state.uid,
-												phoneNumber: this.state.phoneNumber,
-												venmoUsername: this.state.venmoUsername
-											}}, "editUser");
-											this.setState({edit: !this.state.edit})
-										}}
-                                    />
-                                </CardSection>
-                                
                                 <TextInput
                                     style={styles.textInputStyle}
                                     label='Name'
@@ -268,40 +303,7 @@ class Account extends Component {
                                     onChangeText={textString => this.setState({venmoUsername: textString})}
                                 />
                             </View>
-                            <View style={styles.cardSectionStyle}>
-                                <Text style={styles.cardHeaderTextStyle}>GROUP SETTINGS</Text>
-                                    <List.Accordion
-                                        title="List of members in group"
-                                        onPress={() => {LayoutAnimation.easeInEaseOut()}}
-                                    >
-                                        {this.renderListofMembers()}
-                                    </List.Accordion>
-                                <TextInput
-                                    style={styles.textInputStyle}
-                                    label='Group Name'
-                                    mode='outlined'
-                                    value={this.state.groupName}
-                                    theme={{
-                                        colors: {
-                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                            text: this.state.edit ? 'white' : theme.lightColor,
-                                            primary: this.state.edit ? 'white' : theme.lightColor,
-                                        }
-                                    }}
-                                    keyboardAppearance='dark'
-                                    editable={false}
-                                    onChangeText={textString => {}}
-                                />
-                                <CardSection>
-                                    <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
-                                        Leave Group
-                                    </Button>
-                                    <Button style={styles.leaveAndShareButtonStyle} icon={require('../icons/share-variant.png')} onPress={this.onSharePressed}>
-                                        Invite someone
-                                    </Button>
-                                </CardSection>
-
-                            </View>
+                            {this.groupSectionVisibility()}
                             <Button 
                                 style={styles.buttonContainedStyle} color={theme.buttonColor} 
                                 mode='contained'
@@ -311,17 +313,7 @@ class Account extends Component {
                                         SIGN OUT
                                 </Text>
                             </Button>
-                            <Button
-                                    color={theme.buttonColor}
-                                    style={styles.buttonContainedStyle}
-                                    mode="contained"
-                                    onPress={() => {
-										if(!this.state.user.groupid)
-                                        this.props.navigation.navigate('CreateOrJoin')
-                                    }}
-                                >
-                                    Group options
-                            </Button>
+                            
                         </Card>
                     </ScrollView>
                 </PaperProvider>
