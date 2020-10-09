@@ -27,16 +27,16 @@ class Account extends Component {
 
 		if(res.result){
 			this.setState({
-                name: res.result.firstName + " " + res.result.lastName, 
-                phoneNumber: res.result.phoneNumber, 
-                venmoUsername: res.result.venmoUsername,
-                admin: res.result.admin
+				user: res.result,
+				venmoUsername: res.result.venmoUsername,
+				phoneNumber: res.result.phoneNumber,
+				name: res.result.firstName + " " + res.result.lastName
             })
 		}
 
 		if(res.result.groupid){
-			res = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
-			mems = res.result.users
+			grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+			mems = grp.result.users
 			values = []
 			for (var key in mems) {
 				var user = await getDB({data: {uid: mems[key]} }, "getUser")
@@ -49,20 +49,20 @@ class Account extends Component {
 
     state = {
 		group: {},
-        name: '',
+		user: {},
         edit: false,
-        phoneNumber: '',
-        venmoUsername: '',
-        members: [],
-        groupName: 'TempName',
-		admin: false,
+		members: [],
+		name: '',
+		groupName: '',
+		phoneNumber: '',
+		venmoUsername: ''
     };
 
     onSharePressed = async () => {
         try {
           const result = await Share.share({
             message:
-              'Sample share message',
+              this.state.user.groupid,
           });
         } catch (error) {
           alert(error.message);
@@ -83,7 +83,7 @@ class Account extends Component {
 
     renderListofMembers (){
 		let members = this.state.members;
-		if(this.state.admin){
+		if(this.state.user.admin){
 			return members.map((item)=>{
 				return(
 					<List.Item
@@ -172,7 +172,6 @@ class Account extends Component {
 												venmoUsername: this.state.venmoUsername
 											}}, "editUser");
 											this.setState({edit: !this.state.edit})
-
 										}}
                                     />
                                 </CardSection>
@@ -184,7 +183,7 @@ class Account extends Component {
                                     value={this.state.name}
                                     keyboardAppearance='dark'
                                     editable={false}
-                                    onChangeText={textString => this.setState({name: textString})}
+                                    onChangeText={textString => {}}
                                 />
                                 <TextInput
                                     style={styles.textInputStyle}
@@ -241,8 +240,8 @@ class Account extends Component {
                                         }
                                     }}
                                     keyboardAppearance='dark'
-                                    editable={this.state.edit}
-                                    onChangeText={textString => this.setState({groupName: textString})}
+                                    editable={false}
+                                    onChangeText={textString => {}}
                                 />
                                 <CardSection>
                                     <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed()}}>
@@ -264,6 +263,7 @@ class Account extends Component {
                                     style={styles.buttonContainedStyle}
                                     mode="contained"
                                     onPress={() => {
+										if(!this.state.user.groupid)
                                         this.props.navigation.navigate('CreateOrJoin')
                                     }}
                                 >
