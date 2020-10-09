@@ -6,6 +6,10 @@ import {Button, Provider as PaperProvider, TextInput, List, Switch} from 'react-
 import firebase from 'firebase';
 import paperTheme from './common/paperTheme';
 import componentStyles from './common/componentStyles';
+import { StackActions } from '@react-navigation/native';
+import getDB from './Cloud';
+import auth from '@react-native-firebase/auth';
+
 
 
 class Account extends Component {
@@ -15,8 +19,17 @@ class Account extends Component {
 
         if (Platform.OS === 'android') {
             UIManager.setLayoutAnimationEnabledExperimental(true);
-        }
-    }
+		}
+	}
+	
+	async componentDidMount(){
+		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
+
+		if(res.result){
+			this.setState({name: res.result.firstName + " " + res.result.lastName, phoneNumber: res.result.phoneNumber, 
+			venmoUsername: res.result.venmoUsername})
+		}
+	}
 
     state = {
         name: 'Temp',

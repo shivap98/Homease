@@ -69,7 +69,7 @@ class LoginPage extends Component {
 			this.props.navigation.navigate('SignUp', params = {google: auth().currentUser})
 		}else{
 			this.props.navigation.dispatch(
-                StackActions.replace('Home', { screen: 'Account' })
+				StackActions.replace('Home', { screen: 'Account' })
             );
 		}
         
@@ -96,12 +96,12 @@ class LoginPage extends Component {
 		val = auth().signInWithCredential(facebookCredential);
 
 		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
-	
+
 		if(!res.result){
 			this.props.navigation.navigate('SignUp', params = {facebook: auth().currentUser})
 		}else{
 			this.props.navigation.dispatch(
-                StackActions.replace('Home', { screen: 'Account' })
+				StackActions.replace('Home', { screen: 'Account' })
             );
 		}
 		
