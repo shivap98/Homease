@@ -48,6 +48,7 @@ exports.createUser = functions.https.onCall((data, context) => {
 		email: data.email,
 		phoneNumber: data.phoneNumber,
 		venmoUsername: data.phoneNumber,
+		admin: false
 
 	}).then((data) => {
 		return "success"

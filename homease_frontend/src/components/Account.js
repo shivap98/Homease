@@ -26,8 +26,12 @@ class Account extends Component {
 		res = await getDB({data: {uid: auth().currentUser.uid} }, "getUser")
 
 		if(res.result){
-			this.setState({name: res.result.firstName + " " + res.result.lastName, phoneNumber: res.result.phoneNumber, 
-			venmoUsername: res.result.venmoUsername})
+			this.setState({
+                name: res.result.firstName + " " + res.result.lastName, 
+                phoneNumber: res.result.phoneNumber, 
+                venmoUsername: res.result.venmoUsername,
+                admin: res.result.admin
+            })
 		}
 
 
@@ -53,7 +57,8 @@ class Account extends Component {
             {name: 'User1', admin: true},
             {name: 'User2', admin: false}
         ],
-        groupName: 'TempName'
+        groupName: 'TempName',
+        admin: false
     };
 
     onSharePressed = async () => {
