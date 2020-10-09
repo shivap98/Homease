@@ -61,3 +61,22 @@ exports.getUser = functions.https.onCall((data, context) => {
 			return snapshot.val()
 		})
 });
+
+exports.createGroup = functions.https.onCall((data, context) => {
+
+	var num = Math.floor(Math.random() * 9000) + 1000;
+
+	var groupRef = firebase.database().ref("groups/" + data.groupName + "*	" + num + "/");
+
+	return groupRef.set({
+
+		groupName: data.groupName,
+		groupCode: data.groupCode,
+		users: [data.uid]
+
+	}).then((data) => {
+		return "success"
+	}).catch((error) => {
+		return "fail"
+	})
+});
