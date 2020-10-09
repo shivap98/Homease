@@ -219,8 +219,8 @@ class Account extends Component {
                             }
                         }}
                         keyboardAppearance='dark'
-                        editable={false}
-                        onChangeText={textString => {}}
+                        editable={this.state.edit}
+                        onChangeText={(textString) => {this.setState({groupName: textString})}}
                     />
                     <CardSection>
                         <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed(null)}}>
@@ -241,7 +241,9 @@ class Account extends Component {
                 <PaperProvider theme={paperTheme}>
                     <ScrollView>
                         <Card>
-                            <Text style = {styles.groupHeadingStyle}>{this.state.groupName}</Text>
+                            <Text style = {styles.groupHeadingStyle}>
+                                {this.state.groupName}
+                            </Text>
                             <View style={styles.groupPictureStyle}>
                                 <Image
                                     style={styles.profilePicStyle}
@@ -268,6 +270,12 @@ class Account extends Component {
                                             phoneNumber: this.state.phoneNumber,
                                             venmoUsername: this.state.venmoUsername
                                         }}, "editUser");
+                                        if (this.state.groupid && this.state.groupid != '') {
+                                            getDB({ data: {
+                                                groupid: this.state.groupid,
+                                                groupName: this.state.groupName,
+                                            }}, "editGroup");
+                                        }
                                         this.setState({edit: !this.state.edit})
 
                                     }}

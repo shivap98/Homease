@@ -222,4 +222,20 @@ exports.getGroupFromGroupID = functions.https.onCall((data, context) => {
 		})
 });
 
+exports.editGroup = functions.https.onCall((data, context) => {
 
+	if (data.groupid == "") {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var ref = firebase.database().ref("groups/" + groupid);
+
+	return ref.update({
+		groupName: data.groupName,
+	}).then((data) => {
+		return "succes"
+	}).catch((error) => {
+		return "fail"
+	})
+});
