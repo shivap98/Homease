@@ -34,31 +34,25 @@ class Account extends Component {
             })
 		}
 
-
-		res = await getDB({data: {groupid: res.result.groupid} }, "getMembersFromGroup")
-
+		res = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+		mems = res.result.users
 		values = []
-		for (var key in res.result) {
-			var user = await getDB({data: {uid: res.result[key]} }, "getUser")
-			//todo: admin true for now
-			values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin});
+		for (var key in mems) {
+			var user = await getDB({data: {uid: mems[key]} }, "getUser")
+			values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
 		}
-
-		this.setState({members: values})
-
+		this.setState({members: values, group: res.result, groupName: res.result.groupName})
 	}
 
     state = {
-        name: 'Temp',
+		group: {},
+        name: '',
         edit: false,
-        phoneNumber: '1234567890',
-        venmoUsername: 'temp',
-        members: [
-            {name: 'User1', admin: true},
-            {name: 'User2', admin: false}
-        ],
+        phoneNumber: '',
+        venmoUsername: '',
+        members: [],
         groupName: 'TempName',
-        admin: false
+        admin: false,
     };
 
     onSharePressed = async () => {

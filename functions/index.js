@@ -157,21 +157,6 @@ exports.joinGroup = functions.https.onCall((data, context) => {
 		})
 });
 
-exports.getMembersFromGroup = functions.https.onCall((data, context) => {
-
-	if (data.groupid == "") {
-		return "fail"
-	}
-
-	var groupid = data.groupid.replace("#", "*");
-	var ref = firebase.database().ref("groups/" + groupid + "/users");
-
-	return ref.once("value")
-		.then(function (snapshot) {
-			return snapshot.val()
-		})
-});
-
 exports.leaveGroup = functions.https.onCall((data, context) => {
 
 	if (data.uid == "" || data.uid == null || data.groupid == "" || data.groupid == null ) {
@@ -203,4 +188,20 @@ exports.leaveGroup = functions.https.onCall((data, context) => {
 			}
 		})
 });
+
+exports.getGroupFromGroupID = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "") {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var ref = firebase.database().ref("groups/" + groupid);
+
+	return ref.once("value")
+		.then(function (snapshot) {
+			return snapshot.val()
+		})
+});
+
 
