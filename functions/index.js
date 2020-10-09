@@ -129,6 +129,10 @@ exports.joinGroup = functions.https.onCall((data, context) => {
 
 			if(snapshot.val() != null) {
 
+				if(snapshot.val().groupCode != data.groupCode) {
+					return "wrong group code";
+				}
+
 				return usersInGroupRef.push(data.uid).then(() => {
 
 					var ref = firebase.database().ref("users/" + data.uid + "/");
