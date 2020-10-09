@@ -98,7 +98,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='First Name'
 								mode='outlined'
-								editable={this.state.firstNameField}
+								disabled={!this.state.firstNameField}
                                 value={this.state.firstName}
                                 onChangeText={textString => this.setState({firstName: textString})}
                             />
@@ -106,7 +106,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='Last Name'
 								mode='outlined'
-								editable={this.state.lastNameField}
+								disabled={!this.state.lastNameField}
                                 value={this.state.lastName}
                                 onChangeText={textString => this.setState({lastName: textString})}
                             />
@@ -114,7 +114,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='Email'
 								mode='outlined'
-								editable={this.state.emailField}
+								disabled={!this.state.emailField}
                                 value={this.state.email}
                                 onChangeText={textString => this.setState({email: textString})}
 
@@ -123,7 +123,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='Password'
 								mode='outlined'
-								editable={this.state.passwordField}
+								disabled={!this.state.passwordField}
 								value={this.state.password}
 								secureTextEntry
                                 onChangeText={textString => this.setState({password: textString})}
@@ -133,7 +133,7 @@ class CreateAccount extends Component{
                                 style={styles.textInputStyle}
                                 label='Phone Number'
 								mode='outlined'
-								editable={this.state.phoneNumberField}
+								disabled={!this.state.phoneNumberField}
                                 value={this.state.phoneNumber}
                                 keyboardType='numeric'
                                 onChangeText={textString => this.setState({phoneNumber: textString.replace(/[^0-9]/g, '')})}
