@@ -38,7 +38,7 @@ class CreateAccount extends Component{
 	}
 
 	componentDidMount(){
-		if(this.props.route.params.facebook || this.props.route.params.google){
+		if(this.props.route.params && (this.props.route.params.facebook || this.props.route.params.google)) {
 			var data = (this.props.route.params.facebook)?this.props.route.params.facebook:this.props.route.params.google
 			var name = data.displayName.split(" ")
 			this.setState({firstName: name[0], firstNameDisabled: (name[0])?true:false, lastName: name[1], lastNameDisabled: (name[1])?true:false,
@@ -71,19 +71,21 @@ class CreateAccount extends Component{
 
 		const {email, password, phoneNumber, firstName, lastName, venmoUsername} = this.state;
 		
-		if(this.props.route.params.facebook || this.props.route.params.google){
+		if(this.props.route.params && (this.props.route.params.facebook || this.props.route.params.google)) {
 			getDB({ data: this.state }, "createUser");
-		}else{
+		} else {
 			try {
-				await firebase.auth().createUserWithEmailAndPassword(email, password)
+                await firebase.auth().createUserWithEmailAndPassword(email, password)
+                this.setState({uid: firebase.auth().currentUser.uid})
+			    getDB({ data: this.state }, "createUser");
 			} catch (err) {
+                // TODO: show pop and not proceed
 				console.log(err)
 			}
-			this.setState({uid: firebase.auth().currentUser.uid})
-			getDB({ data: this.state }, "createUser");
+			
 		}
 
-
+        
 		this.props.navigation.dispatch(
 			StackActions.popToTop()
 		);

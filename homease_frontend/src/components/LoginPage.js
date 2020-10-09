@@ -105,13 +105,8 @@ class LoginPage extends Component {
             );
 		}
 		
-
-
         return val;
 	};
-
-
-	
     render() {
 
         return (
