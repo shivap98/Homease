@@ -34,7 +34,7 @@ class Account extends Component {
             })
 		}
 
-		if(res){
+		if(res.result.groupid){
 			res = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
 			mems = res.result.users
 			values = []
@@ -83,21 +83,34 @@ class Account extends Component {
 
     renderListofMembers (){
 		let members = this.state.members;
-        return members.map((item)=>{
-            return(
-                <List.Item
-                    title={item.name}
-                    titleStyle={styles.cardHeaderTextStyle}
-                    key={item.name}
-                    right={props =>
-                        <CardSection>
-                            <Button onPress={() => {this.onAdminPressed()}}><Text>Admin</Text></Button>
-                            <Button onPress={() => {this.onRemovePressed()}}><Text>Remove</Text></Button>
-                        </CardSection>
-                    }
-                />
-            )
-        })
+		if(this.state.admin){
+			return members.map((item)=>{
+				return(
+					<List.Item
+						title={(item.admin)?"* "+item.name:item.name}
+						titleStyle={styles.cardHeaderTextStyle}
+						key={item.name}
+						right={props =>
+							<CardSection>
+								<Button onPress={() => {this.onAdminPressed()}}><Text>Admin</Text></Button>
+								<Button onPress={() => {this.onRemovePressed()}}><Text>Remove</Text></Button>
+							</CardSection>
+						}
+					/>
+				)
+			})
+		}else{
+			return members.map((item)=>{
+				return(
+					<List.Item
+						title={(item.admin)?"* "+item.name:item.name}
+						titleStyle={styles.cardHeaderTextStyle}
+						key={item.name}
+					/>
+				)
+			})
+		}
+        
     }
 
 	async signOut() {
