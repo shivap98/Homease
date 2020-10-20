@@ -6,4 +6,5 @@ export default {
 	smallButtonFontSize: 11,
 	bigButtonFontSize: 20,
 	buttonTextColor: 'white',
+	borderColor: '#696969'
 }

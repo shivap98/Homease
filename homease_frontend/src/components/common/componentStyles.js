@@ -12,4 +12,12 @@ export default {
         fontWeight: 'bold',
         color: theme.buttonTextColor
     },
+    cardSectionWithBorderStyle: {
+        margin: 5,
+        marginBottom: 20,
+        borderWidth: 2,
+        padding: 20,
+        borderColor: theme.borderColor,
+        borderRadius: 20
+    },
 }

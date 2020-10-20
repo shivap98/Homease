@@ -196,14 +196,8 @@ class Account extends Component {
             )
         } else {
             return (
-                <View style={styles.cardSectionStyle}>
+                <View style={componentStyles.cardSectionWithBorderStyle}>
                     <Text style={styles.cardHeaderTextStyle}>GROUP SETTINGS</Text>
-                        <List.Accordion
-                            title="List of members in group"
-                            onPress={() => {LayoutAnimation.easeInEaseOut()}}
-                        >
-                            {this.renderListofMembers()}
-                        </List.Accordion>
                     <TextInput
                         style={styles.textInputStyle}
                         label='Group Name'
@@ -220,6 +214,12 @@ class Account extends Component {
                         editable={this.state.edit}
                         onChangeText={(textString) => {this.setState({groupName: textString})}}
                     />
+                    <List.Accordion
+                        title="List of members in group"
+                        onPress={() => {LayoutAnimation.easeInEaseOut()}}
+                    >
+                        {this.renderListofMembers()}
+                    </List.Accordion>
                     <CardSection>
                         <Button style={styles.leaveAndShareButtonStyle} onPress={() => {this.onLeaveGroupPressed(null)}}>
                             Leave Group
@@ -279,7 +279,7 @@ class Account extends Component {
                                     }}
                                 />
                             </CardSection>
-                            <View style={styles.cardSectionStyle}>
+                            <View style={componentStyles.cardSectionWithBorderStyle}>
                                 <Text style={styles.cardHeaderTextStyle}>PROFILE SETTINGS</Text>
                                 <TextInput
                                     style={styles.textInputStyle}
@@ -353,14 +353,6 @@ const styles = {
     },
     groupPictureStyle: {
         alignItems: 'center'
-    },
-    cardSectionStyle: {
-        margin: 5,
-        marginBottom: 20,
-        borderWidth: 2,
-        padding: 20,
-        borderColor: '#696969',
-        borderRadius: 20
     },
     profilePicStyle: {
         height: 100,

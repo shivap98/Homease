@@ -10,7 +10,7 @@ import firebase from 'firebase';
 import LoginPage from './LoginPage';
 import CreateAccount from './CreateAccount';
 import Account from './Account';
-import Chores from './Chores';
+import ChoresTab from './ChoresTab';
 import CreateOrJoin from './CreateOrJoinGroup';
 import CreateGroup from './CreateGroup';
 import JoinGroup from './JoinGroup';
@@ -52,7 +52,7 @@ class App extends Component<Props> {
 					},
 				}}
 			>
-				<Tab.Screen name="Chores" component={Chores} />
+				<Tab.Screen name="Chores" component={ChoresTab} />
 				<Tab.Screen name="Account" component={Account} />
 			</Tab.Navigator>
 		);
