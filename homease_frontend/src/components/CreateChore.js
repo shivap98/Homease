@@ -13,7 +13,7 @@ class CreateChore extends Component{
             title: 'Create Chore'
         };
     };
-    
+
     state = {
         choreName: '',
         users: [
@@ -21,7 +21,7 @@ class CreateChore extends Component{
             {name: 'user2', selected: false},
             {name: 'user3', selected: false}
         ],
-
+        choreSelected: false,
         recursiveChore: false,
         description: '',
         multiLine: true
@@ -34,8 +34,22 @@ class CreateChore extends Component{
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
         let users = this.state.users;
-        users[index].selected = !selectedUser.selected;
-        this.setState({users: users});
+        if(this.state.recursiveChore === true) {
+            users[index].selected = !selectedUser.selected;
+            this.setState({users: users});
+        }else{
+            if(selectedUser.selected === false){
+                console.log("Clicked new user");
+                users = users.map(user => {
+                    user.selected=false;
+                    return user;
+                });
+                users[index].selected = true;
+                this.setState({users: users});
+            }else{
+                console.log("Clicked selected user again");
+            }
+        }
     }
 
     renderListOfMembers (){
@@ -44,7 +58,7 @@ class CreateChore extends Component{
             return(
                 <List.Item
                     title={item.name}
-                    titleStyle={(item.selected) ? styles.selectedTextStyle : styles.unselectedTextStyle}//{this.userItemColor(item)}//{styles.cardHeaderTextStyle}
+                    titleStyle={(item.selected) ? styles.selectedTextStyle : styles.unselectedTextStyle}
                     key={index}
                     onPress={() => {this.onSelectPressed(item, index)}}
                 />
@@ -64,6 +78,27 @@ class CreateChore extends Component{
             this.setState({users: users, recursiveChore: false})
         }else{
             this.setState({recursiveChore: true})
+        }
+    }
+
+    onCreateChoreClicked(){
+        console.log("Clicked create chore button");
+        let users = this.state.users;
+        let hasSelectedUsers = users.some(user => user.selected === true);
+        if(hasSelectedUsers === false){
+            Alert.alert(
+                'Oops!',
+                'Please select at least one user to assign the chore to!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
         }
     }
 
@@ -119,9 +154,7 @@ class CreateChore extends Component{
                                 color={theme.buttonColor}
                                 style={styles.buttonContainedStyle}
                                 mode="contained"
-                                onPress={() => {
-                                    console.log("Create chore clicked.")
-                                }}
+                                onPress={() => {this.onCreateChoreClicked()}}
                             >
                                 Create chore
                             </Button>
