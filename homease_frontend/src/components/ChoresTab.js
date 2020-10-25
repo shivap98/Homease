@@ -86,7 +86,10 @@ class ChoresTab extends Component {
                     small
                     color={theme.darkColor}
                     icon="plus"
-                    onPress={() => console.log('Pressed')}
+                    onPress={() => {
+                        console.log("Pressed fab");
+                        this.props.navigation.navigate('CreateChore');
+                    }}
                 />
             </View>
         );

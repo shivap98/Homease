@@ -11,6 +11,7 @@ import LoginPage from './LoginPage';
 import CreateAccount from './CreateAccount';
 import Account from './Account';
 import ChoresTab from './ChoresTab';
+import CreateChore from './CreateChore';
 import CreateOrJoin from './CreateOrJoinGroup';
 import CreateGroup from './CreateGroup';
 import JoinGroup from './JoinGroup';
@@ -98,6 +99,11 @@ class App extends Component<Props> {
 						name="JoinGroup"
 						component={JoinGroup}
 						option={{title: 'Join a Group'}}
+					/>
+					<Stack.Screen
+						name="CreateChore"
+						component={CreateChore}
+						option={{title: 'Create a Chore'}}
 					/>
 				</Stack.Navigator>
 			</NavigationContainer>

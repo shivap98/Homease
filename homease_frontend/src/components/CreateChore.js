@@ -1,0 +1,178 @@
+import React, {Component} from "react";
+import {ScrollView, View, Text, Alert, LayoutAnimation} from 'react-native';
+import {Button, List, Provider as PaperProvider, Switch, TextInput} from 'react-native-paper';
+import paperTheme from './common/paperTheme';
+import theme from './common/theme';
+import getDB from './Cloud';
+import {CardSection} from './common';
+import componentStyles from './common/componentStyles';
+
+class CreateChore extends Component{
+    static navigationOptions = () => {
+        return {
+            title: 'Create Chore'
+        };
+    };
+    
+    state = {
+        choreName: '',
+        users: [
+            {name: 'user1', selected: false},
+            {name: 'user2', selected: false},
+            {name: 'user3', selected: false}
+        ],
+
+        recursiveChore: false,
+        description: '',
+        multiLine: true
+    };
+
+    constructor(props) {
+        super(props);
+    }
+
+    onSelectPressed(selectedUser, index){
+        console.log("Select pressed");
+        let users = this.state.users;
+        users[index].selected = !selectedUser.selected;
+        this.setState({users: users});
+    }
+
+    renderListOfMembers (){
+        let members = this.state.users;
+        return members.map((item, index)=>{
+            return(
+                <List.Item
+                    title={item.name}
+                    titleStyle={(item.selected) ? styles.selectedTextStyle : styles.unselectedTextStyle}//{this.userItemColor(item)}//{styles.cardHeaderTextStyle}
+                    key={index}
+                    onPress={() => {this.onSelectPressed(item, index)}}
+                />
+            )
+        })
+
+    }
+
+    onRecursiveClicked(){
+        if(this.state.recursiveChore === true){
+            let users = this.state.users;
+            users = users.map(user => {
+                user.selected=false;
+                return user;
+            });
+            console.log("Setting chore to false");
+            this.setState({users: users, recursiveChore: false})
+        }else{
+            this.setState({recursiveChore: true})
+        }
+    }
+
+    render() {
+        return (
+            <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
+                <PaperProvider theme={paperTheme}>
+                    <ScrollView>
+                        <View style={styles.viewStyle}>
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='Chore Name'
+                                mode='outlined'
+                                value={this.state.choreName}
+                                onChangeText={textString => this.setState({choreName: textString})}
+                            />
+                            <CardSection>
+                                <Text style={{
+                                    fontWeight: 'bold',
+                                    flex: 1,
+                                    marginTop: 7,
+                                    marginRight: 15,
+                                    color: 'white',
+                                    textAlign: 'center'
+                                }}>
+                                    Recursive chore?
+                                </Text>
+                                <Switch
+                                    value={this.state.recursiveChore}
+                                    onValueChange={() => {
+                                        this.onRecursiveClicked();
+                                    }}
+                                />
+                            </CardSection>
+                            <View style={componentStyles.cardSectionWithBorderStyle}>
+                                <Text style={styles.cardHeaderTextStyle}>GROUP MEMBERS</Text>
+                                <List.Accordion
+                                    title="List of members in group"
+                                    onPress={() => {LayoutAnimation.easeInEaseOut()}}
+                                >
+                                    {this.renderListOfMembers()}
+                                </List.Accordion>
+                            </View>
+                            <TextInput
+                                style={styles.textInputStyle}
+                                label='Chore Description'
+                                mode='outlined'
+                                multiline= {true}
+                                value={this.state.description}
+                                onChangeText={textString => this.setState({description: textString})}
+                            />
+                            <Button
+                                color={theme.buttonColor}
+                                style={styles.buttonContainedStyle}
+                                mode="contained"
+                                onPress={() => {
+                                    console.log("Create chore clicked.")
+                                }}
+                            >
+                                Create chore
+                            </Button>
+                        </View>
+                    </ScrollView>
+                </PaperProvider>
+            </View>
+        )
+    }
+}
+
+const styles = {
+
+    viewStyle: {
+        margin: 10,
+        padding: 12,
+        flex: 1,
+    },
+
+    textInputStyle: {
+        flex: 1,
+        marginTop: 20
+    },
+
+    buttonContainedStyle: {
+        height: 47,
+        justifyContent: 'center',
+        flex: 1,
+        marginTop: 25
+    },
+    cardHeaderTextStyle: {
+        fontWeight: 'bold',
+        marginTop: 10,
+        flex: 1,
+        color: theme.buttonTextColor,
+        textAlign: 'center'
+    },
+    selectedTextStyle:{
+        fontWeight: 'bold',
+        marginTop: 10,
+        flex: 1,
+        color: theme.lightColor,
+        textAlign: 'center'
+    },
+    unselectedTextStyle:{
+        fontWeight: 'bold',
+        marginTop: 10,
+        flex: 1,
+        color: theme.buttonTextColor,
+        textAlign: 'center'
+    }
+};
+
+export default CreateChore;
