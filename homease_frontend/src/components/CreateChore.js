@@ -6,6 +6,7 @@ import theme from './common/theme';
 import getDB from './Cloud';
 import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
+import auth from '@react-native-firebase/auth';
 
 class CreateChore extends Component{
     static navigationOptions = () => {
@@ -16,11 +17,6 @@ class CreateChore extends Component{
 
     state = {
         choreName: '',
-        users: [
-            {name: 'user1', selected: false},
-            {name: 'user2', selected: false},
-            {name: 'user3', selected: false}
-        ],
         choreSelected: false,
         recursiveChore: false,
         description: '',
@@ -29,7 +25,33 @@ class CreateChore extends Component{
 
     constructor(props) {
         super(props);
-    }
+	}
+	
+	async componentDidMount(){
+		var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
+
+            this.setState({uid: auth().currentUser.uid})
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({uid: firebase.auth().currentUser.uid})
+        }
+		res = await getDB({data: {uid: uid} }, "getUser")
+
+		if(res.result.groupid){
+			grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+			mems = grp.result.users
+			values = []
+			for (var key in mems) {
+				var user = await getDB({data: {uid: mems[key]} }, "getUser")
+				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key], selected: false});
+			}
+			this.setState({
+					members: values, 
+			})
+		}
+	}
 
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
@@ -53,18 +75,20 @@ class CreateChore extends Component{
     }
 
     renderListOfMembers (){
-        let members = this.state.users;
-        return members.map((item, index)=>{
-            return(
-                <List.Item
-                    title={item.name}
-                    titleStyle={(item.selected) ? styles.selectedTextStyle : styles.unselectedTextStyle}
-                    key={index}
-                    onPress={() => {this.onSelectPressed(item, index)}}
-                />
-            )
-        })
-
+		let members = this.state.members;
+		console.log(members)
+		if(members){
+			return members.map((item, index)=>{
+				return(
+					<List.Item
+						title={item.name}
+						titleStyle={(item.selected) ? styles.selectedTextStyle : styles.unselectedTextStyle}
+						key={index}
+						onPress={() => {this.onSelectPressed(item, index)}}
+					/>
+				)
+			})
+		}
     }
 
     onRecursiveClicked(){
