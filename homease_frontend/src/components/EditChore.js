@@ -22,8 +22,8 @@ class EditChore extends Component{
             {name: 'user3', selected: false}
         ],
         chores: [
-            {key: '1', name: 'Dishes', status: 'incomplete', description: 'Chore 1'},
-            {key: '2', name: 'Cleaning', status: 'in progress', description: 'Chore 2'}
+            {key: '1', name: 'Dishes', status: 'incomplete', description: 'Chore 1', recursiveChore: true, selectedUsers: ['user1', 'user3']},
+            {key: '2', name: 'Cleaning', status: 'in progress', description: 'Chore 2', recursiveChore: false, selectedUsers: ['user2']}
         ],
         recursiveChore: false,
         description: '',
@@ -39,7 +39,17 @@ class EditChore extends Component{
             return chore.key === this.props.route.params.key;
         })[0];
         console.log(chore.name);
-        this.setState({choreName: chore.name, description: chore.description});
+
+        let users = this.state.users;
+        console.log(users);
+        users = users.map(user =>{
+            if(chore.selectedUsers.includes(user.name)){
+                user.selected = true;
+            }
+            return user;
+        });
+        console.log(users);
+        this.setState({choreName: chore.name, description: chore.description, users: users,selectedUsers: chore.selectedUsers, recursiveChore: chore.recursiveChore});
     }
 
     onSelectPressed(selectedUser, index){
@@ -47,7 +57,13 @@ class EditChore extends Component{
         let users = this.state.users;
         if(this.state.recursiveChore === true) {
             users[index].selected = !selectedUser.selected;
-            this.setState({users: users});
+            let selectedUsers = this.state.selectedUsers;
+            if(users[index].selected === true){
+                selectedUsers.push(users[index].name);
+            }else{
+                selectedUsers = selectedUsers.filter(user => user !== users[index].name);
+            }
+            this.setState({users: users, selectedUsers: selectedUsers});
         }else{
             if(selectedUser.selected === false){
                 console.log("Clicked new user");
@@ -56,7 +72,9 @@ class EditChore extends Component{
                     return user;
                 });
                 users[index].selected = true;
-                this.setState({users: users});
+                let selectedUsers = [];
+                selectedUsers.push(users[index].name);
+                this.setState({users: users, selectedUsers: selectedUsers});
             }else{
                 console.log("Clicked selected user again");
             }
@@ -87,15 +105,16 @@ class EditChore extends Component{
                 user.selected=false;
                 return user;
             });
-            console.log("Setting chore to false");
-            this.setState({users: users, recursiveChore: false})
+            console.log("Setting recursiveChore to false");
+            let selectedUsers = [];
+            this.setState({users: users, recursiveChore: false, selectedUsers: selectedUsers})
         }else{
             this.setState({recursiveChore: true})
         }
     }
 
     onCreateChoreClicked(){
-        console.log("Clicked create chore button");
+        console.log("Clicked save chore button");
         let users = this.state.users;
         let hasSelectedUsers = users.some(user => user.selected === true);
         if(hasSelectedUsers === false){
@@ -169,7 +188,7 @@ class EditChore extends Component{
                                 mode="contained"
                                 onPress={() => {this.onCreateChoreClicked()}}
                             >
-                                Create chore
+                                Save changes to chore
                             </Button>
                         </View>
                     </ScrollView>
