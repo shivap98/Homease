@@ -10,6 +10,7 @@ import firebase from 'firebase';
 import LoginPage from './LoginPage';
 import CreateAccount from './CreateAccount';
 import Account from './Account';
+import EditChore from './EditChore';
 import ChoresTab from './ChoresTab';
 import CreateChore from './CreateChore';
 import CreateOrJoin from './CreateOrJoinGroup';
@@ -104,6 +105,11 @@ class App extends Component<Props> {
 						name="CreateChore"
 						component={CreateChore}
 						option={{title: 'Create a Chore'}}
+					/>
+					<Stack.Screen
+						name="EditChore"
+						component={EditChore}
+						option={{title: 'Edit a Chore'}}
 					/>
 				</Stack.Navigator>
 			</NavigationContainer>

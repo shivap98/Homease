@@ -7,10 +7,10 @@ import getDB from './Cloud';
 import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 
-class CreateChore extends Component{
+class EditChore extends Component{
     static navigationOptions = () => {
         return {
-            title: 'Create Chore'
+            title: 'Edit Chore'
         };
     };
 
@@ -21,6 +21,10 @@ class CreateChore extends Component{
             {name: 'user2', selected: false},
             {name: 'user3', selected: false}
         ],
+        chores: [
+            {key: '1', name: 'Dishes', status: 'incomplete', description: 'Chore 1'},
+            {key: '2', name: 'Cleaning', status: 'in progress', description: 'Chore 2'}
+        ],
         recursiveChore: false,
         description: '',
         multiLine: true
@@ -28,6 +32,14 @@ class CreateChore extends Component{
 
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount(){
+        let chore = this.state.chores.filter(chore =>{
+            return chore.key === this.props.route.params.key;
+        })[0];
+        console.log(chore.name);
+        this.setState({choreName: chore.name, description: chore.description});
     }
 
     onSelectPressed(selectedUser, index){
@@ -67,6 +79,8 @@ class CreateChore extends Component{
     }
 
     onRecursiveClicked(){
+        console.log("data check in props");
+        console.log(this.props.route.params.key);
         if(this.state.recursiveChore === true){
             let users = this.state.users;
             users = users.map(user => {
@@ -207,4 +221,4 @@ const styles = {
     }
 };
 
-export default CreateChore;
+export default EditChore;

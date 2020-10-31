@@ -27,9 +27,15 @@ class ChoresTab extends Component {
         console.log('This row opened', rowKey);
     };
 
-     renderItem = data => (
+    onPressChore(data) {
+        console.log("Edit Chore options");
+        console.log(data);
+        this.props.navigation.navigate('EditChore', {key: data.item.key});
+    }
+
+    renderItem = data => (
         <TouchableHighlight
-            onPress={() => console.log('You touched ', data.item.name)}
+            onPress={() => this.onPressChore(data)}
             style={styles.rowFront}
             underlayColor={'#AAA'}
         >
@@ -40,7 +46,7 @@ class ChoresTab extends Component {
         </TouchableHighlight>
     );
 
-     renderHiddenItem = (data, rowMap) => (
+    renderHiddenItem = (data, rowMap) => (
         <View style={styles.rowBack}>
             <Text>Left</Text>
             <TouchableOpacity
