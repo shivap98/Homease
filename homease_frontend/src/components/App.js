@@ -89,27 +89,22 @@ class App extends Component<Props> {
 					<Stack.Screen
 						name="CreateOrJoin"
 						component={CreateOrJoin}
-						option={{title: 'Create or Join a Group'}}
 					/>
 					<Stack.Screen
 						name="CreateGroup"
 						component={CreateGroup}
-						option={{title: 'Create a Group'}}
 					/>
 					<Stack.Screen
 						name="JoinGroup"
 						component={JoinGroup}
-						option={{title: 'Join a Group'}}
 					/>
 					<Stack.Screen
 						name="CreateChore"
 						component={CreateChore}
-						option={{title: 'Create a Chore'}}
 					/>
 					<Stack.Screen
 						name="EditChore"
 						component={EditChore}
-						option={{title: 'Edit a Chore'}}
 					/>
 				</Stack.Navigator>
 			</NavigationContainer>

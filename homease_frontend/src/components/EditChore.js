@@ -50,6 +50,7 @@ class EditChore extends Component{
         });
         console.log(users);
         this.setState({choreName: chore.name, description: chore.description, users: users,selectedUsers: chore.selectedUsers, recursiveChore: chore.recursiveChore});
+        this.props.navigation.setOptions({ title: 'Chore' })
     }
 
     onSelectPressed(selectedUser, index){

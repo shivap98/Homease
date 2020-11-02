@@ -32,6 +32,7 @@ class CreateGroup extends Component{
             uid = firebase.auth().currentUser.uid
             this.setState({uid: firebase.auth().currentUser.uid})
         }
+        this.props.navigation.setOptions({title: 'Create Group'})
     }
 
     onNameChange(textString){

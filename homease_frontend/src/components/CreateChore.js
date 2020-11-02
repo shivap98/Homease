@@ -31,6 +31,10 @@ class CreateChore extends Component{
         super(props);
     }
 
+    componentDidMount() {
+        this.props.navigation.setOptions({title: 'Create Chore'})
+    }
+
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
         console.log("selected users at time of click"+this.state.selectedUsers);

@@ -173,15 +173,6 @@ class LoginPage extends Component {
                                             CREATE ACCOUNT
                                         </Text>
                                     </Button>
-                                    <Button
-                                        color={theme.buttonColor}
-                                        style={styles.buttonContainedStyle}
-                                        mode="contained"
-                                    >
-                                        <Text style={componentStyles.smallButtonTextStyle}>
-                                            FORGOT PASSWORD
-                                        </Text>
-                                    </Button>
                                 </CardSection>
 
 								<CardSection style={{justifyContent: 'space-around'}}>

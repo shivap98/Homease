@@ -12,6 +12,10 @@ class CreateOrJoinGroup extends Component{
         super(props);
     }
 
+    componentDidMount() {
+        this.props.navigation.setOptions({title: 'Join or Create Group'})
+    }
+
     render(){
         return(
             <View style={{flexDirection: 'column' ,flex: 1, backgroundColor: theme.backgroundColor, justifyContent: 'center'}}>
