@@ -7,7 +7,7 @@ import {FAB} from 'react-native-paper';
 import getDB from './Cloud';
 import auth from '@react-native-firebase/auth';
 import firebase from 'firebase';
-import { ThemeProvider } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 class ChoresTab extends Component {
 
@@ -79,10 +79,14 @@ class ChoresTab extends Component {
         <TouchableHighlight
             onPress={() => this.onPressChore(data)}
             style={styles.rowFront}
-            underlayColor={'#AAA'}
+            underlayColor={'white'}
         >
             <View>
-                <Text>Name: {data.item.name}</Text>
+                <Text 
+                    style={{ fontSize: 20 }}
+                >
+                    {data.item.name}
+                </Text>
                 <Text>Status: {data.item.status}</Text>
             </View>
         </TouchableHighlight>
@@ -92,16 +96,16 @@ class ChoresTab extends Component {
         <View style={styles.rowBack}>
             <Text>Left</Text>
             <TouchableOpacity
-                style={[styles.backRightBtn, styles.backRightBtnLeft]}
+                style={[styles.backRightBtn, styles.inProgressButtonStyle]}
                 onPress={() => console.log('Clicked in progress for', data.item.key)}
             >
                 <Text style={styles.backTextWhite}>In Progress</Text>
             </TouchableOpacity>
             <TouchableOpacity
-                style={[styles.backRightBtn, styles.backRightBtnRight]}
+                style={[styles.backRightBtn, styles.doneButtonStyle]}
                 onPress={() => console.log('Clicked Done for', data.item.key)}
             >
-                <Text style={styles.backTextWhite}>Done</Text>
+                <Icon name='done' size={30}/>
             </TouchableOpacity>
         </View>
     );
@@ -117,8 +121,7 @@ class ChoresTab extends Component {
                         renderHiddenItem={this.renderHiddenItem}
                         leftOpenValue={75}
                         stopLeftSwipe={100}
-                        rightOpenValue={-150}
-                        stopRightSwipe={-250}
+                        disableRightSwipe={true}
                         previewRowKey={'0'}
                         previewOpenValue={-40}
                         previewOpenDelay={3000}
@@ -158,9 +161,7 @@ class ChoresTab extends Component {
 }
 
 const styles = {
-
-
-
+    
     cardHeaderTextStyle: {
         fontWeight: 'bold',
         color: theme.buttonTextColor,
@@ -172,12 +173,13 @@ const styles = {
         color: '#FFF',
     },
     rowFront: {
-        paddingLeft: 20,
-        backgroundColor: '#CCC',
+        backgroundColor: 'white',
         borderBottomColor: 'black',
         borderBottomWidth: 1,
         justifyContent: 'center',
-        height: 50,
+        height: 70,
+        paddingLeft: 20,
+        margin: 7
     },
     rowBack: {
         alignItems: 'center',
@@ -185,7 +187,7 @@ const styles = {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingLeft: 15,
+        margin: 10
     },
     backRightBtn: {
         alignItems: 'center',
@@ -195,12 +197,12 @@ const styles = {
         top: 0,
         width: 75,
     },
-    backRightBtnLeft: {
+    inProgressButtonStyle: {
         backgroundColor: 'blue',
         right: 75,
     },
-    backRightBtnRight: {
-        backgroundColor: 'red',
+    doneButtonStyle: {
+        backgroundColor: '#09af00',
         right: 0,
     },
     fab: {

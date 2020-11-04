@@ -11,6 +11,7 @@ import componentStyles from './common/componentStyles';
 import { StackActions } from '@react-navigation/native';
 import firebase from 'firebase';
 import getDB from './Cloud';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 class LoginPage extends Component {
     static navigationOptions = {
@@ -45,7 +46,7 @@ class LoginPage extends Component {
 					console.log("  Email: " + profile.email);
 				});
                 this.props.navigation.dispatch(
-                    StackActions.replace('Home', { screen: 'Account' })
+                    StackActions.replace('Home', { screen: 'Chores' })
                 );
 			}
 		} catch (err) {
@@ -69,7 +70,7 @@ class LoginPage extends Component {
 			this.props.navigation.navigate('SignUp', params = {google: auth().currentUser})
 		}else{
 			this.props.navigation.dispatch(
-				StackActions.replace('Home', { screen: 'Account' })
+				StackActions.replace('Home', { screen: 'Chores' })
             );
 		}
         
@@ -101,7 +102,7 @@ class LoginPage extends Component {
 			this.props.navigation.navigate('SignUp', params = {facebook: auth().currentUser})
 		}else{
 			this.props.navigation.dispatch(
-				StackActions.replace('Home', { screen: 'Account' })
+				StackActions.replace('Home', { screen: 'Chores' })
             );
 		}
 		
@@ -151,7 +152,7 @@ class LoginPage extends Component {
                                     <Button
                                         color={theme.buttonColor}
                                         testID="loginButton"
-                                        style={{...styles.buttonContainedStyle, margin: 0}}
+                                        style={styles.buttonContainedStyle}
                                         mode="contained"
                                         onPress={this.onLoginButtonPressed}
                                     >
@@ -169,7 +170,7 @@ class LoginPage extends Component {
                                             this.props.navigation.navigate('SignUp')
                                         }}
                                     >
-                                        <Text style={componentStyles.smallButtonTextStyle}>
+                                        <Text style={componentStyles.bigButtonTextStyle}>
                                             CREATE ACCOUNT
                                         </Text>
                                     </Button>
@@ -183,19 +184,17 @@ class LoginPage extends Component {
 										onPress={this.signIn}
 										disabled={false}
 									/>
-                            	</CardSection>
-
-								<CardSection style={{justifyContent: 'space-around'}}>
-								<Button
-                                        color={theme.buttonColor}
-                                        style={styles.buttonContainedStyle}
-                                        mode="contained"
+                                    <Icon.Button
+                                        name="facebook" 
+                                        backgroundColor="#3b5998" 
                                         onPress={this.fbSignIn}
+                                        size={40}
+                                        style={{...styles.buttonContainedStyle}}
                                     >
-                                        <Text style={componentStyles.smallButtonTextStyle}>
-                                            FB SIGN-IN 
+                                        <Text style={{ fontSize: 15, color: 'white'}}>
+                                            Sign in with Facebook
                                         </Text>
-                                    </Button>
+                                    </Icon.Button>
                             	</CardSection>
                             </Card>
                         </View>
@@ -205,8 +204,6 @@ class LoginPage extends Component {
         );
 	}
 }
-
-
 
 
 const styles = {
@@ -227,7 +224,6 @@ const styles = {
     buttonContainedStyle: {
         height: 47,
         justifyContent: 'center',
-        margin: 6,
         flex: 1,
     },
 }

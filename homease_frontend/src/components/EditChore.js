@@ -38,9 +38,13 @@ class EditChore extends Component{
     }
 
     componentDidMount(){
-        let chore = this.state.chores.filter(chore =>{
-            return chore.key === this.props.route.params.key;
-        })[0];
+        //TODO: change this for actual db call
+        // let chore = this.state.chores.filter(chore =>{
+        //     return chore.key === this.props.route.params.key;
+        // })[0];
+        
+        // console.log(this.props.route.params.key)
+        let chore = this.state.chores[0]
         console.log(chore.name);
 
         let users = this.state.users;
