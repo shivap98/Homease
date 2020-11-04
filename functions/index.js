@@ -240,3 +240,48 @@ exports.editGroup = functions.https.onCall((data, context) => {
 		return "fail"
 	})
 });
+
+exports.createChore = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	var currChore = {
+		choreName: data.choreName,
+		selectedUsers: data.selectedUsers,
+		recursiveChore: data.recursiveChore,
+		description: data.description
+	}
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			var choresRef = firebase.database().ref("groups/" + groupid + "/chores/");
+
+			if (snapshot.val() != null) {
+
+				console.log(snapshot.val())
+				console.log(data.groupid)
+
+				return choresRef.push(currChore).then(() => {
+
+					return "success"
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+				
+			}
+			else {
+				return "group not found"
+			}
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
