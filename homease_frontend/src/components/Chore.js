@@ -7,12 +7,7 @@ import getDB from './Cloud';
 import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 
-class EditChore extends Component{
-    static navigationOptions = () => {
-        return {
-            title: 'Edit Chore'
-        };
-    };
+class Chore extends Component{
 
     state = {
         choreName: '',
@@ -122,11 +117,7 @@ class EditChore extends Component{
 
     onEditClicked(){
         console.log("edit was "+this.state.edit);
-        this.setState({edit: !this.state.edit})
-    }
 
-    onCreateChoreClicked(){
-        console.log("Clicked save chore button");
         let users = this.state.users;
         let hasSelectedUsers = users.some(user => user.selected === true);
         if(hasSelectedUsers === false){
@@ -143,11 +134,23 @@ class EditChore extends Component{
                 ],
                 {cancelable: false},
             );
+        } else {
+            this.setState({edit: !this.state.edit})
         }
+
     }
+
 
     onRollBackClicked(){
         console.log("ROLLBACK CLICKED");
+    }
+
+    onDoneButtonClicked() {
+        console.log("Done button pressed")
+    }
+
+    onInProgressButtonClicked() {
+        console.log("In Progress button pressed")
     }
 
     renderPreviousUser (){
@@ -159,11 +162,13 @@ class EditChore extends Component{
                 </Text>
                 <Button
                     color={theme.buttonColor}
-                    style={styles.buttonContainedStyle}
+                    style={{...styles.buttonContainedStyle, marginTop: 20}}
                     mode="contained"
                     onPress={() => {this.onRollBackClicked()}}
                 >
-                    ROLLBACK CHORE TO USER
+                    <Text style={componentStyles.smallButtonTextStyle}>
+                        Rollback chore
+                    </Text>
                 </Button>
             </View>
         )
@@ -173,7 +178,7 @@ class EditChore extends Component{
         if(this.state.recursiveChore === true){
             return (
                 <List.Accordion
-                    title="LAST COMPLETED BY"
+                    title="Last Completed by"
                     onPress={() => {LayoutAnimation.easeInEaseOut()}}
                 >
                     {this.renderPreviousUser()}
@@ -184,10 +189,9 @@ class EditChore extends Component{
 
     showGroupMembers(){
         return(
-            <View style={componentStyles.cardSectionWithBorderStyle}>
-                <Text style={styles.cardHeaderTextStyle}>GROUP MEMBERS</Text>
+            <View>
                 <List.Accordion
-                    title="List of members in group"
+                    title="List of members"
                     onPress={() => {LayoutAnimation.easeInEaseOut()}}
                 >
                     {this.renderListOfMembers()}
@@ -218,6 +222,7 @@ class EditChore extends Component{
                                     onValueChange={() => {this.onEditClicked()}}
                                 />
                             </CardSection>
+                            <View style={componentStyles.cardSectionWithBorderStyle}>
                             <TextInput
                                 style={styles.textInputStyle}
                                 label='Chore Name'
@@ -249,28 +254,44 @@ class EditChore extends Component{
                                 onChangeText={textString => this.setState({description: textString})}
                                 editable={this.state.edit}
                             />
-                            {this.showGroupMembers()}
-                            <View style={componentStyles.cardSectionWithBorderStyle}>
-                                <Text style={styles.cardHeaderTextStyle}>ASSIGNMENT INFORMATION</Text>
-                                <TextInput
+                            <TextInput
                                     style={styles.textInputStyle}
-                                    label='Currently assigned user'
+                                    label='Current User'
                                     mode='outlined'
                                     value={this.state.currentUser}
                                     keyboardAppearance='dark'
                                     editable={false}
                                     onChangeText={textString => {}}
-                                />
+                            />
+                            {this.showGroupMembers()}
+                            </View>
+                            <View style={componentStyles.cardSectionWithBorderStyle}>
+                                <Text style={styles.cardHeaderTextStyle}>LAST DONE INFORMATION</Text>
+
                                 {this.showPreviousUser()}
                             </View>
-                            <Button
-                                color={theme.buttonColor}
-                                style={styles.buttonContainedStyle}
-                                mode="contained"
-                                onPress={() => {this.onCreateChoreClicked()}}
-                            >
-                                Save changes to chore
-                            </Button>
+                            <CardSection>
+                                <Button
+                                    color={theme.buttonColor}
+                                    style={styles.buttonContainedStyle}
+                                    mode="contained"
+                                    onPress={() => {this.onInProgressButtonClicked()}}
+                                >
+                                    <Text style={componentStyles.smallButtonTextStyle}>
+                                                In Progress
+                                    </Text>
+                                </Button>
+                                <Button
+                                    color={theme.buttonColor}
+                                    style={styles.buttonContainedStyle}
+                                    mode="contained"
+                                    onPress={() => {this.onDoneButtonClicked()}}
+                                >
+                                    <Text style={componentStyles.smallButtonTextStyle}>
+                                                Done
+                                    </Text>
+                                </Button>
+                            </CardSection>
                         </View>
                     </ScrollView>
                 </PaperProvider>
@@ -296,7 +317,7 @@ const styles = {
         height: 47,
         justifyContent: 'center',
         flex: 1,
-        marginTop: 25
+        margin: 10
     },
     cardHeaderTextStyle: {
         fontWeight: 'bold',
@@ -321,4 +342,4 @@ const styles = {
     }
 };
 
-export default EditChore;
+export default Chore;

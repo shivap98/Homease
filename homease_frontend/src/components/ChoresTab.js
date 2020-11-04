@@ -7,7 +7,7 @@ import {FAB} from 'react-native-paper';
 import getDB from './Cloud';
 import auth from '@react-native-firebase/auth';
 import firebase from 'firebase';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 class ChoresTab extends Component {
 
@@ -70,9 +70,9 @@ class ChoresTab extends Component {
     };
 
     onPressChore(data) {
-        console.log("Edit Chore options");
+        console.log("View chore");
         console.log(data);
-        this.props.navigation.navigate('EditChore', {key: data.item.key});
+        this.props.navigation.navigate('Chore', {key: data.item.key});
     }
 
     renderItem = data => (
@@ -99,13 +99,13 @@ class ChoresTab extends Component {
                 style={[styles.backRightBtn, styles.inProgressButtonStyle]}
                 onPress={() => console.log('Clicked in progress for', data.item.key)}
             >
-                <Text style={styles.backTextWhite}>In Progress</Text>
+                <Icon name='progress-check' size={30}/>
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.backRightBtn, styles.doneButtonStyle]}
                 onPress={() => console.log('Clicked Done for', data.item.key)}
             >
-                <Icon name='done' size={30}/>
+                <Icon name='check' size={30}/>
             </TouchableOpacity>
         </View>
     );
@@ -119,9 +119,8 @@ class ChoresTab extends Component {
                         data={this.state.myChoresList}
                         renderItem={this.renderItem}
                         renderHiddenItem={this.renderHiddenItem}
-                        leftOpenValue={75}
-                        stopLeftSwipe={100}
-                        disableRightSwipe={true}
+                        rightOpenValue={-150}
+                        disableRightSwipe={true}                        
                         previewRowKey={'0'}
                         previewOpenValue={-40}
                         previewOpenDelay={3000}
@@ -135,10 +134,8 @@ class ChoresTab extends Component {
                         data={this.state.allChoresList}
                         renderItem={this.renderItem}
                         renderHiddenItem={this.renderHiddenItem}
-                        leftOpenValue={75}
-                        stopLeftSwipe={100}
                         rightOpenValue={-150}
-                        stopRightSwipe={-250}
+                        disableRightSwipe={true}                        
                         previewRowKey={'0'}
                         previewOpenValue={-40}
                         previewOpenDelay={3000}
@@ -198,7 +195,7 @@ const styles = {
         width: 75,
     },
     inProgressButtonStyle: {
-        backgroundColor: 'blue',
+        backgroundColor: 'yellow',
         right: 75,
     },
     doneButtonStyle: {

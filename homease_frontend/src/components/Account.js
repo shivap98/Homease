@@ -24,7 +24,8 @@ class Account extends Component {
 		phoneNumber: '',
         venmoUsername: '',
         groupid: '',
-        groupCode: ''
+        groupCode: '',
+        outOfHouse: false
     };
 
     constructor(props) {
@@ -323,6 +324,25 @@ class Account extends Component {
                                     keyboardAppearance='dark'
                                     onChangeText={textString => this.setState({venmoUsername: textString})}
                                 />
+                                <CardSection>
+                                    <Text style={{
+                                        fontWeight: 'bold',
+                                        flex: 1,
+                                        margin: 15,
+                                        fontSize: 20,
+                                        color: 'white',
+                                        textAlign: 'left'
+                                    }}>
+                                        Out of house
+                                    </Text>
+                                    <Switch
+                                        value={this.state.outOfHouse}
+                                        style={{margin: 15}}
+                                        onValueChange={() => {
+                                            this.setState({outOfHouse: !this.state.outOfHouse})
+                                        }}
+                                    />
+                                </CardSection>
                             </View>
                             {this.groupSectionVisibility()}
                             <Button 
