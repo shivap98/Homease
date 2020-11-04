@@ -156,7 +156,7 @@ class CreateChore extends Component{
 				recursiveChore: this.state.recursiveChore,
 				description: this.state.description,
 				status: "incomplete",
-				currentUser: "a"
+				currentUser: this.state.selectedUsers[0]
 			}, 
 		},
 		'createChore');
