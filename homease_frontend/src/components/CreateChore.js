@@ -7,6 +7,7 @@ import getDB from './Cloud';
 import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 import auth from '@react-native-firebase/auth';
+import firebase from 'firebase';
 
 class CreateChore extends Component{
     static navigationOptions = () => {

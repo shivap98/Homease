@@ -6,6 +6,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import {FAB} from 'react-native-paper';
 import getDB from './Cloud';
 import auth from '@react-native-firebase/auth';
+import firebase from 'firebase';
 import { ThemeProvider } from '@react-navigation/native';
 
 class ChoresTab extends Component {
@@ -32,9 +33,7 @@ class ChoresTab extends Component {
 		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result.groupid){
-			chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
-
-			
+            chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
 
 			var allChoresList = []
 			var myChoresList = []
