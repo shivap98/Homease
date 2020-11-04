@@ -4,6 +4,8 @@ import theme from './common/theme';
 import componentStyles from './common/componentStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import {FAB} from 'react-native-paper';
+import getDB from './Cloud';
+import auth from '@react-native-firebase/auth';
 import { ThemeProvider } from '@react-navigation/native';
 
 class ChoresTab extends Component {
@@ -11,7 +13,6 @@ class ChoresTab extends Component {
     mockData = [
         {key: '1', name: 'Dishes', status: 'incomplete'},
         {key: '2', name: 'Cleaning', status: 'in progress'},
-
     ]
 
     state = {
@@ -21,7 +22,45 @@ class ChoresTab extends Component {
 
     constructor(props) {
         super(props);
-    }
+	}
+	
+	async componentDidMount(){
+		var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
+
+            this.setState({uid: auth().currentUser.uid})
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({uid: firebase.auth().currentUser.uid})
+        }
+		res = await getDB({data: {uid: uid} }, "getUser")
+
+		if(res.result.groupid){
+			chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
+
+			var allChoresList = []
+			var i = 1
+			for(key in chores.result){
+				var obj = chores.result[key]
+				var name = ''
+				var status = 'incomplete'
+				for (var prop in obj) {
+					if (!obj.hasOwnProperty(prop)) continue;
+					if(prop == "choreName"){
+						name = obj[prop]
+					}else if(prop == "status"){
+						status = obj[prop]
+					}
+				}
+
+				allChoresList.push({key: i, name, status})
+				i++
+			}
+
+			this.setState({allChoresList, myChoresList: allChoresList})
+		}
+	}
 
      onRowDidOpen = rowKey => {
         console.log('This row opened', rowKey);
@@ -86,6 +125,19 @@ class ChoresTab extends Component {
 
                 <View style={componentStyles.cardSectionWithBorderStyle}>
                     <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
+					<SwipeListView
+                        data={this.state.allChoresList}
+                        renderItem={this.renderItem}
+                        renderHiddenItem={this.renderHiddenItem}
+                        leftOpenValue={75}
+                        stopLeftSwipe={100}
+                        rightOpenValue={-150}
+                        stopRightSwipe={-250}
+                        previewRowKey={'0'}
+                        previewOpenValue={-40}
+                        previewOpenDelay={3000}
+                        onRowDidOpen={this.onRowDidOpen}
+                    />
                 </View>
                 <FAB
                     style={styles.fab}
