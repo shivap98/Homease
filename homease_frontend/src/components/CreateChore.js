@@ -17,7 +17,12 @@ class CreateChore extends Component{
 
     state = {
         choreName: '',
-        choreSelected: false,
+        users: [
+            {name: 'user1', selected: false},
+            {name: 'user2', selected: false},
+            {name: 'user3', selected: false}
+        ],
+        selectedUsers:[],
         recursiveChore: false,
         description: '',
         multiLine: true
@@ -53,12 +58,23 @@ class CreateChore extends Component{
 		}
 	}
 
+    componentDidMount() {
+        this.props.navigation.setOptions({title: 'Create Chore'})
+    }
+
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
+        console.log("selected users at time of click"+this.state.selectedUsers);
         let users = this.state.users;
         if(this.state.recursiveChore === true) {
             users[index].selected = !selectedUser.selected;
-            this.setState({users: users});
+            let selectedUsers = this.state.selectedUsers;
+            if(users[index].selected === true){
+                selectedUsers.push(users[index].name);
+            }else{
+                selectedUsers = selectedUsers.filter(user => user !== users[index].name);
+            }
+            this.setState({users: users, selectedUsers: selectedUsers});
         }else{
             if(selectedUser.selected === false){
                 console.log("Clicked new user");
@@ -67,7 +83,9 @@ class CreateChore extends Component{
                     return user;
                 });
                 users[index].selected = true;
-                this.setState({users: users});
+                let selectedUsers = [];
+                selectedUsers.push(users[index].name);
+                this.setState({users: users, selectedUsers: selectedUsers});
             }else{
                 console.log("Clicked selected user again");
             }
@@ -92,14 +110,16 @@ class CreateChore extends Component{
     }
 
     onRecursiveClicked(){
+        // console.log(this.state.selectedUsers);
         if(this.state.recursiveChore === true){
             let users = this.state.users;
             users = users.map(user => {
                 user.selected=false;
                 return user;
             });
-            console.log("Setting chore to false");
-            this.setState({users: users, recursiveChore: false})
+            console.log("Setting recursiveChore to false");
+            let selectedUsers = [];
+            this.setState({users: users, recursiveChore: false, selectedUsers: selectedUsers})
         }else{
             this.setState({recursiveChore: true})
         }

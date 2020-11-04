@@ -10,6 +10,7 @@ import firebase from 'firebase';
 import LoginPage from './LoginPage';
 import CreateAccount from './CreateAccount';
 import Account from './Account';
+import EditChore from './EditChore';
 import ChoresTab from './ChoresTab';
 import CreateChore from './CreateChore';
 import CreateOrJoin from './CreateOrJoinGroup';
@@ -88,22 +89,22 @@ class App extends Component<Props> {
 					<Stack.Screen
 						name="CreateOrJoin"
 						component={CreateOrJoin}
-						option={{title: 'Create or Join a Group'}}
 					/>
 					<Stack.Screen
 						name="CreateGroup"
 						component={CreateGroup}
-						option={{title: 'Create a Group'}}
 					/>
 					<Stack.Screen
 						name="JoinGroup"
 						component={JoinGroup}
-						option={{title: 'Join a Group'}}
 					/>
 					<Stack.Screen
 						name="CreateChore"
 						component={CreateChore}
-						option={{title: 'Create a Chore'}}
+					/>
+					<Stack.Screen
+						name="EditChore"
+						component={EditChore}
 					/>
 				</Stack.Navigator>
 			</NavigationContainer>
