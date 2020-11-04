@@ -254,7 +254,9 @@ exports.createChore = functions.https.onCall((data, context) => {
 		choreName: data.choreName,
 		selectedUsers: data.selectedUsers,
 		recursiveChore: data.recursiveChore,
-		description: data.description
+		description: data.description,
+		currentUser: data.currentUser,
+		status: data.status
 	}
 
 	return groupref.once("value")
