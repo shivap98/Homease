@@ -264,9 +264,6 @@ exports.createChore = functions.https.onCall((data, context) => {
 
 			if (snapshot.val() != null) {
 
-				console.log(snapshot.val())
-				console.log(data.groupid)
-
 				return choresRef.push(currChore).then(() => {
 
 					return "success"
@@ -285,3 +282,34 @@ exports.createChore = functions.https.onCall((data, context) => {
 			return "fail3"
 		})
 });
+
+exports.getChoresByGroupID = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			var choresRef = firebase.database().ref("groups/" + groupid + "/chores/");
+
+			return choresRef.once("value")
+				.then(function (snapshot) {
+
+					return snapshot.val()
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
+
