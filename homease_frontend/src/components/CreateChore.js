@@ -16,7 +16,8 @@ class CreateChore extends Component{
     };
 
     state = {
-        choreName: '',
+		choreName: '',
+		groupid: '',
         users: [
             {name: 'user1', selected: false},
             {name: 'user2', selected: false},
@@ -53,6 +54,7 @@ class CreateChore extends Component{
 				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key], selected: false});
 			}
 			this.setState({
+					groupid: res.result.groupid,
 					users: values, 
 			})
 		}
@@ -70,9 +72,9 @@ class CreateChore extends Component{
             users[index].selected = !selectedUser.selected;
             let selectedUsers = this.state.selectedUsers;
             if(users[index].selected === true){
-                selectedUsers.push(users[index].name);
+                selectedUsers.push(users[index].uid);
             }else{
-                selectedUsers = selectedUsers.filter(user => user !== users[index].name);
+                selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
             }
             this.setState({users: users, selectedUsers: selectedUsers});
         }else{
@@ -84,7 +86,7 @@ class CreateChore extends Component{
                 });
                 users[index].selected = true;
                 let selectedUsers = [];
-                selectedUsers.push(users[index].name);
+                selectedUsers.push(users[index].uid);
                 this.setState({users: users, selectedUsers: selectedUsers});
             }else{
                 console.log("Clicked selected user again");
@@ -125,7 +127,7 @@ class CreateChore extends Component{
         }
     }
 
-    onCreateChoreClicked(){
+    async onCreateChoreClicked(){
         console.log("Clicked create chore button");
         let users = this.state.users;
         let hasSelectedUsers = users.some(user => user.selected === true);
@@ -143,7 +145,25 @@ class CreateChore extends Component{
                 ],
                 {cancelable: false},
             );
-        }
+		}
+
+		let resp = await getDB(
+		{
+			data: {
+				groupid: this.state.groupid,
+				choreName: this.state.choreName,
+				selectedUsers: this.state.selectedUsers,
+				recursiveChore: this.state.recursiveChore,
+				description: this.state.description
+			}, 
+		},
+		'createChore');
+
+		console.log(resp)
+
+		
+		
+
     }
 
     render() {
