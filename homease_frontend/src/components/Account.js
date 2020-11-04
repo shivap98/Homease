@@ -72,8 +72,7 @@ class Account extends Component {
                     groupName: grp.result.groupName,
                     groupCode: grp.result.groupCode
                 })
-		}
-		
+        }
 	}
 
 
@@ -326,7 +325,6 @@ class Account extends Component {
                                 />
                                 <CardSection>
                                     <Text style={{
-                                        fontWeight: 'bold',
                                         flex: 1,
                                         margin: 15,
                                         fontSize: 20,

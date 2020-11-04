@@ -79,22 +79,25 @@ class ChoresTab extends Component {
         <TouchableHighlight
             onPress={() => this.onPressChore(data)}
             style={styles.rowFront}
-            underlayColor={'white'}
+            underlayColor={theme.lightColor}
         >
             <View>
                 <Text 
-                    style={{ fontSize: 20 }}
+                    style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}
                 >
                     {data.item.name}
                 </Text>
-                <Text>Status: {data.item.status}</Text>
+                <Text 
+                    style={{ color: 'white' }}
+                >
+                    Status: {data.item.status}
+                </Text>
             </View>
         </TouchableHighlight>
     );
 
     renderHiddenItem = (data, rowMap) => (
         <View style={styles.rowBack}>
-            <Text>Left</Text>
             <TouchableOpacity
                 style={[styles.backRightBtn, styles.inProgressButtonStyle]}
                 onPress={() => console.log('Clicked in progress for', data.item.key)}
@@ -165,12 +168,8 @@ const styles = {
         textAlign: 'center',
         marginBottom: 20
     },
-
-    backTextWhite: {
-        color: '#FFF',
-    },
     rowFront: {
-        backgroundColor: 'white',
+        backgroundColor: theme.lightColor,
         borderBottomColor: 'black',
         borderBottomWidth: 1,
         justifyContent: 'center',

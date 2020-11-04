@@ -152,6 +152,10 @@ class Chore extends Component{
     onInProgressButtonClicked() {
         console.log("In Progress button pressed")
     }
+    onDeleteButtonClicked() {
+        console.log("Delete button pressed")
+        
+    }
 
     renderPreviousUser (){
         let previousUser = this.state.previousUser;
@@ -292,6 +296,34 @@ class Chore extends Component{
                                     </Text>
                                 </Button>
                             </CardSection>
+                            <Button
+                                color={theme.buttonColor}
+                                style={{...styles.buttonContainedStyle, marginLeft: 15, marginRight: 15}}
+                                mode="contained"
+                                color='red'
+                                onPress={() => {
+                                    Alert.alert(
+                                        'Are you sure?',
+                                        '',
+                                        [
+                                            {
+                                                text: 'No',
+                                                onPress: () => {},
+                                                style: 'cancel',
+                                            },
+                                            {
+                                                text: 'Yes',
+                                                onPress: () => {this.onDeleteButtonClicked()},
+                                            }
+                                        ],
+                                        {cancelable: false},
+                                    );
+                                }}
+                            >
+                                <Text style={componentStyles.smallButtonTextStyle}>
+                                            Delete
+                                </Text>
+                            </Button>
                         </View>
                     </ScrollView>
                 </PaperProvider>
@@ -317,7 +349,7 @@ const styles = {
         height: 47,
         justifyContent: 'center',
         flex: 1,
-        margin: 10
+        margin: 5
     },
     cardHeaderTextStyle: {
         fontWeight: 'bold',

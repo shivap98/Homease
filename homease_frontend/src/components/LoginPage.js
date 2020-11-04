@@ -170,7 +170,7 @@ class LoginPage extends Component {
                                             this.props.navigation.navigate('SignUp')
                                         }}
                                     >
-                                        <Text style={componentStyles.bigButtonTextStyle}>
+                                        <Text style={componentStyles.smallButtonTextStyle}>
                                             CREATE ACCOUNT
                                         </Text>
                                     </Button>
