@@ -10,14 +10,9 @@ import { ThemeProvider } from '@react-navigation/native';
 
 class ChoresTab extends Component {
 
-    mockData = [
-        {key: '1', name: 'Dishes', status: 'incomplete'},
-        {key: '2', name: 'Cleaning', status: 'in progress'},
-    ]
-
     state = {
-        myChoresList: this.mockData,
-        allChoresList: this.mockData
+        myChoresList: [],
+        allChoresList: []
     }
 
     constructor(props) {
@@ -39,26 +34,35 @@ class ChoresTab extends Component {
 		if(res.result.groupid){
 			chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
 
+			
+
 			var allChoresList = []
-			var i = 1
+			var myChoresList = []
 			for(key in chores.result){
 				var obj = chores.result[key]
 				var name = ''
 				var status = 'incomplete'
+				var selectedUsers = []
 				for (var prop in obj) {
 					if (!obj.hasOwnProperty(prop)) continue;
 					if(prop == "choreName"){
 						name = obj[prop]
 					}else if(prop == "status"){
 						status = obj[prop]
+					}else if(prop == "selectedUsers"){
+						selectedUsers = obj[prop]
 					}
 				}
-
-				allChoresList.push({key: i, name, status})
-				i++
+				allChoresList.push({key, name, status, selectedUsers})
 			}
 
-			this.setState({allChoresList, myChoresList: allChoresList})
+			allChoresList.forEach(function (item, index) {
+				if(item.selectedUsers.includes(uid)){
+					myChoresList.push(item)
+				}
+			  });
+
+			this.setState({allChoresList, myChoresList})
 		}
 	}
 
