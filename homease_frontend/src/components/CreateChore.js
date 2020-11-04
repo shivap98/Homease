@@ -29,10 +29,10 @@ class CreateChore extends Component{
     };
 
     constructor(props) {
-        super(props);
+		super(props);
 	}
 	
-	async componentDidMount(){
+	async componentWillMount(){
 		var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid
@@ -53,7 +53,7 @@ class CreateChore extends Component{
 				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key], selected: false});
 			}
 			this.setState({
-					members: values, 
+					users: values, 
 			})
 		}
 	}
@@ -93,7 +93,7 @@ class CreateChore extends Component{
     }
 
     renderListOfMembers (){
-		let members = this.state.members;
+		let members = this.state.users;
 		console.log(members)
 		if(members){
 			return members.map((item, index)=>{
