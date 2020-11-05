@@ -256,7 +256,10 @@ exports.createChore = functions.https.onCall((data, context) => {
 		recursiveChore: data.recursiveChore,
 		description: data.description,
 		currentUser: data.currentUser,
-		status: data.status
+		status: data.status,
+		lastDoneDate: "",
+		lastDoneBy: "",
+		lastDonePhoto: ""
 	}
 
 	return groupref.once("value")
@@ -315,3 +318,39 @@ exports.getChoresByGroupID = functions.https.onCall((data, context) => {
 		})
 });
 
+exports.editChore = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null || data.choreid == "" || data.choreid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	var currChore = data.chore
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			var choreRef = firebase.database().ref("groups/" + groupid + "/chores/" + data.choreid);
+
+			if (snapshot.val() != null) {
+
+				return choreRef.set(data.chore).then(() => {
+
+					return "success"
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+			}
+			else {
+				return "group not found"
+			}
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
