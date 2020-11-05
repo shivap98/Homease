@@ -171,9 +171,21 @@ class Chore extends Component{
     onInProgressButtonClicked() {
         console.log("In Progress button pressed")
     }
-    onDeleteButtonClicked() {
+    
+    async onDeleteButtonClicked() {
         console.log("Delete button pressed")
 
+        let ans = await getDB({
+            data: {
+                groupid: this.state.groupid,
+                choreid: this.state.choreid
+            }
+        },"deleteChore");
+
+        if(ans.result === "success"){
+
+            this.props.navigation.goBack()
+        }
     }
 
     renderPreviousUser (){
