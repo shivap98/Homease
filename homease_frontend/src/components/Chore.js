@@ -256,23 +256,26 @@ class Chore extends Component{
 
 	async doneButtonPressed(){
 
-		res = await getDB({ data: {
-			groupid: this.state.groupid,
-			choreid: this.state.choreid,
-			chore: {
-				choreName: this.state.choreName,
-				selectedUsers: this.state.selectedUsers,
-				recursiveChore: this.state.recursiveChore,
-				description: this.state.description,
-				currentUser: this.state.currentUser,
-				status: this.state.status,
-				lastDoneBy: this.state.lastDoneBy,
-				lastDoneDate: this.state.lastDoneDate,
-				lastDonePhoto: this.state.lastDonePhoto,
-			}
-		} }, "editChore");
-		
-		console.log(res)
+		if(!this.state.recursiveChore){
+			res = await getDB({ data: {
+				groupid: this.state.groupid,
+				choreid: this.state.choreid,
+				chore: {
+					choreName: this.state.choreName,
+					selectedUsers: this.state.selectedUsers,
+					recursiveChore: this.state.recursiveChore,
+					description: this.state.description,
+					currentUser: this.state.currentUser,
+					status: "Complete",
+					lastDoneBy: this.state.currentUser,
+					lastDoneDate: this.state.lastDoneDate,
+					lastDonePhoto: this.state.lastDonePhoto,
+				}
+			} }, "editChore");
+
+			console.log(res)
+		}
+
 	}
 
     render() {
