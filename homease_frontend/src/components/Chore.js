@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {ScrollView, View, Image, Text, Alert, LayoutAnimation, TouchableOpacity} from 'react-native';
+import {ScrollView, View, Image, Text, Alert, LayoutAnimation, Platform, TouchableOpacity} from 'react-native';
 import {Button, List, Provider as PaperProvider, Switch, TextInput, Modal, Portal} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
@@ -7,6 +7,9 @@ import getDB from './Cloud';
 import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 import ImagePicker from 'react-native-image-picker';
+import ImgToBase64 from 'react-native-image-base64';
+
+
 
 const options = {
     title: 'Select Avatar',
@@ -19,7 +22,8 @@ const options = {
 class Chore extends Component{
 
     state = {
-        choreName: '',
+		choreName: '',
+		avatarSource: '',
         users: [
             {name: 'user1', selected: false},
             {name: 'user2', selected: false},
@@ -227,32 +231,45 @@ class Chore extends Component{
 			} else if (response.customButton) {
 			  console.log('User tapped custom button: ', response.customButton);
 			} else {
+				// this.setState({
+                //     photoURL: response.uri,
+				// });
+				
 				const source = { uri: response.uri };
+
+				// You can also display the image using data:
+				// const source = { uri: 'data:image/jpeg;base64,' + response.data };
+			
 				this.setState({
-					photoURL: response.uri,
+				  avatarSource: source,
 				});
-				this.setState({
-				avatarSource: source,
-				});
-			}
-		});
+            }
+        });
+			
 	}
 
 	showImage(){
-        console.log('PhotoUrl is: ' + this.state.photoURL);
+		//console.log('PhotoUrl is: ' + this.state.photoURL)
+
+		
+
         if(this.state.photoURL !== ''){
-            console.log("PHOTO URL NOT EMPTY");
+
+// 			ImgToBase64.getBase64String(this.state.photoURL)
+//   .then(base64String => console.log(base64String))
+//   .catch(err => console.log(error));
+            
             return(
-                <TouchableOpacity
-                    style={{justifyContent: 'center', alignItems: 'center'}}
-                    onPress={this.onImageButtonPressed.bind(this)}
-                >
+                // <TouchableOpacity
+                //     style={{justifyContent: 'center', alignItems: 'center'}}
+                //     onPress={this.onImageButtonPressed.bind(this)}
+                // >
                     <Image
-                        source={{uri: this.state.photoURL}}
+                        source={{uri: this.state.avatarSource}}
                         style={styles.modalImageStyle}
-                        resizeMode='contain'
+                        //resizeMode='contain'
                     />
-                </TouchableOpacity>
+                // </TouchableOpacity>
             )
         }
     }
@@ -278,7 +295,12 @@ class Chore extends Component{
                                     Done
                                 </Text>
                             </Button>
-                            {this.showImage()}
+							{/* {this.showImage()} */}
+							<Image
+								source={{uri: this.state.avatarSource.uri}}
+								style={styles.modalImageStyle}
+								//resizeMode='contain'
+							/>
                             <Button onPress={()=>{this.onCompleteClicked()}}>
                                 Cancel
                             </Button>
