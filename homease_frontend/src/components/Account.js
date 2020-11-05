@@ -275,7 +275,6 @@ class Account extends Component {
                                             }}, "editGroup");
                                         }
                                         this.setState({edit: !this.state.edit})
-
                                     }}
                                 />
                             </CardSection>

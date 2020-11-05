@@ -1,11 +1,20 @@
 import React, {Component} from "react";
-import {ScrollView, View, Text, Alert, LayoutAnimation} from 'react-native';
+import {ScrollView, View, Image, Text, Alert, LayoutAnimation, TouchableOpacity} from 'react-native';
 import {Button, List, Provider as PaperProvider, Switch, TextInput} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import getDB from './Cloud';
 import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
+import ImagePicker from 'react-native-image-picker';
+
+const options = {
+    title: 'Select Avatar',
+    storageOptions: {
+        skipBackup: true,
+        path: 'images',
+    },
+};
 
 class Chore extends Component{
 
@@ -19,7 +28,8 @@ class Chore extends Component{
         chores: [
             {key: '1', name: 'Dishes', status: 'incomplete', description: 'Chore 1', recursiveChore: true, selectedUsers: ['user1', 'user3'], currentUser: 'user1', previousUser: 'user3'},
             {key: '2', name: 'Cleaning', status: 'in progress', description: 'Chore 2', recursiveChore: false, selectedUsers: ['user2'], currentUser: 'user2'}
-        ],
+		],
+		photoURL: '',
         recursiveChore: false,
         description: '',
         multiLine: true,
@@ -202,7 +212,29 @@ class Chore extends Component{
                 </List.Accordion>
             </View>
         )
-    }
+	}
+	
+	onImageButtonPressed() {
+		ImagePicker.showImagePicker(options, (response) => {
+			console.log('Response = ', response);
+		  
+			if (response.didCancel) {
+			  console.log('User cancelled image picker');
+			} else if (response.error) {
+			  console.log('ImagePicker Error: ', response.error);
+			} else if (response.customButton) {
+			  console.log('User tapped custom button: ', response.customButton);
+			} else {
+				const source = { uri: response.uri };
+				this.setState({
+					photoURL: response.uri,
+				});
+				this.setState({
+				avatarSource: source,
+				});
+			}
+		});
+	}
 
     render() {
         return (
@@ -223,7 +255,20 @@ class Chore extends Component{
                                 </Text>
                                 <Switch
                                     value={this.state.edit}
-                                    onValueChange={() => {this.onEditClicked()}}
+                                    onValueChange={async = () => {
+                                        getDB({ data: {
+                                            uid: this.state.uid,
+                                            phoneNumber: this.state.phoneNumber,
+                                            venmoUsername: this.state.venmoUsername
+                                        }}, "editUser");
+                                        if (this.state.groupid && this.state.groupid != '') {
+                                            getDB({ data: {
+                                                groupid: this.state.groupid,
+                                                groupName: this.state.groupName,
+                                            }}, "editGroup");
+                                        }
+                                        this.setState({edit: !this.state.edit})
+                                    }}
                                 />
                             </CardSection>
                             <View style={componentStyles.cardSectionWithBorderStyle}>
@@ -289,12 +334,22 @@ class Chore extends Component{
                                     color={theme.buttonColor}
                                     style={styles.buttonContainedStyle}
                                     mode="contained"
-                                    onPress={() => {this.onDoneButtonClicked()}}
+                                    onPress={this.onImageButtonPressed.bind(this)}
                                 >
                                     <Text style={componentStyles.smallButtonTextStyle}>
                                                 Done
                                     </Text>
+									
                                 </Button>
+							<TouchableOpacity
+                            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+                            onPress={this.onImageButtonPressed.bind(this)}>
+								<Image
+									source={{uri: this.state.photoURL}}
+									style={styles.profilePicStyle}
+									resizeMode='contain'
+								/>
+                        	</TouchableOpacity>
                             </CardSection>
                             <Button
                                 color={theme.buttonColor}
@@ -371,7 +426,13 @@ const styles = {
         flex: 1,
         color: theme.buttonTextColor,
         textAlign: 'center'
-    }
+	},
+	profilePicStyle: {
+        height: 150,
+        width: 150,
+        alignItems: 'center',
+        flex: 1,
+    },
 };
 
 export default Chore;
