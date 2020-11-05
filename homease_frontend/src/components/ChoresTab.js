@@ -19,8 +19,40 @@ class ChoresTab extends Component {
     constructor(props) {
         super(props);
 	}
+
+	async getDbInfo(uid, res) {
+		chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
+
+		var allChoresList = []
+		var myChoresList = []
+		for(key in chores.result){
+			var obj = chores.result[key]
+			var name = ''
+			var status = 'incomplete'
+			var selectedUsers = []
+			for (var prop in obj) {
+				if (!obj.hasOwnProperty(prop)) continue;
+				if(prop == "choreName"){
+					name = obj[prop]
+				}else if(prop == "status"){
+					status = obj[prop]
+				}else if(prop == "selectedUsers"){
+					selectedUsers = obj[prop]
+				}
+			}
+			allChoresList.push({key, name, status, selectedUsers})
+		}
+
+		allChoresList.forEach(function (item, index) {
+			if(item.selectedUsers.includes(uid)){
+				myChoresList.push(item)
+			}
+			});
+
+		this.setState({allChoresList, myChoresList})
+	}
 	
-	async componentDidMount(){
+	async componentWillMount(){
 		var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid
@@ -33,37 +65,24 @@ class ChoresTab extends Component {
 		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result.groupid){
-            chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
-
-			var allChoresList = []
-			var myChoresList = []
-			for(key in chores.result){
-				var obj = chores.result[key]
-				var name = ''
-				var status = 'incomplete'
-				var selectedUsers = []
-				for (var prop in obj) {
-					if (!obj.hasOwnProperty(prop)) continue;
-					if(prop == "choreName"){
-						name = obj[prop]
-					}else if(prop == "status"){
-						status = obj[prop]
-					}else if(prop == "selectedUsers"){
-						selectedUsers = obj[prop]
-					}
-				}
-				allChoresList.push({key, name, status, selectedUsers})
-			}
-
-			allChoresList.forEach(function (item, index) {
-				if(item.selectedUsers.includes(uid)){
-					myChoresList.push(item)
-				}
-			  });
-
-			this.setState({allChoresList, myChoresList})
+			
+			
+			firebase.database().ref('/groups/'+res.result.groupid + '/chores/').on('value', (snapshot) => {
+				console.log("getdb-----------")
+				this.getDbInfo(uid, res)
+			})
 		}
+
+
+
+		
 	}
+
+	
+
+	// componentWillMount(){
+		
+	// }
 
      onRowDidOpen = rowKey => {
         console.log('This row opened', rowKey);
@@ -118,13 +137,15 @@ class ChoresTab extends Component {
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <View style={componentStyles.cardSectionWithBorderStyle}>
                     <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
+					
                     <SwipeListView
                         data={this.state.myChoresList}
                         renderItem={this.renderItem}
                         renderHiddenItem={this.renderHiddenItem}
                         rightOpenValue={-150}
                         disableRightSwipe={true}                        
-                        previewRowKey={'0'}
+						previewRowKey={'0'}
+						animated
                         previewOpenValue={-40}
                         previewOpenDelay={3000}
                         onRowDidOpen={this.onRowDidOpen}
@@ -139,7 +160,8 @@ class ChoresTab extends Component {
                         renderHiddenItem={this.renderHiddenItem}
                         rightOpenValue={-150}
                         disableRightSwipe={true}                        
-                        previewRowKey={'0'}
+						previewRowKey={'0'}
+						animated
                         previewOpenValue={-40}
                         previewOpenDelay={3000}
                         onRowDidOpen={this.onRowDidOpen}
