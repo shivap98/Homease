@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {ScrollView, View, Image, Text, Alert, LayoutAnimation, TouchableOpacity} from 'react-native';
-import {Button, List, Provider as PaperProvider, Switch, TextInput} from 'react-native-paper';
+import {Button, List, Provider as PaperProvider, Switch, TextInput, Modal, Portal} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import getDB from './Cloud';
@@ -35,7 +35,8 @@ class Chore extends Component{
         multiLine: true,
         currentUser: '',
         previousUser: '',
-        edit: false
+        edit: false,
+        modalVisible: false
     };
 
     constructor(props) {
@@ -47,7 +48,7 @@ class Chore extends Component{
         // let chore = this.state.chores.filter(chore =>{
         //     return chore.key === this.props.route.params.key;
         // })[0];
-        
+
         // console.log(this.props.route.params.key)
         let chore = this.state.chores[0]
         console.log(chore.name);
@@ -155,8 +156,9 @@ class Chore extends Component{
         console.log("ROLLBACK CLICKED");
     }
 
-    onDoneButtonClicked() {
-        console.log("Done button pressed")
+    onCompleteClicked() {
+        console.log("Complete button pressed");
+        this.setState({modalVisible: !this.state.modalVisible});
     }
 
     onInProgressButtonClicked() {
@@ -164,7 +166,7 @@ class Chore extends Component{
     }
     onDeleteButtonClicked() {
         console.log("Delete button pressed")
-        
+
     }
 
     renderPreviousUser (){
@@ -213,11 +215,11 @@ class Chore extends Component{
             </View>
         )
 	}
-	
+
 	onImageButtonPressed() {
 		ImagePicker.showImagePicker(options, (response) => {
 			console.log('Response = ', response);
-		  
+
 			if (response.didCancel) {
 			  console.log('User cancelled image picker');
 			} else if (response.error) {
@@ -319,6 +321,18 @@ class Chore extends Component{
 
                                 {this.showPreviousUser()}
                             </View>
+                            <Portal>
+                                <Modal
+                                    visible={this.state.modalVisible}
+                                    onDismiss = {() => { this.onCompleteClicked() }}
+                                    contentContainerStyle={styles.containerStyle}
+                                >
+                                    <Button onPress={()=>{this.onCompleteClicked()}}>
+                                        CLICK TO CLOSE
+                                    </Button>
+                                    <Text>TEST</Text>
+                                </Modal>
+                            </Portal>
                             <CardSection>
                                 <Button
                                     color={theme.buttonColor}
@@ -334,22 +348,32 @@ class Chore extends Component{
                                     color={theme.buttonColor}
                                     style={styles.buttonContainedStyle}
                                     mode="contained"
-                                    onPress={this.onImageButtonPressed.bind(this)}
+                                    onPress= {() => {this.onCompleteClicked()}}
                                 >
                                     <Text style={componentStyles.smallButtonTextStyle}>
-                                                Done
+                                        Complete
                                     </Text>
-									
                                 </Button>
-							<TouchableOpacity
-                            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-                            onPress={this.onImageButtonPressed.bind(this)}>
-								<Image
-									source={{uri: this.state.photoURL}}
-									style={styles.profilePicStyle}
-									resizeMode='contain'
-								/>
-                        	</TouchableOpacity>
+                                {/*<Button*/}
+                                    {/*color={theme.buttonColor}*/}
+                                    {/*style={styles.buttonContainedStyle}*/}
+                                    {/*mode="contained"*/}
+                                    {/*onPress={this.onImageButtonPressed.bind(this)}*/}
+                                {/*>*/}
+                                    {/*<Text style={componentStyles.smallButtonTextStyle}>*/}
+                                                {/*Done*/}
+                                    {/*</Text>*/}
+
+                                {/*</Button>*/}
+							{/*<TouchableOpacity*/}
+                            {/*style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}*/}
+                            {/*onPress={this.onImageButtonPressed.bind(this)}>*/}
+								{/*<Image*/}
+									{/*source={{uri: this.state.photoURL}}*/}
+									{/*style={styles.profilePicStyle}*/}
+									{/*resizeMode='contain'*/}
+								{/*/>*/}
+                        	{/*</TouchableOpacity>*/}
                             </CardSection>
                             <Button
                                 color={theme.buttonColor}
@@ -433,6 +457,10 @@ const styles = {
         alignItems: 'center',
         flex: 1,
     },
+    containerStyle : {
+        backgroundColor: 'white',
+        padding: 20
+    }
 };
 
 export default Chore;
