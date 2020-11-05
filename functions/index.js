@@ -5,10 +5,10 @@ const api = require('./api.js');
 firebase.initializeApp(api.data.firebaseConfig);
 
 exports.helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", {structuredData: true});
-  response.send({
-	  result: "Hello from Firebase!"
-  });
+	functions.logger.info("Hello logs!", { structuredData: true });
+	response.send({
+		result: "Hello from Firebase!"
+	});
 });
 
 exports.yoyo = functions.https.onCall((data, context) => {
@@ -22,10 +22,11 @@ exports.editUser = functions.https.onCall((data, context) => {
 	}
 
 	var userRef = firebase.database().ref("users/" + data.uid + "/");
-	
+
 	return userRef.update({
 		phoneNumber: data.phoneNumber,
 		venmoUsername: data.venmoUsername,
+		outOfHouse: data.outOfHouse
 	}).then((data) => {
 		return "succes"
 	}).catch((error) => {
@@ -35,7 +36,7 @@ exports.editUser = functions.https.onCall((data, context) => {
 
 exports.createUser = functions.https.onCall((data, context) => {
 
-	if(data.uid == "" || data.uid == null) {
+	if (data.uid == "" || data.uid == null) {
 		return "fail"
 	}
 
@@ -48,7 +49,8 @@ exports.createUser = functions.https.onCall((data, context) => {
 		email: data.email,
 		phoneNumber: data.phoneNumber,
 		venmoUsername: data.venmoUsername,
-		admin: false
+		admin: false,
+		outOfHouse: false
 
 	}).then((data) => {
 		return "success"
@@ -115,7 +117,7 @@ exports.createGroup = functions.https.onCall((data, context) => {
 
 exports.joinGroup = functions.https.onCall((data, context) => {
 
-	if (data.uid == "" || data.uid == null || data.groupid == "" || data.groupid == null ) {
+	if (data.uid == "" || data.uid == null || data.groupid == "" || data.groupid == null) {
 		return "fail"
 	}
 
@@ -124,12 +126,12 @@ exports.joinGroup = functions.https.onCall((data, context) => {
 
 	return ref.once("value")
 		.then(function (snapshot) {
-			
+
 			var usersInGroupRef = firebase.database().ref("groups/" + groupid + "/users/");
 
-			if(snapshot.val() != null) {
+			if (snapshot.val() != null) {
 
-				if(snapshot.val().groupCode != data.groupCode) {
+				if (snapshot.val().groupCode != data.groupCode) {
 					return "wrong group code";
 				}
 
@@ -143,11 +145,11 @@ exports.joinGroup = functions.https.onCall((data, context) => {
 						admin: false
 
 					}).then((data) => {
-						
+
 						return "success"
 
 					}).catch((error) => {
-						
+
 						return "fail1"
 					})
 
@@ -164,7 +166,7 @@ exports.joinGroup = functions.https.onCall((data, context) => {
 
 exports.leaveGroup = functions.https.onCall((data, context) => {
 
-	if (data.uid == "" || data.uid == null || data.groupid == "" || data.groupid == null ) {
+	if (data.uid == "" || data.uid == null || data.groupid == "" || data.groupid == null) {
 		return "fail"
 	}
 
@@ -173,12 +175,12 @@ exports.leaveGroup = functions.https.onCall((data, context) => {
 
 	return usersInGroupRef.once("value")
 		.then(function (snapshot) {
-			
 
-			if(snapshot.val() != null) {
+
+			if (snapshot.val() != null) {
 
 				for (entry in snapshot.val()) {
-					var userID = snapshot.val()[entry];
+					var userID = snapshot.val()[ entry ];
 
 					if (userID == data.uid) {
 						usersInGroupRef.child(entry).remove();
@@ -190,11 +192,11 @@ exports.leaveGroup = functions.https.onCall((data, context) => {
 							groupid: {}
 
 						}).then((data) => {
-							
+
 							return "success"
 
 						}).catch((error) => {
-							
+
 							return "fail1"
 						})
 					}
@@ -235,7 +237,7 @@ exports.editGroup = functions.https.onCall((data, context) => {
 	return ref.update({
 		groupName: data.groupName,
 	}).then((data) => {
-		return "succes"
+		return "success"
 	}).catch((error) => {
 		return "fail"
 	})
@@ -277,7 +279,7 @@ exports.createChore = functions.https.onCall((data, context) => {
 
 					return "fail2"
 				})
-				
+
 			}
 			else {
 				return "group not found"
@@ -337,6 +339,71 @@ exports.editChore = functions.https.onCall((data, context) => {
 			if (snapshot.val() != null) {
 
 				return choreRef.set(data.chore).then(() => {
+
+					return "success"
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+			}
+			else {
+				return "group not found"
+			}
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
+
+exports.getChoreByID = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null || data.choreid == "" || data.choreid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			var choreRef = firebase.database().ref("groups/" + groupid + "/chores/" + data.choreid);
+
+			return choreRef.once("value")
+				.then(function (snapshot) {
+
+					return snapshot.val()
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
+
+exports.deleteChore = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null || data.choreid == "" || data.choreid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			var choreRef = firebase.database().ref("groups/" + groupid + "/chores/" + data.choreid);
+
+			if (snapshot.val() != null) {
+
+				return choreRef.remove().then(() => {
 
 					return "success"
 
