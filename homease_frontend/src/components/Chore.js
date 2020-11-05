@@ -22,7 +22,6 @@ const options = {
 class Chore extends Component{
 
     state = {
-
         choreName: "",
         currentUser: "",
         description: "",
@@ -78,6 +77,8 @@ class Chore extends Component{
             return user;
         });
 
+        console.log("Selected user is "+ chore.selectedUsers);
+
         this.setState({
             choreName: chore.choreName,
             currentUser: chore.currentUser,
@@ -102,9 +103,9 @@ class Chore extends Component{
                 users[index].selected = !selectedUser.selected;
                 let selectedUsers = this.state.selectedUsers;
                 if (users[index].selected === true) {
-                    selectedUsers.push(users[index].name);
+                    selectedUsers.push(users[index].uid);
                 } else {
-                    selectedUsers = selectedUsers.filter(user => user !== users[index].name);
+                    selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
                 }
                 this.setState({users: users, selectedUsers: selectedUsers});
             } else {
@@ -116,8 +117,8 @@ class Chore extends Component{
                     });
                     users[index].selected = true;
                     let selectedUsers = [];
-                    selectedUsers.push(users[index].name);
-                    this.setState({users: users, selectedUsers: selectedUsers}); //UPDATE CURRENT USER FIELD ONLY IF THEY SAVE CHANGES
+                    selectedUsers.push(users[index].uid);
+                    this.setState({users: users, selectedUsers: selectedUsers});
                 } else {
                     console.log("Clicked selected user again");
                 }
@@ -141,7 +142,7 @@ class Chore extends Component{
 
     getCurrentUserName() {
         if(this.state.users.length > 0) {
-            // console.log("users are "+this.state.users);
+            console.log("users are "+this.state.users);
             let currentUser = this.state.users.find(x => x.uid === this.state.currentUser);
             return currentUser.name;
         }
@@ -396,6 +397,28 @@ class Chore extends Component{
                                 <Switch
                                     value={this.state.edit}
                                     onValueChange={async = () => {
+                                        if(this.state.edit === true) {
+                                            // let selectedUsers = this.state.users.map(user => {
+                                            //     if(this.state.selectedUsers.some(selectedUser => selectedUser))
+                                            // });
+                                            getDB({
+                                                data: {
+                                                    groupid: this.state.groupid,
+                                                    choreid: this.state.choreid,
+                                                    chore: {
+                                                        choreName: this.state.choreName,
+                                                        selectedUsers: this.state.selectedUsers,
+                                                        recursiveChore: this.state.recursiveChore,
+                                                        description: this.state.description,
+                                                        currentUser: this.state.currentUser,
+                                                        status: this.state.status,
+                                                        lastDoneDate: this.state.lastDoneDate,
+                                                        lastDoneBy: this.state.lastDoneBy,
+                                                        lastDonePhoto: this.state.lastDonePhoto
+                                                    }
+                                                }
+                                            }, "editChore");
+                                        }
                                         this.setState({edit: !this.state.edit})
                                     }}
                                 />
