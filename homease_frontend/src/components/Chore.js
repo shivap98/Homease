@@ -100,14 +100,30 @@ class Chore extends Component{
         if(this.state.edit === true) {
             let users = this.state.users;
             if (this.state.recursiveChore === true) {
-                users[index].selected = !selectedUser.selected;
-                let selectedUsers = this.state.selectedUsers;
-                if (users[index].selected === true) {
-                    selectedUsers.push(users[index].uid);
-                } else {
-                    selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
+                if(users[index].uid === this.state.currentUser){
+                    Alert.alert(
+                        'Oops!',
+                        'Current user cannot be removed from Recurring Chores',
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => {},
+                                style: 'cancel',
+                            },
+
+                        ],
+                        {cancelable: false},
+                    );
+                }else {
+                    users[index].selected = !selectedUser.selected;
+                    let selectedUsers = this.state.selectedUsers;
+                    if (users[index].selected === true) {
+                        selectedUsers.push(users[index].uid);
+                    } else {
+                        selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
+                    }
+                    this.setState({users: users, selectedUsers: selectedUsers});
                 }
-                this.setState({users: users, selectedUsers: selectedUsers});
             } else {
                 if (selectedUser.selected === false) {
                     console.log("Clicked new user");
@@ -118,7 +134,7 @@ class Chore extends Component{
                     users[index].selected = true;
                     let selectedUsers = [];
                     selectedUsers.push(users[index].uid);
-                    this.setState({users: users, selectedUsers: selectedUsers});
+                    this.setState({users: users, selectedUsers: selectedUsers, currentUser: selectedUsers[0]});
                 } else {
                     console.log("Clicked selected user again");
                 }
@@ -143,6 +159,7 @@ class Chore extends Component{
     getCurrentUserName() {
         if(this.state.users.length > 0) {
             console.log("users are "+this.state.users);
+            console.log("CURRENT USER IS: "+this.state.currentUser);
             let currentUser = this.state.users.find(x => x.uid === this.state.currentUser);
             return currentUser.name;
         }
@@ -210,7 +227,7 @@ class Chore extends Component{
             </View>
         )
     }
-    
+
     onRollBackClicked(){
         console.log("ROLLBACK CLICKED");
     }
@@ -223,16 +240,16 @@ class Chore extends Component{
     onInProgressButtonClicked() {
         console.log("In Progress button pressed")
     }
-    onDeleteButtonClicked() {
+    async onDeleteButtonClicked() {
         console.log("Delete button pressed")
         let ans = await getDB({
             data: {
                 groupid: this.state.groupid,
                 choreid: this.state.choreid
             }
-        },"deleteChore");
+        }, "deleteChore");
 
-        if(ans.result === "success"){
+        if (ans.result === "success") {
 
             this.props.navigation.goBack()
         }
@@ -344,9 +361,9 @@ class Chore extends Component{
 				});
             }
         });
-			
+
     }
-    
+
     showImage() {
         if(this.state.photoURL !== ''){
             console.log('photo loaded')
