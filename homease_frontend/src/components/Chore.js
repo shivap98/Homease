@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {ScrollView, View, Image, Text, Alert, LayoutAnimation, TouchableOpacity} from 'react-native';
-import {Button, List, Provider as PaperProvider, Switch, TextInput} from 'react-native-paper';
+import {Button, List, Provider as PaperProvider, Switch, TextInput, Modal, Portal} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import getDB from './Cloud';
@@ -163,6 +163,11 @@ class Chore extends Component{
         console.log("ROLLBACK CLICKED");
     }
 
+    onCompleteClicked() {
+        console.log("Complete button pressed");
+        this.setState({modalVisible: !this.state.modalVisible});
+    }
+
     onInProgressButtonClicked() {
         console.log("In Progress button pressed")
     }
@@ -240,10 +245,52 @@ class Chore extends Component{
 		});
 	}
 
+	showImage(){
+        console.log('PhotoUrl is: ' + this.state.photoURL);
+        if(this.state.photoURL !== ''){
+            console.log("PHOTO URL NOT EMPTY");
+            return(
+                <TouchableOpacity
+                    style={{justifyContent: 'center', alignItems: 'center'}}
+                    onPress={this.onImageButtonPressed.bind(this)}
+                >
+                    <Image
+                        source={{uri: this.state.photoURL}}
+                        style={styles.modalImageStyle}
+                        resizeMode='contain'
+                    />
+                </TouchableOpacity>
+            )
+        }
+    }
+
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <PaperProvider theme={paperTheme}>
+                    <Portal>
+                        <Modal
+                            visible={this.state.modalVisible}
+                            onDismiss = {() => { this.onCompleteClicked() }}
+                            contentContainerStyle={styles.containerStyle}
+                        >
+                            <Text style={styles.modalHeaderTextStyle}>COMPLETE CHORE</Text>
+                            <Button onPress={this.onImageButtonPressed.bind(this)}>
+                                <Text style={styles.modalHeaderTextStyle}>
+                                    Add Image
+                                </Text>
+                            </Button>
+                            <Button onPress={()=>{console.log("CLICKED DONE.")}}>
+                                <Text style={styles.modalHeaderTextStyle}>
+                                    Done
+                                </Text>
+                            </Button>
+                            {this.showImage()}
+                            <Button onPress={()=>{this.onCompleteClicked()}}>
+                                Cancel
+                            </Button>
+                        </Modal>
+                    </Portal>
                     <ScrollView>
                         <View style={styles.viewStyle}>
                             <CardSection>
@@ -312,7 +359,9 @@ class Chore extends Component{
 
                                 {this.showPreviousUser()}
                             </View>
+
                             <CardSection>
+
                                 <Button
                                     color={theme.buttonColor}
                                     style={styles.buttonContainedStyle}
@@ -323,6 +372,18 @@ class Chore extends Component{
                                                 In Progress
                                     </Text>
                                 </Button>
+                                <Button
+                                    color={theme.buttonColor}
+                                    style={styles.buttonContainedStyle}
+                                    mode="contained"
+                                    onPress= {() => {this.onCompleteClicked()}}
+                                >
+                                    <Text style={componentStyles.smallButtonTextStyle}>
+                                        Complete
+                                    </Text>
+                                </Button>
+
+
                             </CardSection>
                             <Button
                                 color={theme.buttonColor}
@@ -406,6 +467,20 @@ const styles = {
         alignItems: 'center',
         flex: 1,
     },
+    modalImageStyle: {
+        height: 150,
+        width: 150,
+        alignItems: 'center'
+    },
+    containerStyle : {
+        backgroundColor: 'white',
+        padding: 20,
+    },
+    modalHeaderTextStyle:{
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: theme.bigButtonFontSize
+    }
 };
 
 export default Chore;
