@@ -16,6 +16,8 @@ class ChoresTab extends Component {
         allChoresList: []
     }
 
+    groupid = ''
+
     constructor(props) {
         super(props);
 	}
@@ -33,6 +35,9 @@ class ChoresTab extends Component {
 		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result.groupid){
+
+            this.groupid = res.result.groupid
+
             chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
 
 			var allChoresList = []
@@ -72,7 +77,7 @@ class ChoresTab extends Component {
     onPressChore(data) {
         console.log("View chore");
         console.log(data);
-        this.props.navigation.navigate('Chore', {key: data.item.key});
+        this.props.navigation.navigate('Chore', {key: data.item.key, groupid: this.groupid});
     }
 
     renderItem = data => (

@@ -19,49 +19,73 @@ const options = {
 class Chore extends Component{
 
     state = {
-        choreName: '',
-        users: [
-            {name: 'user1', selected: false},
-            {name: 'user2', selected: false},
-            {name: 'user3', selected: false}
-        ],
-        chores: [
-            {key: '1', name: 'Dishes', status: 'incomplete', description: 'Chore 1', recursiveChore: true, selectedUsers: ['user1', 'user3'], currentUser: 'user1', previousUser: 'user3'},
-            {key: '2', name: 'Cleaning', status: 'in progress', description: 'Chore 2', recursiveChore: false, selectedUsers: ['user2'], currentUser: 'user2'}
-		],
-		photoURL: '',
-        recursiveChore: false,
-        description: '',
-        multiLine: true,
-        currentUser: '',
-        previousUser: '',
-        edit: false
+
+        choreName: "",
+        currentUser: "",
+        description: "",
+        lastDoneBy: "",
+        lastDoneDate: "",
+        lastDonePhoto: "",
+        recursiveChore: "",
+        selectedUsers: [],
+        users: [],
+        status: "",
+        choreid: "",
+        groupid: "",
+		photoURL: "",
+        previousUser: "",
+        edit: false,
     };
 
     constructor(props) {
         super(props);
     }
 
-    componentDidMount(){
-        //TODO: change this for actual db call
-        // let chore = this.state.chores.filter(chore =>{
-        //     return chore.key === this.props.route.params.key;
-        // })[0];
+    async componentDidMount(){
         
-        // console.log(this.props.route.params.key)
-        let chore = this.state.chores[0]
-        console.log(chore.name);
+        groupid = this.props.route.params.groupid
+        choreid = this.props.route.params.key
 
-        let users = this.state.users;
-        users = users.map(user =>{
-            if(chore.selectedUsers.includes(user.name)){
+        chore = await getDB({ data: { 
+                groupid: groupid, 
+                choreid: choreid 
+            }}, 
+            "getChoreByID")
+
+        chore = chore.result
+
+        groupInfo = await getDB({ data: { 
+            groupid: res.result.groupid 
+        } }, "getGroupFromGroupID")
+
+        mems = groupInfo.result.users
+        users = []
+        for (var key in mems) {
+            var user = await getDB({ data: { uid: mems[ key ] } }, "getUser")
+            users.push({ name: user.result.firstName + " " + user.result.lastName, uid: mems[ key ] });
+        }
+
+        users = users.map(user => {
+            if(chore.selectedUsers.includes(user.uid)){
                 user.selected = true;
             }
             return user;
         });
-        console.log(users);
-        this.props.navigation.setOptions({ title: 'Chore' });
-        this.setState({choreName: chore.name, description: chore.description, users: users,selectedUsers: chore.selectedUsers, recursiveChore: chore.recursiveChore, currentUser: chore.currentUser, previousUser: chore.previousUser});
+
+        this.setState({
+            choreName: chore.choreName,
+            currentUser: chore.currentUser,
+            description: chore.description,
+            lastDoneBy: chore.lastDoneBy,
+            lastDoneDate: chore.lastDoneDate,
+            lastDonePhoto: chore.lastDonePhoto,
+            recursiveChore: chore.recursiveChore,
+            users: users,
+            selectedUsers: chore.selectedUsers,
+            status: chore.status,
+            choreid: choreid,
+            groupid: groupid
+        });
     }
 
     onSelectPressed(selectedUser, index){
@@ -146,6 +170,18 @@ class Chore extends Component{
             );
         } else {
             this.setState({edit: !this.state.edit})
+
+            chore = {
+                choreName: this.state.choreName,
+                selectedUsers: users.filter(user => user.selected === true),
+                recursiveChore: this.state.recursiveChore,
+                description: this.state.description,
+                currentUser: this.state.currentUser,
+                status: this.state.status,
+                lastDoneDate: this.state.lastDoneDate,
+                lastDoneBy: this.state.lastDoneBy,
+                lastDonePhoto: this.state.lastDonePhoto
+            }
         }
 
     }
@@ -256,17 +292,6 @@ class Chore extends Component{
                                 <Switch
                                     value={this.state.edit}
                                     onValueChange={async = () => {
-                                        getDB({ data: {
-                                            uid: this.state.uid,
-                                            phoneNumber: this.state.phoneNumber,
-                                            venmoUsername: this.state.venmoUsername
-                                        }}, "editUser");
-                                        if (this.state.groupid && this.state.groupid != '') {
-                                            getDB({ data: {
-                                                groupid: this.state.groupid,
-                                                groupName: this.state.groupName,
-                                            }}, "editGroup");
-                                        }
                                         this.setState({edit: !this.state.edit})
                                     }}
                                 />
