@@ -445,7 +445,6 @@ class Chore extends Component{
                             </View>
                             <View style={componentStyles.cardSectionWithBorderStyle}>
                                 <Text style={styles.cardHeaderTextStyle}>LAST DONE INFORMATION</Text>
-
                                 {this.showPreviousUser()}
                             </View>
 

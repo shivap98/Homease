@@ -160,7 +160,8 @@ class CreateChore extends Component{
 		},
 		'createChore');
 
-		console.log(resp)
+        console.log(resp)
+        this.props.navigation.goBack()
     }
 
     render() {

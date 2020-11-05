@@ -40,26 +40,24 @@ class ChoresTab extends Component {
 		for(key in chores.result){
 			var obj = chores.result[key]
 			var name = ''
-			var status = 'incomplete'
+			var status = 'Incomplete'
 			var selectedUsers = []
 			for (var prop in obj) {
 				if (!obj.hasOwnProperty(prop)) continue;
 				if(prop == "choreName"){
 					name = obj[prop]
-				}else if(prop == "status"){
+				} else if(prop == "status"){
 					status = obj[prop]
-				}else if(prop == "selectedUsers"){
+				} else if(prop == "selectedUsers"){
 					selectedUsers = obj[prop]
 				}
 			}
-			allChoresList.push({key, name, status, selectedUsers})
+            if (selectedUsers.includes(uid)) {
+                myChoresList.push({key, name, status, selectedUsers})
+            } else {
+                allChoresList.push({key, name, status, selectedUsers})
+            }
 		}
-
-		allChoresList.forEach(function (item, index) {
-			if(item.selectedUsers.includes(uid)){
-				myChoresList.push(item)
-			}
-			});
 
 		this.setState({allChoresList, myChoresList})
 	}
@@ -94,7 +92,7 @@ class ChoresTab extends Component {
         this.props.navigation.navigate('Chore', {key: data.item.key, groupid: this.groupid});
     }
 
-    renderItem = data => (
+    renderMyChores = data => (
         <TouchableHighlight
             onPress={() => this.onPressChore(data)}
             style={styles.rowFront}
@@ -115,7 +113,28 @@ class ChoresTab extends Component {
         </TouchableHighlight>
     );
 
-    renderHiddenItem = (data, rowMap) => (
+    renderAllChores = data => (
+        <TouchableHighlight
+            onPress={() => this.onPressChore(data)}
+            style={styles.rowFront}
+            underlayColor={theme.lightColor}
+        >
+            <View>
+                <Text 
+                    style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}
+                >
+                    {data.item.name}
+                </Text>
+                <Text 
+                    style={{ color: 'white', fontSize: 18 }}
+                >
+                    Status: {data.item.status}
+                </Text>
+            </View>
+        </TouchableHighlight>
+    );
+
+    rendeSwipeOptions = (data, rowMap) => (
         <View style={styles.rowBack}>
             <TouchableOpacity
                 style={[styles.backRightBtn, styles.inProgressButtonStyle]}
@@ -140,13 +159,13 @@ class ChoresTab extends Component {
                         <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
                         <SwipeListView
                             data={this.state.myChoresList}
-                            renderItem={this.renderItem}
-                            renderHiddenItem={this.renderHiddenItem}
+                            renderItem={this.renderMyChores}
+                            renderHiddenItem={this.rendeSwipeOptions}
                             rightOpenValue={-150}
                             disableRightSwipe={true}                        
                             previewRowKey={'0'}
                             previewOpenValue={-40}
-                            previewOpenDelay={3000}
+                            previewOpenDelay={5000}
                             onRowDidOpen={this.onRowDidOpen}
                         />
                     </View>
@@ -155,13 +174,9 @@ class ChoresTab extends Component {
                         <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
                         <SwipeListView
                             data={this.state.allChoresList}
-                            renderItem={this.renderItem}
-                            renderHiddenItem={this.renderHiddenItem}
-                            rightOpenValue={-150}
-                            disableRightSwipe={true}                        
-                            previewRowKey={'0'}
-                            previewOpenValue={-40}
-                            previewOpenDelay={3000}
+                            renderItem={this.renderAllChores}
+                            disableRightSwipe={true}
+                            disableLeftSwipe={true}
                             onRowDidOpen={this.onRowDidOpen}
                         />
                     </View>
