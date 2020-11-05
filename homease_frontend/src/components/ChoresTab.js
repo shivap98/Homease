@@ -91,7 +91,6 @@ class ChoresTab extends Component {
 
     onPressChore(data) {
         console.log("View chore");
-        console.log(data);
         this.props.navigation.navigate('Chore', {key: data.item.key, groupid: this.groupid});
     }
 
@@ -108,7 +107,7 @@ class ChoresTab extends Component {
                     {data.item.name}
                 </Text>
                 <Text 
-                    style={{ color: 'white' }}
+                    style={{ color: 'white', fontSize: 18 }}
                 >
                     Status: {data.item.status}
                 </Text>
@@ -166,7 +165,8 @@ class ChoresTab extends Component {
                             onRowDidOpen={this.onRowDidOpen}
                         />
                     </View>
-                    <FAB
+                </ScrollView>
+                <FAB
                         style={styles.fab}
                         small
                         color={theme.darkColor}
@@ -175,8 +175,7 @@ class ChoresTab extends Component {
                             console.log("Pressed fab");
                             this.props.navigation.navigate('CreateChore');
                         }}
-                    />
-                </ScrollView>
+                />
             </View>
         );
     }
@@ -195,8 +194,9 @@ const styles = {
         borderBottomColor: 'black',
         borderBottomWidth: 1,
         justifyContent: 'center',
-        height: 70,
+        flex: 1,
         paddingLeft: 20,
+        padding: 10,
         margin: 7
     },
     rowBack: {

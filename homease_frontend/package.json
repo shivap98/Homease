@@ -20,6 +20,7 @@
     "@react-navigation/native": "^5.7.5",
     "@react-navigation/stack": "^5.9.2",
     "firebase": "7.22.0",
+    "moment": "^2.29.1",
     "node-pre-gyp": "^0.15.0",
     "react": "16.13.1",
     "react-native": "0.63.2",

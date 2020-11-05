@@ -7,6 +7,7 @@ import getDB from './Cloud';
 import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 import ImagePicker from 'react-native-image-picker';
+import moment from 'moment';
 
 
 
@@ -57,14 +58,15 @@ class Chore extends Component{
         chore = chore.result;
 
         let groupInfo = await getDB({ data: {
-            groupid: res.result.groupid
+            groupid: groupid
         } }, "getGroupFromGroupID");
+
 
         let mems = groupInfo.result.users;
         let users = [];
         for (var key in mems) {
             var user = await getDB({ data: { uid: mems[ key ] } }, "getUser");
-            users.push({ name: user.result.firstName + " " + user.result.lastName, uid: mems[ key ] });
+            users.push({ name: user.result.firstName + " " + user.result.lastName, uid: mems[ key ], outOfHouse: user.result.outOfHouse });
         }
 
         users = users.map(user => {
@@ -120,7 +122,7 @@ class Chore extends Component{
                     console.log("Clicked selected user again");
                 }
             }
-        }else{
+        } else {
             Alert.alert(
                 'Oops!',
                 'Click the edit button to update chore assignments',
@@ -137,7 +139,7 @@ class Chore extends Component{
         }
     }
 
-    getCurrentUserName (){
+    getCurrentUserName() {
         if(this.state.users.length > 0) {
             // console.log("users are "+this.state.users);
             let currentUser = this.state.users.find(x => x.uid === this.state.currentUser);
@@ -145,9 +147,9 @@ class Chore extends Component{
         }
     }
 
-    renderListOfMembers (){
+    renderListOfMembers() {
         let members = this.state.users;
-        return members.map((item, index)=>{
+        return members.map((item, index) => {
             return(
                 <List.Item
                     title={item.name}
@@ -161,22 +163,6 @@ class Chore extends Component{
         })
     }
 
-    onRollBackClicked(){
-        console.log("ROLLBACK CLICKED");
-    }
-
-    onCompleteClicked() {
-        console.log("Complete button pressed");
-        this.setState({modalVisible: !this.state.modalVisible});
-    }
-
-    onInProgressButtonClicked() {
-        console.log("In Progress button pressed")
-    }
-    onDeleteButtonClicked() {
-        console.log("Delete button pressed")
-
-    }
 
     renderPreviousUser (){
         let previousUser = this.state.previousUser;
@@ -223,60 +209,144 @@ class Chore extends Component{
                 </List.Accordion>
             </View>
         )
-	}
+    }
+    
+    onRollBackClicked(){
+        console.log("ROLLBACK CLICKED");
+    }
+
+    onCompleteClicked() {
+        console.log("Complete button pressed");
+        this.setState({modalVisible: true});
+    }
+
+    onInProgressButtonClicked() {
+        console.log("In Progress button pressed")
+    }
+    onDeleteButtonClicked() {
+        console.log("Delete button pressed")
+    }
+
+    async onDoneButtonClicked() {
+        console.log("CLICKED DONE.")
+        console.log(this.state.selectedUsers)
+        console.log('recursive: ', this.state.recursiveChore)
+        console.log(this.state.users)
+
+        let chore = {}
+
+        if (this.state.recursiveChore) {
+            let users = this.state.users
+
+            if (this.state.selectedUsers.length == 1) {
+                chore = {
+                    choreName: this.state.choreName,
+                    currentUser: this.state.currentUser,
+                    description: this.state.description,
+                    lastDoneBy: this.state.currentUser,
+                    lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
+                    lastDonePhoto: this.state.photoURL,
+                    recursiveChore: this.state.recursiveChore,
+                    selectedUsers: this.state.selectedUsers,
+                    status: 'Incomplete'
+                }
+            } else {
+                let nextUserKey = -1
+                for (var key in this.state.selectedUsers) {
+                    if (this.state.selectedUsers[key] == this.state.currentUser) {
+                        nextUserKey = key
+                    }
+                }
+                nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
+                console.log(nextUserKey)
+
+                let usersMap = {}
+                for (var key in users) {
+                    usersMap[users[key].uid] = users[key]
+                }
+
+                for (var i = 0; i < this.state.selectedUsers.length; i++) {
+                    let userUID = this.state.selectedUsers[nextUserKey]
+                    if (usersMap[userUID].outOfHouse == false) {
+                        break
+                    }
+                    nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
+                }
+                let nextUserUID = this.state.selectedUsers[nextUserKey]
+                chore = {
+                    choreName: this.state.choreName,
+                    currentUser: nextUserUID,
+                    description: this.state.description,
+                    lastDoneBy: this.state.currentUser,
+                    lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
+                    lastDonePhoto: this.state.photoURL,
+                    recursiveChore: this.state.recursiveChore,
+                    selectedUsers: this.state.selectedUsers,
+                    status: 'Incomplete'
+                }
+            }
+
+        } else {
+            chore = {
+                choreName: this.state.choreName,
+                currentUser: this.state.currentUser,
+                description: this.state.description,
+                lastDoneBy: this.state.currentUser,
+                lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
+                lastDonePhoto: this.state.photoURL,
+                recursiveChore: this.state.recursiveChore,
+                selectedUsers: this.state.selectedUsers,
+                status: 'Complete',
+            }
+        }
+
+        console.log(chore)
+
+        res = await getDB({ data: {
+            chore: chore,
+            choreid: this.state.choreid,
+            groupid: this.state.groupid
+        }}, "editChore");
+        console.log(res)
+
+        this.setState({modalVisible: false, photoURL: ''});
+        this.props.navigation.goBack()
+    }
+
+    onModalClose() {
+        console.log("Modal Closed");
+        this.setState({modalVisible: false, photoURL: ''});
+    }
 
 	onImageButtonPressed() {
 		ImagePicker.showImagePicker(options, (response) => {
-
 			if (response.didCancel) {
-			  console.log('User cancelled image picker');
+              console.log('User cancelled image picker');
 			} else if (response.error) {
-			  console.log('ImagePicker Error: ', response.error);
+              console.log('ImagePicker Error: ', response.error);
 			} else if (response.customButton) {
 			  console.log('User tapped custom button: ', response.customButton);
 			} else {
-				// this.setState({
-                //     photoURL: response.uri,
-				// });
-
-				//console.log(response.data)
-				
 				const source = { uri: response.data };
-
-				// You can also display the image using data:
-				// const source = { uri: 'data:image/jpeg;base64,' + response.data };
-			
 				this.setState({
-				  	lastDonePhoto: source.uri,
+				  	photoURL: source.uri,
 				});
             }
         });
 			
-	}
-
-	async doneButtonPressed(){
-
-		if(!this.state.recursiveChore){
-			res = await getDB({ data: {
-				groupid: this.state.groupid,
-				choreid: this.state.choreid,
-				chore: {
-					choreName: this.state.choreName,
-					selectedUsers: this.state.selectedUsers,
-					recursiveChore: this.state.recursiveChore,
-					description: this.state.description,
-					currentUser: this.state.currentUser,
-					status: "Complete",
-					lastDoneBy: this.state.currentUser,
-					lastDoneDate: this.state.lastDoneDate,
-					lastDonePhoto: this.state.lastDonePhoto,
-				}
-			} }, "editChore");
-
-			console.log(res)
-		}
-
-	}
+    }
+    
+    showImage() {
+        if(this.state.photoURL !== ''){
+            console.log('photo loaded')
+            return(
+                <Image
+                    source={{uri: `data:image/png;base64,${this.state.photoURL}`}}
+                    style={styles.modalImageStyle}
+                />
+            )
+        }
+    }
 
     render() {
         return (
@@ -285,7 +355,7 @@ class Chore extends Component{
                     <Portal>
                         <Modal
                             visible={this.state.modalVisible}
-                            onDismiss = {() => { this.onCompleteClicked() }}
+                            onDismiss = {() => { this.onModalClose() }}
                             contentContainerStyle={styles.containerStyle}
                         >
                             <Text style={styles.modalHeaderTextStyle}>COMPLETE CHORE</Text>
@@ -294,23 +364,18 @@ class Chore extends Component{
                                     Add Image
                                 </Text>
                             </Button>
-                            <Button onPress={this.doneButtonPressed.bind(this)}>
-                                <Text style={styles.modalHeaderTextStyle}>
-                                    Done
-                                </Text>
-                            </Button>
-							{/* {this.showImage()} */}
 							<TouchableOpacity
 								style={{justifyContent: 'center', alignItems: 'center'}}
 								onPress={this.onImageButtonPressed.bind(this)}
 							>
-								<Image
-									source={{uri: `data:image/png;base64,${this.state.lastDonePhoto}`}}
-									style={styles.modalImageStyle}
-									//resizeMode='contain'
-								/>
+								{this.showImage()}
                 			</TouchableOpacity>
-                            <Button onPress={()=>{this.onCompleteClicked()}}>
+                            <Button onPress={async = () => {this.onDoneButtonClicked()}}>
+                                <Text style={styles.modalHeaderTextStyle}>
+                                    Done
+                                </Text>
+                            </Button>
+                            <Button onPress={()=>{this.onModalClose()}}>
                                 Cancel
                             </Button>
                         </Modal>

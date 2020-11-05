@@ -10,12 +10,6 @@ import auth from '@react-native-firebase/auth';
 import firebase from 'firebase';
 
 class CreateChore extends Component{
-    static navigationOptions = () => {
-        return {
-            title: 'Create Chore'
-        };
-    };
-
     state = {
 		choreName: '',
 		groupid: '',
@@ -103,7 +97,6 @@ class CreateChore extends Component{
 
     renderListOfMembers (){
 		let members = this.state.users;
-		console.log(members)
 		if(members){
 			return members.map((item, index)=>{
 				return(
@@ -119,7 +112,6 @@ class CreateChore extends Component{
     }
 
     onRecursiveClicked(){
-        // console.log(this.state.selectedUsers);
         if(this.state.recursiveChore === true){
             let users = this.state.users;
             users = users.map(user => {
@@ -162,17 +154,13 @@ class CreateChore extends Component{
 				selectedUsers: this.state.selectedUsers,
 				recursiveChore: this.state.recursiveChore,
 				description: this.state.description,
-				status: "incomplete",
+				status: "Incomplete",
 				currentUser: this.state.selectedUsers[0]
 			}, 
 		},
 		'createChore');
 
 		console.log(resp)
-
-		
-		
-
     }
 
     render() {
