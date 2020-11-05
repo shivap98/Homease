@@ -29,8 +29,40 @@ class ChoresTab extends Component {
     constructor(props) {
         super(props);
 	}
+
+	async getDbInfo(uid, res) {
+		chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
+
+		var allChoresList = []
+		var myChoresList = []
+		for(key in chores.result){
+			var obj = chores.result[key]
+			var name = ''
+			var status = 'incomplete'
+			var selectedUsers = []
+			for (var prop in obj) {
+				if (!obj.hasOwnProperty(prop)) continue;
+				if(prop == "choreName"){
+					name = obj[prop]
+				}else if(prop == "status"){
+					status = obj[prop]
+				}else if(prop == "selectedUsers"){
+					selectedUsers = obj[prop]
+				}
+			}
+			allChoresList.push({key, name, status, selectedUsers})
+		}
+
+		allChoresList.forEach(function (item, index) {
+			if(item.selectedUsers.includes(uid)){
+				myChoresList.push(item)
+			}
+			});
+
+		this.setState({allChoresList, myChoresList})
+	}
 	
-	async componentDidMount(){
+	async componentWillMount(){
 		var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid
@@ -43,35 +75,11 @@ class ChoresTab extends Component {
 		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result.groupid){
-            chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
-
-			var allChoresList = []
-			var myChoresList = []
-			for(key in chores.result){
-				var obj = chores.result[key]
-				var name = ''
-				var status = 'incomplete'
-				var selectedUsers = []
-				for (var prop in obj) {
-					if (!obj.hasOwnProperty(prop)) continue;
-					if(prop == "choreName"){
-						name = obj[prop]
-					}else if(prop == "status"){
-						status = obj[prop]
-					}else if(prop == "selectedUsers"){
-						selectedUsers = obj[prop]
-					}
-				}
-				allChoresList.push({key, name, status, selectedUsers})
-			}
-
-			allChoresList.forEach(function (item, index) {
-				if(item.selectedUsers.includes(uid)){
-					myChoresList.push(item)
-				}
-			  });
-
-            this.setState({allChoresList, myChoresList})
+			
+			
+			firebase.database().ref('/groups/'+res.result.groupid + '/chores/').on('value', (snapshot) => {
+				this.getDbInfo(uid, res)
+			})
 		}
 	}
 
