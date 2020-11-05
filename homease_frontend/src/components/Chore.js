@@ -164,7 +164,6 @@ class Chore extends Component{
         })
     }
 
-
     renderPreviousUser (){
         let previousUser = this.state.previousUser;
         return (
@@ -226,6 +225,17 @@ class Chore extends Component{
     }
     onDeleteButtonClicked() {
         console.log("Delete button pressed")
+        let ans = await getDB({
+            data: {
+                groupid: this.state.groupid,
+                choreid: this.state.choreid
+            }
+        },"deleteChore");
+
+        if(ans.result === "success"){
+
+            this.props.navigation.goBack()
+        }
     }
 
     async onDoneButtonClicked() {
