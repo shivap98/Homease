@@ -42,32 +42,34 @@ class Chore extends Component{
     }
 
     async componentDidMount(){
-        
-        groupid = this.props.route.params.groupid
-        choreid = this.props.route.params.key
 
-        chore = await getDB({ data: { 
-                groupid: groupid, 
-                choreid: choreid 
-            }}, 
-            "getChoreByID")
+        let groupid = this.props.route.params.groupid;
+        let choreid = this.props.route.params.key;
 
-        chore = chore.result
+        let chore = await getDB({ data: {
+                groupid: groupid,
+                choreid: choreid
+            }},
+            "getChoreByID");
 
-        groupInfo = await getDB({ data: { 
-            groupid: res.result.groupid 
-        } }, "getGroupFromGroupID")
+        chore = chore.result;
 
-        mems = groupInfo.result.users
-        users = []
+        let groupInfo = await getDB({ data: {
+            groupid: res.result.groupid
+        } }, "getGroupFromGroupID");
+
+        let mems = groupInfo.result.users;
+        let users = [];
         for (var key in mems) {
-            var user = await getDB({ data: { uid: mems[ key ] } }, "getUser")
+            var user = await getDB({ data: { uid: mems[ key ] } }, "getUser");
             users.push({ name: user.result.firstName + " " + user.result.lastName, uid: mems[ key ] });
         }
 
         users = users.map(user => {
             if(chore.selectedUsers.includes(user.uid)){
                 user.selected = true;
+            }else{
+                user.selected = false;
             }
             return user;
         });
@@ -133,6 +135,14 @@ class Chore extends Component{
         }
     }
 
+    getCurrentUserName (){
+        if(this.state.users.length > 0) {
+            // console.log("users are "+this.state.users);
+            let currentUser = this.state.users.find(x => x.uid === this.state.currentUser);
+            return currentUser.name;
+        }
+    }
+
     renderListOfMembers (){
         let members = this.state.users;
         return members.map((item, index)=>{
@@ -149,50 +159,8 @@ class Chore extends Component{
         })
     }
 
-    onEditClicked(){
-        console.log("edit was "+this.state.edit);
-
-        let users = this.state.users;
-        let hasSelectedUsers = users.some(user => user.selected === true);
-        if(hasSelectedUsers === false){
-            Alert.alert(
-                'Oops!',
-                'Please select at least one user to assign the chore to!',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {},
-                        style: 'cancel',
-                    },
-
-                ],
-                {cancelable: false},
-            );
-        } else {
-            this.setState({edit: !this.state.edit})
-
-            chore = {
-                choreName: this.state.choreName,
-                selectedUsers: users.filter(user => user.selected === true),
-                recursiveChore: this.state.recursiveChore,
-                description: this.state.description,
-                currentUser: this.state.currentUser,
-                status: this.state.status,
-                lastDoneDate: this.state.lastDoneDate,
-                lastDoneBy: this.state.lastDoneBy,
-                lastDonePhoto: this.state.lastDonePhoto
-            }
-        }
-
-    }
-
-
     onRollBackClicked(){
         console.log("ROLLBACK CLICKED");
-    }
-
-    onDoneButtonClicked() {
-        console.log("Done button pressed")
     }
 
     onInProgressButtonClicked() {
@@ -200,7 +168,7 @@ class Chore extends Component{
     }
     onDeleteButtonClicked() {
         console.log("Delete button pressed")
-        
+
     }
 
     renderPreviousUser (){
@@ -249,11 +217,11 @@ class Chore extends Component{
             </View>
         )
 	}
-	
+
 	onImageButtonPressed() {
 		ImagePicker.showImagePicker(options, (response) => {
 			console.log('Response = ', response);
-		  
+
 			if (response.didCancel) {
 			  console.log('User cancelled image picker');
 			} else if (response.error) {
@@ -332,7 +300,7 @@ class Chore extends Component{
                                     style={styles.textInputStyle}
                                     label='Current User'
                                     mode='outlined'
-                                    value={this.state.currentUser}
+                                    value={this.getCurrentUserName()}
                                     keyboardAppearance='dark'
                                     editable={false}
                                     onChangeText={textString => {}}
@@ -355,26 +323,6 @@ class Chore extends Component{
                                                 In Progress
                                     </Text>
                                 </Button>
-                                <Button
-                                    color={theme.buttonColor}
-                                    style={styles.buttonContainedStyle}
-                                    mode="contained"
-                                    onPress={this.onImageButtonPressed.bind(this)}
-                                >
-                                    <Text style={componentStyles.smallButtonTextStyle}>
-                                                Done
-                                    </Text>
-									
-                                </Button>
-							<TouchableOpacity
-                            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-                            onPress={this.onImageButtonPressed.bind(this)}>
-								<Image
-									source={{uri: this.state.photoURL}}
-									style={styles.profilePicStyle}
-									resizeMode='contain'
-								/>
-                        	</TouchableOpacity>
                             </CardSection>
                             <Button
                                 color={theme.buttonColor}
