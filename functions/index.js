@@ -354,3 +354,33 @@ exports.editChore = functions.https.onCall((data, context) => {
 			return "fail3"
 		})
 });
+
+exports.getChoreByID = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null || data.choreid == "" || data.choreid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			var choreRef = firebase.database().ref("groups/" + groupid + "/chores/" + data.choreid);
+
+			return choreRef.once("value")
+				.then(function (snapshot) {
+
+					return snapshot.val()
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
