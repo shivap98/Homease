@@ -9,8 +9,6 @@ target 'homease_frontend' do
   use_react_native!(:path => config["reactNativePath"])
 
 
-  pod 'react-native-image-base64', :path => '../node_modules/react-native-image-base64'
-
   target 'homease_frontendTests' do
     inherit! :complete
     # Pods for testing

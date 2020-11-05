@@ -7,7 +7,6 @@ import getDB from './Cloud';
 import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 import ImagePicker from 'react-native-image-picker';
-import ImgToBase64 from 'react-native-image-base64';
 
 
 
