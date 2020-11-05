@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, TouchableOpacity, TouchableHighlight} from 'react-native';
+import {Text, View, TouchableOpacity, TouchableHighlight, ScrollView} from 'react-native';
 import theme from './common/theme';
 import componentStyles from './common/componentStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -11,6 +11,16 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 class ChoresTab extends Component {
 
+    mockData = [
+        {key: '1', name: 'Dishes', status: 'incomplete'},
+        {key: '2', name: 'Cleaning', status: 'in progress'},
+        {key: '3', name: 'Cleaning', status: 'in progress'},
+        {key: '4', name: 'Cleaning', status: 'in progress'},
+        {key: '5', name: 'Cleaning', status: 'in progress'},
+        {key: '6', name: 'Cleaning', status: 'in progress'},
+
+    ]
+    
     state = {
         myChoresList: [],
         allChoresList: []
@@ -61,7 +71,7 @@ class ChoresTab extends Component {
 				}
 			  });
 
-			this.setState({allChoresList, myChoresList})
+            this.setState({allChoresList, myChoresList})
 		}
 	}
 
@@ -116,45 +126,47 @@ class ChoresTab extends Component {
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
-                <View style={componentStyles.cardSectionWithBorderStyle}>
-                    <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
-                    <SwipeListView
-                        data={this.state.myChoresList}
-                        renderItem={this.renderItem}
-                        renderHiddenItem={this.renderHiddenItem}
-                        rightOpenValue={-150}
-                        disableRightSwipe={true}                        
-                        previewRowKey={'0'}
-                        previewOpenValue={-40}
-                        previewOpenDelay={3000}
-                        onRowDidOpen={this.onRowDidOpen}
-                    />
-                </View>
+                <ScrollView>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
+                        <SwipeListView
+                            data={this.state.myChoresList}
+                            renderItem={this.renderItem}
+                            renderHiddenItem={this.renderHiddenItem}
+                            rightOpenValue={-150}
+                            disableRightSwipe={true}                        
+                            previewRowKey={'0'}
+                            previewOpenValue={-40}
+                            previewOpenDelay={3000}
+                            onRowDidOpen={this.onRowDidOpen}
+                        />
+                    </View>
 
-                <View style={componentStyles.cardSectionWithBorderStyle}>
-                    <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
-					<SwipeListView
-                        data={this.state.allChoresList}
-                        renderItem={this.renderItem}
-                        renderHiddenItem={this.renderHiddenItem}
-                        rightOpenValue={-150}
-                        disableRightSwipe={true}                        
-                        previewRowKey={'0'}
-                        previewOpenValue={-40}
-                        previewOpenDelay={3000}
-                        onRowDidOpen={this.onRowDidOpen}
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
+                        <SwipeListView
+                            data={this.state.allChoresList}
+                            renderItem={this.renderItem}
+                            renderHiddenItem={this.renderHiddenItem}
+                            rightOpenValue={-150}
+                            disableRightSwipe={true}                        
+                            previewRowKey={'0'}
+                            previewOpenValue={-40}
+                            previewOpenDelay={3000}
+                            onRowDidOpen={this.onRowDidOpen}
+                        />
+                    </View>
+                    <FAB
+                        style={styles.fab}
+                        small
+                        color={theme.darkColor}
+                        icon="plus"
+                        onPress={() => {
+                            console.log("Pressed fab");
+                            this.props.navigation.navigate('CreateChore');
+                        }}
                     />
-                </View>
-                <FAB
-                    style={styles.fab}
-                    small
-                    color={theme.darkColor}
-                    icon="plus"
-                    onPress={() => {
-                        console.log("Pressed fab");
-                        this.props.navigation.navigate('CreateChore');
-                    }}
-                />
+                </ScrollView>
             </View>
         );
     }

@@ -13,7 +13,7 @@ export default {
 			text: theme.lightColor,
 			disabled: '#000000',
 			placeholder: theme.lightColor,
-			backdrop: '#ffffff00',//'#d20022',
+			backdrop: '#ffffff00',
 			notification: '#e46eef',
 	},
 }
