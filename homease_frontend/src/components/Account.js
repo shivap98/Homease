@@ -274,7 +274,8 @@ class Account extends Component {
                                         getDB({ data: {
                                             uid: this.state.uid,
                                             phoneNumber: this.state.phoneNumber,
-                                            venmoUsername: this.state.venmoUsername
+											venmoUsername: this.state.venmoUsername,
+											outOfHouse: this.state.outOfHouse
                                         }}, "editUser");
                                         if (this.state.groupid && this.state.groupid != '') {
                                             getDB({ data: {
@@ -344,6 +345,12 @@ class Account extends Component {
                                         value={this.state.outOfHouse}
                                         style={{margin: 15}}
                                         onValueChange={() => {
+											getDB({ data: {
+												uid: this.state.uid,
+												phoneNumber: this.state.phoneNumber,
+												venmoUsername: this.state.venmoUsername,
+												outOfHouse: !this.state.outOfHouse
+											}}, "editUser");
                                             this.setState({outOfHouse: !this.state.outOfHouse})
                                         }}
                                     />
