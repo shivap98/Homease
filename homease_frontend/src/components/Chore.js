@@ -37,7 +37,6 @@ class Chore extends Component{
         groupid: "",
 		photoURL: "",
 		previousUser: "",
-		imageURI: "",
         edit: false,
     };
 
@@ -240,18 +239,41 @@ class Chore extends Component{
 				// this.setState({
                 //     photoURL: response.uri,
 				// });
+
+				//console.log(response.data)
 				
-				const source = { uri: response.uri };
+				const source = { uri: response.data };
 
 				// You can also display the image using data:
 				// const source = { uri: 'data:image/jpeg;base64,' + response.data };
 			
 				this.setState({
-				  imageURI: source,
+				  	lastDonePhoto: source.uri,
 				});
             }
         });
 			
+	}
+
+	async doneButtonPressed(){
+
+		res = await getDB({ data: {
+			groupid: this.state.groupid,
+			choreid: this.state.choreid,
+			chore: {
+				choreName: this.state.choreName,
+				selectedUsers: this.state.selectedUsers,
+				recursiveChore: this.state.recursiveChore,
+				description: this.state.description,
+				currentUser: this.state.currentUser,
+				status: this.state.status,
+				lastDoneBy: this.state.lastDoneBy,
+				lastDoneDate: this.state.lastDoneDate,
+				lastDonePhoto: this.state.lastDonePhoto,
+			}
+		} }, "editChore");
+		
+		console.log(res)
 	}
 
     render() {
@@ -270,7 +292,7 @@ class Chore extends Component{
                                     Add Image
                                 </Text>
                             </Button>
-                            <Button onPress={()=>{console.log("CLICKED DONE.")}}>
+                            <Button onPress={this.doneButtonPressed.bind(this)}>
                                 <Text style={styles.modalHeaderTextStyle}>
                                     Done
                                 </Text>
@@ -281,7 +303,7 @@ class Chore extends Component{
 								onPress={this.onImageButtonPressed.bind(this)}
 							>
 								<Image
-									source={{uri: this.state.imageURI.uri}}
+									source={{uri: `data:image/png;base64,${this.state.lastDonePhoto}`}}
 									style={styles.modalImageStyle}
 									//resizeMode='contain'
 								/>
