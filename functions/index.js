@@ -26,6 +26,7 @@ exports.editUser = functions.https.onCall((data, context) => {
 	return userRef.update({
 		phoneNumber: data.phoneNumber,
 		venmoUsername: data.venmoUsername,
+		outOfHouse: data.outOfHouse
 	}).then((data) => {
 		return "succes"
 	}).catch((error) => {
@@ -48,7 +49,8 @@ exports.createUser = functions.https.onCall((data, context) => {
 		email: data.email,
 		phoneNumber: data.phoneNumber,
 		venmoUsername: data.venmoUsername,
-		admin: false
+		admin: false,
+		outOfHouse: false
 
 	}).then((data) => {
 		return "success"
@@ -235,7 +237,7 @@ exports.editGroup = functions.https.onCall((data, context) => {
 	return ref.update({
 		groupName: data.groupName,
 	}).then((data) => {
-		return "succes"
+		return "success"
 	}).catch((error) => {
 		return "fail"
 	})
