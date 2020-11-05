@@ -36,7 +36,8 @@ class Chore extends Component{
         choreid: "",
         groupid: "",
 		photoURL: "",
-        previousUser: "",
+		previousUser: "",
+		imageURI: "",
         edit: false,
     };
 
@@ -228,7 +229,6 @@ class Chore extends Component{
 
 	onImageButtonPressed() {
 		ImagePicker.showImagePicker(options, (response) => {
-			console.log('Response = ', response);
 
 			if (response.didCancel) {
 			  console.log('User cancelled image picker');
@@ -247,38 +247,12 @@ class Chore extends Component{
 				// const source = { uri: 'data:image/jpeg;base64,' + response.data };
 			
 				this.setState({
-				  avatarSource: source,
+				  imageURI: source,
 				});
             }
         });
 			
 	}
-
-	showImage(){
-		//console.log('PhotoUrl is: ' + this.state.photoURL)
-
-		
-
-        if(this.state.photoURL !== ''){
-
-// 			ImgToBase64.getBase64String(this.state.photoURL)
-//   .then(base64String => console.log(base64String))
-//   .catch(err => console.log(error));
-            
-            return(
-                // <TouchableOpacity
-                //     style={{justifyContent: 'center', alignItems: 'center'}}
-                //     onPress={this.onImageButtonPressed.bind(this)}
-                // >
-                    <Image
-                        source={{uri: this.state.avatarSource}}
-                        style={styles.modalImageStyle}
-                        //resizeMode='contain'
-                    />
-                // </TouchableOpacity>
-            )
-        }
-    }
 
     render() {
         return (
@@ -302,11 +276,16 @@ class Chore extends Component{
                                 </Text>
                             </Button>
 							{/* {this.showImage()} */}
-							<Image
-								source={{uri: this.state.avatarSource.uri}}
-								style={styles.modalImageStyle}
-								//resizeMode='contain'
-							/>
+							<TouchableOpacity
+								style={{justifyContent: 'center', alignItems: 'center'}}
+								onPress={this.onImageButtonPressed.bind(this)}
+							>
+								<Image
+									source={{uri: this.state.imageURI.uri}}
+									style={styles.modalImageStyle}
+									//resizeMode='contain'
+								/>
+                			</TouchableOpacity>
                             <Button onPress={()=>{this.onCompleteClicked()}}>
                                 Cancel
                             </Button>
