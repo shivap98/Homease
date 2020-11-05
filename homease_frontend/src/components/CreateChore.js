@@ -33,6 +33,20 @@ class CreateChore extends Component{
     constructor(props) {
 		super(props);
 	}
+
+	async getDbUserInfo(res){
+		grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+		mems = grp.result.users
+		values = []
+		for (var key in mems) {
+			var user = await getDB({data: {uid: mems[key]} }, "getUser")
+			values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key], selected: false});
+		}
+		this.setState({
+			groupid: res.result.groupid,
+			users: values, 
+		})
+	}
 	
 	async componentWillMount(){
 		var uid = null
@@ -47,16 +61,8 @@ class CreateChore extends Component{
 		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result.groupid){
-			grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
-			mems = grp.result.users
-			values = []
-			for (var key in mems) {
-				var user = await getDB({data: {uid: mems[key]} }, "getUser")
-				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key], selected: false});
-			}
-			this.setState({
-					groupid: res.result.groupid,
-					users: values, 
+			firebase.database().ref('/groups/'+res.result.groupid + '/users/').on('value', (snapshot) => {
+				this.getDbUserInfo(res)
 			})
 		}
 	}

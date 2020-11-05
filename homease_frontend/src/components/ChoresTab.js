@@ -68,21 +68,10 @@ class ChoresTab extends Component {
 			
 			
 			firebase.database().ref('/groups/'+res.result.groupid + '/chores/').on('value', (snapshot) => {
-				console.log("getdb-----------")
 				this.getDbInfo(uid, res)
 			})
 		}
-
-
-
-		
 	}
-
-	
-
-	// componentWillMount(){
-		
-	// }
 
      onRowDidOpen = rowKey => {
         console.log('This row opened', rowKey);

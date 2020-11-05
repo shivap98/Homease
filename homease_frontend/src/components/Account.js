@@ -35,6 +35,22 @@ class Account extends Component {
             UIManager.setLayoutAnimationEnabledExperimental(true);
 		}
 	}
+
+	async getDbUserInfo(res){
+		grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+		mems = grp.result.users
+		values = []
+		for (var key in mems) {
+			var user = await getDB({data: {uid: mems[key]} }, "getUser")
+			values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
+		}
+		this.setState({
+				members: values, 
+				group: grp.result, 
+				groupName: grp.result.groupName,
+				groupCode: grp.result.groupCode
+		})
+	}
 	
 	async componentDidMount(){
         var uid = null
@@ -59,19 +75,11 @@ class Account extends Component {
 		}
 
 		if(res.result.groupid){
-			grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
-			mems = grp.result.users
-			values = []
-			for (var key in mems) {
-				var user = await getDB({data: {uid: mems[key]} }, "getUser")
-				values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});
-			}
-			this.setState({
-                    members: values, 
-                    group: grp.result, 
-                    groupName: grp.result.groupName,
-                    groupCode: grp.result.groupCode
-                })
+
+			firebase.database().ref('/groups/'+res.result.groupid + '/users/').on('value', (snapshot) => {
+				this.getDbUserInfo(res)
+			})
+			
         }
 	}
 
