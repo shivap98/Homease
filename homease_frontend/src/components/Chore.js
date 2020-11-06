@@ -93,8 +93,6 @@ class Chore extends Component{
             return user;
         });
 
-        console.log("Selected user is "+ chore.selectedUsers);
-
         this.setState({
             choreName: chore.choreName,
             currentUser: chore.currentUser,
@@ -213,32 +211,39 @@ class Chore extends Component{
     renderPreviousUser (){
         let previousUserId = this.state.lastDoneBy;
         let previousUserName = this.getUserNameFromId(previousUserId);
-        console.log("Chore last done by: "+previousUserName);
-        return (
-            <View>
-                <Text style={styles.unselectedTextStyle}>
-                    {previousUserName}
-                </Text>
-                {this.showPreviousImage()}
-                <Button
-                    color={theme.buttonColor}
-                    style={{...styles.buttonContainedStyle, marginTop: 20}}
-                    mode="contained"
-                    onPress={() => {this.onRollBackClicked()}}
-                >
-                    <Text style={componentStyles.smallButtonTextStyle}>
-                        Rollback chore
+        if (previousUserName) {
+            return (
+                <View>
+                    <Text style={styles.unselectedTextStyle}>
+                        {previousUserName}
                     </Text>
-                </Button>
-            </View>
-        )
+                    {this.showPreviousImage()}
+                    <Button
+                        color={theme.buttonColor}
+                        style={{...styles.buttonContainedStyle, marginTop: 20}}
+                        mode="contained"
+                        onPress={async = () => {this.onRollBackClicked()}}
+                    >
+                        <Text style={componentStyles.smallButtonTextStyle}>
+                            Rollback chore
+                        </Text>
+                    </Button>
+                </View>
+            )
+        } else {
+            return(
+                <Text style={styles.unselectedTextStyle}>
+                    Chore not completed yet
+                </Text>
+            )
+        }
     }
 
     showPreviousUser(){
         if(this.state.recursiveChore === true){
             return (
                 <List.Accordion
-                    title="Last Completed by"
+                    title="Last Completed By"
                     onPress={() => {LayoutAnimation.easeInEaseOut()}}
                 >
                     {this.renderPreviousUser()}
@@ -260,8 +265,19 @@ class Chore extends Component{
         )
     }
 
-    onRollBackClicked(){
+    async onRollBackClicked(){
         console.log("ROLLBACK CLICKED");
+        let chore = this.packageChoreObj()
+        chore.currentUser = this.state.lastDoneBy
+        chore.status = 'Incomplete'
+        res = await getDB({ data: {
+            chore: chore,
+            choreid: this.state.choreid,
+            groupid: this.state.groupid
+        }}, "editChore");
+        console.log(res)
+
+        this.props.navigation.goBack()
     }
 
     onCompleteClicked() {
@@ -306,27 +322,17 @@ class Chore extends Component{
 
     async onDoneButtonClicked() {
         console.log("CLICKED DONE.")
-        console.log(this.state.selectedUsers)
-        console.log('recursive: ', this.state.recursiveChore)
-        console.log(this.state.users)
 
-        let chore = {}
+        let chore = this.packageChoreObj()
 
         if (this.state.recursiveChore) {
             let users = this.state.users
 
             if (this.state.selectedUsers.length == 1) {
-                chore = {
-                    choreName: this.state.choreName,
-                    currentUser: this.state.currentUser,
-                    description: this.state.description,
-                    lastDoneBy: this.state.currentUser,
-                    lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                    lastDonePhoto: this.state.photoURL,
-                    recursiveChore: this.state.recursiveChore,
-                    selectedUsers: this.state.selectedUsers,
-                    status: 'Incomplete'
-                }
+                chore.lastDoneBy = this.state.currentUser
+                chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
+                chore.lastDonePhoto = this.state.photoURL
+                chore.status = 'Incomplete'
             } else {
                 let nextUserKey = -1
                 for (var key in this.state.selectedUsers) {
@@ -335,7 +341,6 @@ class Chore extends Component{
                     }
                 }
                 nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
-                console.log(nextUserKey)
 
                 let usersMap = {}
                 for (var key in users) {
@@ -350,34 +355,19 @@ class Chore extends Component{
                     nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
                 }
                 let nextUserUID = this.state.selectedUsers[nextUserKey]
-                chore = {
-                    choreName: this.state.choreName,
-                    currentUser: nextUserUID,
-                    description: this.state.description,
-                    lastDoneBy: this.state.currentUser,
-                    lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                    lastDonePhoto: this.state.photoURL,
-                    recursiveChore: this.state.recursiveChore,
-                    selectedUsers: this.state.selectedUsers,
-                    status: 'Incomplete'
-                }
+                chore.currentUser = nextUserUID
+                chore.lastDoneBy = this.state.currentUser
+                chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
+                chore.lastDonePhoto = this.state.photoURL
+                chore.status = 'Incomplete'
             }
 
         } else {
-            chore = {
-                choreName: this.state.choreName,
-                currentUser: this.state.currentUser,
-                description: this.state.description,
-                lastDoneBy: this.state.currentUser,
-                lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                lastDonePhoto: this.state.photoURL,
-                recursiveChore: this.state.recursiveChore,
-                selectedUsers: this.state.selectedUsers,
-                status: 'Complete',
-            }
+            chore.lastDoneBy = this.state.currentUser
+            chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
+            chore.lastDonePhoto = this.state.photoURL
+            chore.status = 'Complete'
         }
-
-        console.log(chore)
 
         res = await getDB({ data: {
             chore: chore,
