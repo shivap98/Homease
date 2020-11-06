@@ -165,6 +165,13 @@ class Chore extends Component{
         }
     }
 
+    getUserNameFromId(userId) {
+        if(this.state.users.length>0){
+            let currentUser = this.state.users.find(x => x.uid === userId);
+            return currentUser.name;
+        }
+    }
+
     renderListOfMembers() {
         let members = this.state.users;
         return members.map((item, index) => {
@@ -182,12 +189,15 @@ class Chore extends Component{
     }
 
     renderPreviousUser (){
-        let previousUser = this.state.previousUser;
+        let previousUserId = this.state.lastDoneBy;
+        let previousUserName = this.getUserNameFromId(previousUserId);
+        console.log("Chore last done by: "+previousUserName);
         return (
             <View>
                 <Text style={styles.unselectedTextStyle}>
-                    {previousUser}
+                    {previousUserName}
                 </Text>
+                {this.showPreviousImage()}
                 <Button
                     color={theme.buttonColor}
                     style={{...styles.buttonContainedStyle, marginTop: 20}}
@@ -362,6 +372,20 @@ class Chore extends Component{
             }
         });
 
+    }
+
+    showPreviousImage() {
+        if(this.state.lastDonePhoto !== ''){
+            console.log('photo loaded');
+            return(
+                <View style={{alignItems: 'center'}}>
+                    <Image
+                        source={{uri: `data:image/png;base64,${this.state.lastDonePhoto}`}}
+                        style={styles.lastDoneImageStyle}
+                    />
+                </View>
+            )
+        }
     }
 
     showImage() {
@@ -619,6 +643,11 @@ const styles = {
     modalImageStyle: {
         height: 150,
         width: 150,
+        alignItems: 'center'
+    },
+    lastDoneImageStyle: {
+        height: 200,
+        width: 200,
         alignItems: 'center'
     },
     containerStyle : {
