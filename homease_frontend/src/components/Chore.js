@@ -43,6 +43,22 @@ class Chore extends Component{
         super(props);
     }
 
+    packageChoreObj() {
+        chore = {
+            choreName: this.state.choreName,
+            currentUser: this.state.currentUser,
+            description: this.state.description,
+            lastDoneBy: this.state.lastDoneBy,
+            lastDoneDate: this.state.lastDoneDate,
+            lastDonePhoto: this.state.photoURL,
+            recursiveChore: this.state.recursiveChore,
+            selectedUsers: this.state.selectedUsers,
+            status: this.state.status,
+        }
+
+        return chore
+    }
+
     async componentDidMount(){
 
         let groupid = this.props.route.params.groupid;
@@ -466,17 +482,7 @@ class Chore extends Component{
                                                 data: {
                                                     groupid: this.state.groupid,
                                                     choreid: this.state.choreid,
-                                                    chore: {
-                                                        choreName: this.state.choreName,
-                                                        selectedUsers: this.state.selectedUsers,
-                                                        recursiveChore: this.state.recursiveChore,
-                                                        description: this.state.description,
-                                                        currentUser: this.state.currentUser,
-                                                        status: this.state.status,
-                                                        lastDoneDate: this.state.lastDoneDate,
-                                                        lastDoneBy: this.state.lastDoneBy,
-                                                        lastDonePhoto: this.state.lastDonePhoto
-                                                    }
+                                                    chore: this.packageChoreObj()
                                                 }
                                             }, "editChore");
                                         }
