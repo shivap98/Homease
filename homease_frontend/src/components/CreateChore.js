@@ -38,10 +38,10 @@ class CreateChore extends Component{
 		}
 		this.setState({
 			groupid: res.result.groupid,
-			users: values, 
+			users: values,
 		})
 	}
-	
+
 	async componentWillMount(){
 		var uid = null
         if (auth().currentUser) {
@@ -156,7 +156,7 @@ class CreateChore extends Component{
 				description: this.state.description,
 				status: "Incomplete",
 				currentUser: this.state.selectedUsers[0]
-			}, 
+			},
 		},
 		'createChore');
 
@@ -186,7 +186,7 @@ class CreateChore extends Component{
                                     color: 'white',
                                     textAlign: 'center'
                                 }}>
-                                    Recursive chore?
+                                    Recurring chore?
                                 </Text>
                                 <Switch
                                     value={this.state.recursiveChore}

@@ -376,6 +376,19 @@ class Chore extends Component{
         }
     }
 
+    displayChoreType() {
+        let message = "Loading info...";
+        if(this.state.recursiveChore === false) {
+            message = "This is a non-recurring chore.";
+        }
+        else if(this.state.recursiveChore === true){
+            message = "This is a recurring chore.";
+        }
+        return(
+            <Text style={styles.cardHeaderTextStyle}>{message}</Text>
+        )
+    }
+
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
@@ -425,9 +438,6 @@ class Chore extends Component{
                                     value={this.state.edit}
                                     onValueChange={async = () => {
                                         if(this.state.edit === true) {
-                                            // let selectedUsers = this.state.users.map(user => {
-                                            //     if(this.state.selectedUsers.some(selectedUser => selectedUser))
-                                            // });
                                             getDB({
                                                 data: {
                                                     groupid: this.state.groupid,
@@ -451,47 +461,48 @@ class Chore extends Component{
                                 />
                             </CardSection>
                             <View style={componentStyles.cardSectionWithBorderStyle}>
-                            <TextInput
-                                style={styles.textInputStyle}
-                                label='Chore Name'
-                                mode='outlined'
-                                theme={{
-                                    colors: {
-                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                        text: this.state.edit ? 'white' : theme.lightColor,
-                                        primary: this.state.edit ? 'white' : theme.lightColor,
-                                    }
-                                }}
-                                value={this.state.choreName}
-                                onChangeText={textString => this.setState({choreName: textString})}
-                                editable={this.state.edit}
-                            />
-                            <TextInput
-                                style={styles.textInputStyle}
-                                label='Chore Description'
-                                mode='outlined'
-                                theme={{
-                                    colors: {
-                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                        text: this.state.edit ? 'white' : theme.lightColor,
-                                        primary: this.state.edit ? 'white' : theme.lightColor,
-                                    }
-                                }}
-                                multiline= {true}
-                                value={this.state.description}
-                                onChangeText={textString => this.setState({description: textString})}
-                                editable={this.state.edit}
-                            />
-                            <TextInput
+                                {this.displayChoreType()}
+                                <TextInput
                                     style={styles.textInputStyle}
-                                    label='Current User'
+                                    label='Chore Name'
                                     mode='outlined'
-                                    value={this.getCurrentUserName()}
-                                    keyboardAppearance='dark'
-                                    editable={false}
-                                    onChangeText={textString => {}}
-                            />
-                            {this.showGroupMembers()}
+                                    theme={{
+                                        colors: {
+                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                            text: this.state.edit ? 'white' : theme.lightColor,
+                                            primary: this.state.edit ? 'white' : theme.lightColor,
+                                        }
+                                    }}
+                                    value={this.state.choreName}
+                                    onChangeText={textString => this.setState({choreName: textString})}
+                                    editable={this.state.edit}
+                                />
+                                <TextInput
+                                    style={styles.textInputStyle}
+                                    label='Chore Description'
+                                    mode='outlined'
+                                    theme={{
+                                        colors: {
+                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                            text: this.state.edit ? 'white' : theme.lightColor,
+                                            primary: this.state.edit ? 'white' : theme.lightColor,
+                                        }
+                                    }}
+                                    multiline= {true}
+                                    value={this.state.description}
+                                    onChangeText={textString => this.setState({description: textString})}
+                                    editable={this.state.edit}
+                                />
+                                <TextInput
+                                        style={styles.textInputStyle}
+                                        label='Current User'
+                                        mode='outlined'
+                                        value={this.getCurrentUserName()}
+                                        keyboardAppearance='dark'
+                                        editable={false}
+                                        onChangeText={textString => {}}
+                                />
+                                {this.showGroupMembers()}
                             </View>
                             <View style={componentStyles.cardSectionWithBorderStyle}>
                                 <Text style={styles.cardHeaderTextStyle}>LAST DONE INFORMATION</Text>
