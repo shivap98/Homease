@@ -231,6 +231,9 @@ class Chore extends Component{
                     <Text style={styles.unselectedTextStyle}>
                         {previousUserName}
                     </Text>
+                    <Text style={styles.unselectedTextStyle}>
+                        {this.state.lastDoneDate}
+                    </Text>
                     {this.showPreviousImage()}
                     <Button
                         color={theme.buttonColor}
@@ -263,6 +266,28 @@ class Chore extends Component{
                     {this.renderPreviousUser()}
                 </List.Accordion>
             )
+        } else {
+            let previousUserId = this.state.lastDoneBy;
+            let previousUserName = this.getUserNameFromId(previousUserId);
+            if (previousUserName) {
+                return (
+                    <View>
+                        <Text style={styles.unselectedTextStyle}>
+                            {previousUserName}
+                        </Text>
+                        <Text style={styles.unselectedTextStyle}>
+                            {this.state.lastDoneDate}
+                        </Text>
+                        {this.showPreviousImage()}
+                    </View>
+                )
+            } else {
+                return(
+                    <Text style={styles.unselectedTextStyle}>
+                        Chore not completed yet
+                    </Text>
+                )
+            }
         }
     }
 
@@ -280,7 +305,7 @@ class Chore extends Component{
     }
 
     renderProgressButtons() {
-        if (this.state.loggedInUID === this.state.currentUser) {
+        if (this.state.loggedInUID === this.state.currentUser && this.state.status !== 'Complete') {
             return (
                 <CardSection>
                     <Button

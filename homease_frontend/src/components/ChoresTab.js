@@ -47,7 +47,6 @@ class ChoresTab extends Component {
 
 	async getDbInfo(uid, groupid) {
 		chores = await getDB({data: {groupid: groupid}}, 'getChoresByGroupID')
-        console.log('getDbInfo called')
 		var allChoresList = []
 		var myChoresList = []
 		for(key in chores.result){
@@ -89,16 +88,16 @@ class ChoresTab extends Component {
                     currentUser = obj[prop];
                 }
             }
+
+            res = await getDB({data: {uid: currentUser} }, "getUser")
+            var currentUserName = res.result.firstName + " " + res.result.lastName
             
-            if (currentUser === uid) {
-                myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore})
+            if (currentUser === uid && status !== 'Complete') {
+                myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName})
             } else {
-                allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore})
+                allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName})
             }
 		}
-
-        console.log('getDbInfo ended')
-
 		this.setState({allChoresList, myChoresList})
 	}
 
@@ -170,6 +169,11 @@ class ChoresTab extends Component {
                     style={{ color: 'white', fontSize: 18 }}
                 >
                     Status: {data.item.status}
+                </Text>
+                <Text
+                    style={{ color: 'white', fontSize: 18 }}
+                >
+                    Current User: {data.item.currentUserName}
                 </Text>
             </View>
         </TouchableHighlight>
