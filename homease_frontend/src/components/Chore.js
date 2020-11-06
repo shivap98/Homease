@@ -8,6 +8,8 @@ import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 import ImagePicker from 'react-native-image-picker';
 import moment from 'moment';
+import firebase from 'firebase';
+import auth from '@react-native-firebase/auth';
 
 
 
@@ -37,6 +39,7 @@ class Chore extends Component{
 		photoURL: "",
 		previousUser: "",
         edit: false,
+        loggedInUID: "temp"
     };
 
     constructor(props) {
@@ -60,6 +63,16 @@ class Chore extends Component{
     }
 
     async componentDidMount(){
+
+        var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
+
+            this.setState({ uid: auth().currentUser.uid })
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({ uid: firebase.auth().currentUser.uid })
+        }
 
         let groupid = this.props.route.params.groupid;
         let choreid = this.props.route.params.key;
@@ -93,8 +106,6 @@ class Chore extends Component{
             return user;
         });
 
-        console.log("Selected user is "+ chore.selectedUsers);
-
         this.setState({
             choreName: chore.choreName,
             currentUser: chore.currentUser,
@@ -107,7 +118,8 @@ class Chore extends Component{
             selectedUsers: chore.selectedUsers,
             status: chore.status,
             choreid: choreid,
-            groupid: groupid
+            groupid: groupid,
+            loggedInUID: uid
         });
     }
 
@@ -174,8 +186,6 @@ class Chore extends Component{
 
     getCurrentUserName() {
         if(this.state.users.length > 0) {
-            console.log("users are "+this.state.users);
-            console.log("CURRENT USER IS: "+this.state.currentUser);
             let currentUser = this.state.users.find(x => x.uid === this.state.currentUser);
             return currentUser.name;
         }
@@ -207,7 +217,6 @@ class Chore extends Component{
     renderPreviousUser (){
         let previousUserId = this.state.lastDoneBy;
         let previousUserName = this.getUserNameFromId(previousUserId);
-        console.log("Chore last done by: "+previousUserName);
         return (
             <View>
                 <Text style={styles.unselectedTextStyle}>
@@ -252,6 +261,57 @@ class Chore extends Component{
                 </List.Accordion>
             </View>
         )
+    }
+
+    renderProgressButtons() {
+        if (this.state.loggedInUID === this.state.currentUser) {
+            return (
+                <CardSection>
+                    <Button
+                        color={theme.buttonColor}
+                        style={styles.buttonContainedStyle}
+                        mode="contained"
+                        onPress={() => {
+                            Alert.alert(
+                                'This will mark the chore \'In Progress\'. Are you sure?',
+                                '',
+                                [
+                                    {
+                                        text: 'No',
+                                        onPress: () => { },
+                                        style: 'cancel',
+                                    },
+                                    {
+                                        text: 'Yes',
+                                        onPress: () => { this.onInProgressButtonClicked() },
+                                    }
+                                ],
+                                { cancelable: false },
+                            );
+                        }}
+                    >
+                        <Text style={componentStyles.smallButtonTextStyle}>
+                            In Progress
+                                    </Text>
+                    </Button>
+                    <Button
+                        color={theme.buttonColor}
+                        style={styles.buttonContainedStyle}
+                        mode="contained"
+                        onPress={() => { this.onCompleteClicked() }}
+                    >
+                        <Text style={componentStyles.smallButtonTextStyle}>
+                            Complete
+                                    </Text>
+                    </Button>
+
+
+                </CardSection>
+            )
+        }
+        else {
+            return (<View/>)
+        }
     }
 
     onRollBackClicked(){
@@ -300,9 +360,6 @@ class Chore extends Component{
 
     async onDoneButtonClicked() {
         console.log("CLICKED DONE.")
-        console.log(this.state.selectedUsers)
-        console.log('recursive: ', this.state.recursiveChore)
-        console.log(this.state.users)
 
         let chore = {}
 
@@ -329,7 +386,6 @@ class Chore extends Component{
                     }
                 }
                 nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
-                console.log(nextUserKey)
 
                 let usersMap = {}
                 for (var key in users) {
@@ -370,8 +426,6 @@ class Chore extends Component{
                 status: 'Complete',
             }
         }
-
-        console.log(chore)
 
         res = await getDB({ data: {
             chore: chore,
@@ -555,49 +609,9 @@ class Chore extends Component{
                                 <Text style={styles.cardHeaderTextStyle}>LAST DONE INFORMATION</Text>
                                 {this.showPreviousUser()}
                             </View>
+                            {this.renderProgressButtons()}
 
-                            <CardSection>
-
-                                <Button
-                                    color={theme.buttonColor}
-                                    style={styles.buttonContainedStyle}
-                                    mode="contained"
-                                    onPress={() => {
-                                        Alert.alert(
-                                            'This will mark the chore \'In Progress\'. Are you sure?',
-                                            '',
-                                            [
-                                                {
-                                                    text: 'No',
-                                                    onPress: () => { },
-                                                    style: 'cancel',
-                                                },
-                                                {
-                                                    text: 'Yes',
-                                                    onPress: () => { this.onInProgressButtonClicked() },
-                                                }
-                                            ],
-                                            { cancelable: false },
-                                        );
-                                    }}
-                                >
-                                    <Text style={componentStyles.smallButtonTextStyle}>
-                                                In Progress
-                                    </Text>
-                                </Button>
-                                <Button
-                                    color={theme.buttonColor}
-                                    style={styles.buttonContainedStyle}
-                                    mode="contained"
-                                    onPress= {() => {this.onCompleteClicked()}}
-                                >
-                                    <Text style={componentStyles.smallButtonTextStyle}>
-                                        Complete
-                                    </Text>
-                                </Button>
-
-
-                            </CardSection>
+                            
                             <Button
                                 color={theme.buttonColor}
                                 style={{...styles.buttonContainedStyle, marginLeft: 15, marginRight: 15}}
