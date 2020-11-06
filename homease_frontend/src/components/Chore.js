@@ -158,17 +158,23 @@ class Chore extends Component{
 
     getCurrentUserName() {
         if(this.state.users.length > 0) {
-            console.log("users are "+this.state.users);
-            console.log("CURRENT USER IS: "+this.state.currentUser);
-            let currentUser = this.state.users.find(x => x.uid === this.state.currentUser);
-            return currentUser.name;
+            let users = this.state.users
+            for (var key in users) {
+                if (users[key].uid === this.state.currentUser) {
+                    return users[key].name
+                }
+            }
         }
     }
 
     getUserNameFromId(userId) {
         if(this.state.users.length>0){
-            let currentUser = this.state.users.find(x => x.uid === userId);
-            return currentUser.name;
+            let users = this.state.users
+            for (var key in users) {
+                if (users[key].uid === userId) {
+                    return users[key].name
+                }
+            }
         }
     }
 
