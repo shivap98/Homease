@@ -12,6 +12,7 @@ import moment from 'moment';
 import paperTheme from './common/paperTheme';
 import ImagePicker from 'react-native-image-picker';
 
+
 const options = {
     title: 'Select Avatar',
     storageOptions: {

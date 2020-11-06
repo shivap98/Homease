@@ -10,6 +10,7 @@ import ImagePicker from 'react-native-image-picker';
 import moment from 'moment';
 import firebase from 'firebase';
 import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
 
 
 
@@ -85,9 +86,10 @@ class Chore extends Component{
 
         chore = chore.result;
 
+
         let groupInfo = await getDB({ data: {
             groupid: groupid
-        } }, "getGroupFromGroupID");
+        }}, "getGroupFromGroupID");
 
 
         let mems = groupInfo.result.users;
@@ -415,6 +417,14 @@ class Chore extends Component{
     }
 
     async onDoneButtonClicked() {
+
+		const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
+
+		imageRef = storage().ref(this.state.choreid)
+
+		await imageRef.putFile(uploadUri);
+		storageURL = await imageRef.getDownloadURL()
+		console.log(storageURL)
         console.log("CLICKED DONE.")
         console.log(this.state.selectedUsers)
 
@@ -426,7 +436,7 @@ class Chore extends Component{
             if (this.state.selectedUsers.length == 1) {
                 chore.lastDoneBy = this.state.currentUser
                 chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
-                chore.lastDonePhoto = this.state.photoURL
+                chore.lastDonePhoto = storageURL
                 chore.status = 'Incomplete'
             } else {
                 let nextUserKey = -1
@@ -455,16 +465,18 @@ class Chore extends Component{
                 chore.currentUser = nextUserUID
                 chore.lastDoneBy = this.state.currentUser
                 chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
-                chore.lastDonePhoto = this.state.photoURL
+                chore.lastDonePhoto = storageURL
                 chore.status = 'Incomplete'
             }
 
         } else {
             chore.lastDoneBy = this.state.currentUser
             chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
-            chore.lastDonePhoto = this.state.photoURL
+            chore.lastDonePhoto = storageURL
             chore.status = 'Complete'
-        }
+		}
+		
+		console.log(chore)
 
         res = await getDB({ data: {
             chore: chore,
@@ -482,10 +494,10 @@ class Chore extends Component{
     onModalClose() {
         console.log("Modal Closed");
         this.setState({modalVisible: false, photoURL: ''});
-    }
-
-	onImageButtonPressed() {
-		ImagePicker.showImagePicker(options, (response) => {
+	}
+	
+	onImageButtonPressed(){
+	 ImagePicker.showImagePicker(options, async (response) => {
 			if (response.didCancel) {
               console.log('User cancelled image picker');
 			} else if (response.error) {
@@ -493,10 +505,29 @@ class Chore extends Component{
 			} else if (response.customButton) {
 			  console.log('User tapped custom button: ', response.customButton);
 			} else {
-				const source = { uri: response.data };
+				const source = { data: response.data, uri: response.uri };
+
+				// try {
+				//   await task;
+				// } catch (e) {
+				//   console.error(e);
+				// }
+
+				//const {imageName, uploadUri} = this.state;
+				// firebase
+				// .storage()
+				// .ref(filename)
+				// .putFile(uploadUri)
+				// .then((snapshot) => {
+				// 	//You can check the image is now uploaded in the storage bucket
+				// 	console.log(`${imageName} has been successfully uploaded.`);
+				// })
+				// .catch((e) => console.log('uploading image error => ', e));
+
 				this.setState({
-				  	photoURL: source.uri,
-				});
+					photoURL: source.data,
+					photoURI: source.uri
+			  });
             }
         });
 
@@ -508,7 +539,7 @@ class Chore extends Component{
             return(
                 <View style={{alignItems: 'center'}}>
                     <Image
-                        source={{uri: `data:image/png;base64,${this.state.lastDonePhoto}`}}
+                        source={{uri: `data:image/png;base64,${this.state.photoURL}`}}
                         style={styles.lastDoneImageStyle}
                     />
                 </View>
