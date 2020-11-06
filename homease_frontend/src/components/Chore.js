@@ -43,6 +43,22 @@ class Chore extends Component{
         super(props);
     }
 
+    packageChoreObj() {
+        chore = {
+            choreName: this.state.choreName,
+            currentUser: this.state.currentUser,
+            description: this.state.description,
+            lastDoneBy: this.state.lastDoneBy,
+            lastDoneDate: this.state.lastDoneDate,
+            lastDonePhoto: this.state.photoURL,
+            recursiveChore: this.state.recursiveChore,
+            selectedUsers: this.state.selectedUsers,
+            status: this.state.status,
+        }
+
+        return chore
+    }
+
     async componentDidMount(){
 
         let groupid = this.props.route.params.groupid;
@@ -253,8 +269,25 @@ class Chore extends Component{
         this.setState({modalVisible: true});
     }
 
-    onInProgressButtonClicked() {
+    async onInProgressButtonClicked() {
         console.log("In Progress button pressed")
+
+        this.setState({
+            status: "In Progress"
+        })
+
+        chore = this.packageChoreObj()
+        chore.status = "In Progress"
+
+        res = await getDB({
+            data: {
+                chore: chore,
+                choreid: this.state.choreid,
+                groupid: this.state.groupid
+            }
+        }, "editChore");
+
+        console.log(res)
     }
     async onDeleteButtonClicked() {
         console.log("Delete button pressed")
@@ -472,17 +505,7 @@ class Chore extends Component{
                                                 data: {
                                                     groupid: this.state.groupid,
                                                     choreid: this.state.choreid,
-                                                    chore: {
-                                                        choreName: this.state.choreName,
-                                                        selectedUsers: this.state.selectedUsers,
-                                                        recursiveChore: this.state.recursiveChore,
-                                                        description: this.state.description,
-                                                        currentUser: this.state.currentUser,
-                                                        status: this.state.status,
-                                                        lastDoneDate: this.state.lastDoneDate,
-                                                        lastDoneBy: this.state.lastDoneBy,
-                                                        lastDonePhoto: this.state.lastDonePhoto
-                                                    }
+                                                    chore: this.packageChoreObj()
                                                 }
                                             }, "editChore");
                                         }
@@ -545,7 +568,24 @@ class Chore extends Component{
                                     color={theme.buttonColor}
                                     style={styles.buttonContainedStyle}
                                     mode="contained"
-                                    onPress={() => {this.onInProgressButtonClicked()}}
+                                    onPress={() => {
+                                        Alert.alert(
+                                            'This will mark the chore \'In Progress\'. Are you sure?',
+                                            '',
+                                            [
+                                                {
+                                                    text: 'No',
+                                                    onPress: () => { },
+                                                    style: 'cancel',
+                                                },
+                                                {
+                                                    text: 'Yes',
+                                                    onPress: () => { this.onInProgressButtonClicked() },
+                                                }
+                                            ],
+                                            { cancelable: false },
+                                        );
+                                    }}
                                 >
                                     <Text style={componentStyles.smallButtonTextStyle}>
                                                 In Progress
