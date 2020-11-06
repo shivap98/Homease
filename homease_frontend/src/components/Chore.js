@@ -8,7 +8,7 @@ import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 import ImagePicker from 'react-native-image-picker';
 import moment from 'moment';
-
+import firebase from 'firebase';
 
 
 const options = {
@@ -56,9 +56,10 @@ class Chore extends Component{
 
         chore = chore.result;
 
+
         let groupInfo = await getDB({ data: {
             groupid: groupid
-        } }, "getGroupFromGroupID");
+        }}, "getGroupFromGroupID");
 
 
         let mems = groupInfo.result.users;
@@ -271,7 +272,15 @@ class Chore extends Component{
         console.log('recursive: ', this.state.recursiveChore)
         console.log(this.state.users)
 
-        let chore = {}
+		let chore = {}
+		
+		var storageRef = firebase.storage().ref()
+		var st1 = storageRef.child('image/posts')
+		var message = this.state.photoURL
+		//console.log(message)
+		st1.putString(message).then(function(snapshot) {
+			console.log('Uploaded a string!');
+		});
 
         if (this.state.recursiveChore) {
             let users = this.state.users
@@ -283,7 +292,7 @@ class Chore extends Component{
                     description: this.state.description,
                     lastDoneBy: this.state.currentUser,
                     lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                    lastDonePhoto: this.state.photoURL,
+                    lastDonePhoto: "this.state.photoURL",
                     recursiveChore: this.state.recursiveChore,
                     selectedUsers: this.state.selectedUsers,
                     status: 'Incomplete'
@@ -317,7 +326,7 @@ class Chore extends Component{
                     description: this.state.description,
                     lastDoneBy: this.state.currentUser,
                     lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                    lastDonePhoto: this.state.photoURL,
+                    lastDonePhoto: "this.state.photoURL",
                     recursiveChore: this.state.recursiveChore,
                     selectedUsers: this.state.selectedUsers,
                     status: 'Incomplete'
@@ -331,7 +340,7 @@ class Chore extends Component{
                 description: this.state.description,
                 lastDoneBy: this.state.currentUser,
                 lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                lastDonePhoto: this.state.photoURL,
+                lastDonePhoto: "this.state.photoURL",
                 recursiveChore: this.state.recursiveChore,
                 selectedUsers: this.state.selectedUsers,
                 status: 'Complete',
@@ -365,9 +374,9 @@ class Chore extends Component{
 			} else if (response.customButton) {
 			  console.log('User tapped custom button: ', response.customButton);
 			} else {
-				const source = { uri: response.data };
+				const source = { uri: response.uri };
 				this.setState({
-				  	photoURL: source.uri,
+				  	photoURL: source,
 				});
             }
         });
