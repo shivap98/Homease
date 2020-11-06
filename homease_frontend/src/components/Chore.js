@@ -8,6 +8,8 @@ import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 import ImagePicker from 'react-native-image-picker';
 import moment from 'moment';
+import firebase from 'firebase';
+import auth from '@react-native-firebase/auth';
 
 
 
@@ -37,6 +39,7 @@ class Chore extends Component{
 		photoURL: "",
 		previousUser: "",
         edit: false,
+        loggedInUID: "temp"
     };
 
     constructor(props) {
@@ -60,6 +63,16 @@ class Chore extends Component{
     }
 
     async componentDidMount(){
+
+        var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
+
+            this.setState({ uid: auth().currentUser.uid })
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({ uid: firebase.auth().currentUser.uid })
+        }
 
         let groupid = this.props.route.params.groupid;
         let choreid = this.props.route.params.key;
@@ -105,7 +118,8 @@ class Chore extends Component{
             selectedUsers: chore.selectedUsers,
             status: chore.status,
             choreid: choreid,
-            groupid: groupid
+            groupid: groupid,
+            loggedInUID: uid
         });
     }
 
@@ -265,6 +279,57 @@ class Chore extends Component{
         )
     }
 
+    renderProgressButtons() {
+        if (this.state.loggedInUID === this.state.currentUser) {
+            return (
+                <CardSection>
+                    <Button
+                        color={theme.buttonColor}
+                        style={styles.buttonContainedStyle}
+                        mode="contained"
+                        onPress={() => {
+                            Alert.alert(
+                                'This will mark the chore \'In Progress\'. Are you sure?',
+                                '',
+                                [
+                                    {
+                                        text: 'No',
+                                        onPress: () => { },
+                                        style: 'cancel',
+                                    },
+                                    {
+                                        text: 'Yes',
+                                        onPress: () => { this.onInProgressButtonClicked() },
+                                    }
+                                ],
+                                { cancelable: false },
+                            );
+                        }}
+                    >
+                        <Text style={componentStyles.smallButtonTextStyle}>
+                            In Progress
+                                    </Text>
+                    </Button>
+                    <Button
+                        color={theme.buttonColor}
+                        style={styles.buttonContainedStyle}
+                        mode="contained"
+                        onPress={() => { this.onCompleteClicked() }}
+                    >
+                        <Text style={componentStyles.smallButtonTextStyle}>
+                            Complete
+                                    </Text>
+                    </Button>
+
+
+                </CardSection>
+            )
+        }
+        else {
+            return (<View/>)
+        }
+    }
+
     async onRollBackClicked(){
         console.log("ROLLBACK CLICKED");
         let chore = this.packageChoreObj()
@@ -304,6 +369,10 @@ class Chore extends Component{
         }, "editChore");
 
         console.log(res)
+
+        if (res.result === "success") {
+            this.props.navigation.goBack()
+        }
     }
     async onDeleteButtonClicked() {
         console.log("Delete button pressed")
@@ -322,6 +391,7 @@ class Chore extends Component{
 
     async onDoneButtonClicked() {
         console.log("CLICKED DONE.")
+        console.log(this.state.selectedUsers)
 
         let chore = this.packageChoreObj()
 
@@ -337,7 +407,8 @@ class Chore extends Component{
                 let nextUserKey = -1
                 for (var key in this.state.selectedUsers) {
                     if (this.state.selectedUsers[key] == this.state.currentUser) {
-                        nextUserKey = key
+                        nextUserKey = parseInt(key)
+                        break
                     }
                 }
                 nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
@@ -355,6 +426,7 @@ class Chore extends Component{
                     nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
                 }
                 let nextUserUID = this.state.selectedUsers[nextUserKey]
+                
                 chore.currentUser = nextUserUID
                 chore.lastDoneBy = this.state.currentUser
                 chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
@@ -377,7 +449,9 @@ class Chore extends Component{
         console.log(res)
 
         this.setState({modalVisible: false, photoURL: ''});
-        this.props.navigation.goBack()
+        if (res.result === "success") {
+            this.props.navigation.goBack()
+        }
     }
 
     onModalClose() {
@@ -551,49 +625,9 @@ class Chore extends Component{
                                 <Text style={styles.cardHeaderTextStyle}>LAST DONE INFORMATION</Text>
                                 {this.showPreviousUser()}
                             </View>
+                            {this.renderProgressButtons()}
 
-                            <CardSection>
-
-                                <Button
-                                    color={theme.buttonColor}
-                                    style={styles.buttonContainedStyle}
-                                    mode="contained"
-                                    onPress={() => {
-                                        Alert.alert(
-                                            'This will mark the chore \'In Progress\'. Are you sure?',
-                                            '',
-                                            [
-                                                {
-                                                    text: 'No',
-                                                    onPress: () => { },
-                                                    style: 'cancel',
-                                                },
-                                                {
-                                                    text: 'Yes',
-                                                    onPress: () => { this.onInProgressButtonClicked() },
-                                                }
-                                            ],
-                                            { cancelable: false },
-                                        );
-                                    }}
-                                >
-                                    <Text style={componentStyles.smallButtonTextStyle}>
-                                                In Progress
-                                    </Text>
-                                </Button>
-                                <Button
-                                    color={theme.buttonColor}
-                                    style={styles.buttonContainedStyle}
-                                    mode="contained"
-                                    onPress= {() => {this.onCompleteClicked()}}
-                                >
-                                    <Text style={componentStyles.smallButtonTextStyle}>
-                                        Complete
-                                    </Text>
-                                </Button>
-
-
-                            </CardSection>
+                            
                             <Button
                                 color={theme.buttonColor}
                                 style={{...styles.buttonContainedStyle, marginLeft: 15, marginRight: 15}}

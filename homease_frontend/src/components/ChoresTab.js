@@ -55,6 +55,7 @@ class ChoresTab extends Component {
             var lastDonePhoto = '';
             var currentUser = '';
             var recursiveChore = '';
+            var currentUser = '';
 			for (var prop in obj) {
 				if (!obj.hasOwnProperty(prop)) continue;
 				if(prop == "choreName"){
@@ -77,9 +78,12 @@ class ChoresTab extends Component {
                     currentUser = obj[prop];
                 } else if(prop == "recursiveChore"){
                     recursiveChore = obj[prop];
+                } else if(prop == "currentUser"){
+                    currentUser = obj[prop];
                 }
-			}
-            if (selectedUsers.includes(uid)) {
+            }
+            
+            if (currentUser === uid) {
                 myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore})
             } else {
                 allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore})
@@ -167,19 +171,15 @@ class ChoresTab extends Component {
         let chore = {}
         let choreKey = this.state.currentSwipedKey;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
-        console.log("Chores are: ", JSON.stringify(choreObj));
         // console.log(data);
 
         if (choreObj.recursiveChore) {
-            console.log("Rec chore");
             let mems = choreObj.selectedUsers;
             let users = [];
             for (var key in mems) {
-                console.log("Key is", mems[key]);
                 var user = await getDB({ data: { uid: mems[ key ] } }, "getUser");
                 users.push({ name: user.result.firstName + " " + user.result.lastName, uid: mems[ key ], outOfHouse: user.result.outOfHouse });
             }
-            console.log("users is :", JSON.stringify(users));
 
             if (choreObj.selectedUsers.length === 1) {
                 chore = {
@@ -193,35 +193,29 @@ class ChoresTab extends Component {
                     selectedUsers: choreObj.selectedUsers,
                     status: 'Incomplete'
                 }
-                console.log("Chore is ", JSON.stringify(chore));
             } else {
                 let nextUserKey = -1;
                 for (var key in choreObj.selectedUsers) {
                     if (choreObj.selectedUsers[key] === choreObj.currentUser) {
-                        nextUserKey = key
+                        nextUserKey = parseInt(key)
                     }
                 }
                 nextUserKey = (nextUserKey + 1) % choreObj.selectedUsers.length;
-                console.log("Next user is ",nextUserKey);
 
                 let usersMap = {};
                 for (var key in users) {
                     usersMap[users[key].uid] = users[key]
                 }
 
-                console.log("UsersMap is ", JSON.stringify(usersMap));
 
                 for (var i = 0; i < choreObj.selectedUsers.length; i++) {
                     let userUID = choreObj.selectedUsers[nextUserKey];
-                    console.log("userUID is ", JSON.stringify(userUID));
                     if (usersMap[userUID].outOfHouse == false) {
-                        console.log("BREAK");
                         break
                     }
                     nextUserKey = (nextUserKey + 1) % choreObj.selectedUsers.length
                 }
                 let nextUserUID = choreObj.selectedUsers[nextUserKey];
-                console.log("NEXT USER IS :", nextUserUID);
                 chore = {
                     choreName: choreObj.name,
                     currentUser: nextUserUID,
@@ -233,10 +227,8 @@ class ChoresTab extends Component {
                     selectedUsers: choreObj.selectedUsers,
                     status: 'Incomplete'
                 }
-                console.log("Chore is :", JSON.stringify(chore));
             }
         } else {
-            console.log("Non rec chore.");
             chore = {
                 choreName: choreObj.name,
                 currentUser: choreObj.currentUser,
@@ -248,8 +240,6 @@ class ChoresTab extends Component {
                 selectedUsers: choreObj.selectedUsers,
                 status: 'Complete',
             };
-            console.log("PLZ PRINT");
-            console.log("Chore is ", JSON.stringify(chore));
         }
 
         console.log(chore);
@@ -265,7 +255,6 @@ class ChoresTab extends Component {
     }
 
     onCompleteClicked(data) {
-        console.log("Data in complete is ", JSON.stringify(data));
         console.log("Complete button pressed");
         this.setState({modalVisible: true, currentSwipedKey: data.item.key});
     }
