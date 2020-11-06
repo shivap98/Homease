@@ -45,10 +45,9 @@ class ChoresTab extends Component {
         super(props);
 	}
 
-	async getDbInfo(uid, res) {
-		chores = await getDB({data: {groupid: res.result.groupid}}, 'getChoresByGroupID')
-
-        // console.log(chores);
+	async getDbInfo(uid, groupid) {
+		chores = await getDB({data: {groupid: groupid}}, 'getChoresByGroupID')
+        console.log('getDbInfo called')
 		var allChoresList = []
 		var myChoresList = []
 		for(key in chores.result){
@@ -98,6 +97,8 @@ class ChoresTab extends Component {
             }
 		}
 
+        console.log('getDbInfo ended')
+
 		this.setState({allChoresList, myChoresList})
 	}
 
@@ -114,10 +115,11 @@ class ChoresTab extends Component {
 		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result.groupid){
-			this.groupid = res.result.groupid
+            this.groupid = res.result.groupid
+            this.setState({groupid: this.groupid})
 
-			firebase.database().ref('/groups/'+res.result.groupid + '/chores/').on('value', (snapshot) => {
-				this.getDbInfo(uid, res)
+			firebase.database().ref('/groups/'+ res.result.groupid + '/chores/').on('value', (snapshot) => {
+				this.getDbInfo(uid, this.state.groupid)
 			})
 		}
 	}
