@@ -37,7 +37,8 @@ class Chore extends Component{
         status: "",
         choreid: "",
         groupid: "",
-		photoURL: "",
+        photoURL: "",
+        photoURI: '',
 		previousUser: "",
         edit: false,
         loggedInUID: "temp"
@@ -54,7 +55,7 @@ class Chore extends Component{
             description: this.state.description,
             lastDoneBy: this.state.lastDoneBy,
             lastDoneDate: this.state.lastDoneDate,
-            lastDonePhoto: this.state.photoURL,
+            lastDonePhoto: this.state.lastDonePhoto,
             recursiveChore: this.state.recursiveChore,
             selectedUsers: this.state.selectedUsers,
             status: this.state.status,
@@ -417,17 +418,18 @@ class Chore extends Component{
     }
 
     async onDoneButtonClicked() {
-
-		const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
-
-		imageRef = storage().ref(this.state.choreid)
-
-		await imageRef.putFile(uploadUri);
-		storageURL = await imageRef.getDownloadURL()
-		console.log(storageURL)
         console.log("CLICKED DONE.")
-        console.log(this.state.selectedUsers)
 
+        var storageURL = ''
+        if (this.state.photoURI !== '') {
+            const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
+
+            imageRef = storage().ref(this.state.choreid)
+    
+            await imageRef.putFile(uploadUri);
+            storageURL = await imageRef.getDownloadURL()
+        }
+		
         let chore = this.packageChoreObj()
 
         if (this.state.recursiveChore) {
@@ -476,8 +478,6 @@ class Chore extends Component{
             chore.status = 'Complete'
 		}
 		
-		console.log(chore)
-
         res = await getDB({ data: {
             chore: chore,
             choreid: this.state.choreid,
@@ -485,7 +485,7 @@ class Chore extends Component{
         }}, "editChore");
         console.log(res)
 
-        this.setState({modalVisible: false, photoURL: ''});
+        this.setState({modalVisible: false, photoURL: '', photoURI: ''});
         if (res.result === "success") {
             this.props.navigation.goBack()
         }
@@ -493,7 +493,7 @@ class Chore extends Component{
 
     onModalClose() {
         console.log("Modal Closed");
-        this.setState({modalVisible: false, photoURL: ''});
+        this.setState({modalVisible: false, photoURL: '', photoURI: ''});
 	}
 	
 	onImageButtonPressed(){
@@ -507,23 +507,6 @@ class Chore extends Component{
 			} else {
 				const source = { data: response.data, uri: response.uri };
 
-				// try {
-				//   await task;
-				// } catch (e) {
-				//   console.error(e);
-				// }
-
-				//const {imageName, uploadUri} = this.state;
-				// firebase
-				// .storage()
-				// .ref(filename)
-				// .putFile(uploadUri)
-				// .then((snapshot) => {
-				// 	//You can check the image is now uploaded in the storage bucket
-				// 	console.log(`${imageName} has been successfully uploaded.`);
-				// })
-				// .catch((e) => console.log('uploading image error => ', e));
-
 				this.setState({
 					photoURL: source.data,
 					photoURI: source.uri
@@ -535,11 +518,10 @@ class Chore extends Component{
 
     showPreviousImage() {
         if(this.state.lastDonePhoto !== ''){
-            console.log('photo loaded');
             return(
                 <View style={{alignItems: 'center'}}>
                     <Image
-                        source={{uri: `data:image/png;base64,${this.state.photoURL}`}}
+                        source={{uri: this.state.lastDonePhoto}}
                         style={styles.lastDoneImageStyle}
                     />
                 </View>
@@ -549,7 +531,6 @@ class Chore extends Component{
 
     showImage() {
         if(this.state.photoURL !== ''){
-            console.log('photo loaded')
             return(
                 <Image
                     source={{uri: `data:image/png;base64,${this.state.photoURL}`}}
