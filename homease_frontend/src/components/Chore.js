@@ -13,7 +13,6 @@ import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 
 
-
 const options = {
     title: 'Select Avatar',
     storageOptions: {
@@ -497,7 +496,7 @@ class Chore extends Component{
 	}
 	
 	onImageButtonPressed(){
-	 ImagePicker.showImagePicker(options, async (response) => {
+	    ImagePicker.showImagePicker(options, async (response) => {
 			if (response.didCancel) {
               console.log('User cancelled image picker');
 			} else if (response.error) {
@@ -513,7 +512,6 @@ class Chore extends Component{
 			  });
             }
         });
-
     }
 
     showPreviousImage() {

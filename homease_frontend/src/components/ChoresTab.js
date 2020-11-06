@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
 import paperTheme from './common/paperTheme';
 import ImagePicker from 'react-native-image-picker';
-
+import storage from '@react-native-firebase/storage';
 
 const options = {
     title: 'Select Avatar',
@@ -38,6 +38,7 @@ class ChoresTab extends Component {
         photoURL: '',
         modalVisible: false,
         currentSwipedKey: '',
+        photoURI: '',
     }
 
     groupid = ''
@@ -118,7 +119,7 @@ class ChoresTab extends Component {
             this.groupid = res.result.groupid
             this.setState({groupid: this.groupid})
 
-			firebase.database().ref('/groups/'+ res.result.groupid + '/chores/').on('value', (snapshot) => {
+			firebase.database().ref('/').on('value', (snapshot) => {
 				this.getDbInfo(uid, this.state.groupid)
 			})
 		}
@@ -182,9 +183,21 @@ class ChoresTab extends Component {
 
     async onDoneButtonClicked() {
 
+        console.log("CLICKED DONE.")
+        
         let chore = {}
         let choreKey = this.state.currentSwipedKey;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
+
+        var storageURL = ''
+        if (this.state.photoURI !== '') {
+            const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
+
+            imageRef = storage().ref(choreKey)
+            
+            await imageRef.putFile(uploadUri);
+            storageURL = await imageRef.getDownloadURL()
+        }
 
         if (choreObj.recursiveChore) {
             let mems = choreObj.selectedUsers;
@@ -201,7 +214,7 @@ class ChoresTab extends Component {
                     description: choreObj.description,
                     lastDoneBy: choreObj.currentUser,
                     lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                    lastDonePhoto: this.state.photoURL,
+                    lastDonePhoto: storageURL,
                     recursiveChore: choreObj.recursiveChore,
                     selectedUsers: choreObj.selectedUsers,
                     status: 'Incomplete'
@@ -235,7 +248,7 @@ class ChoresTab extends Component {
                     description: choreObj.description,
                     lastDoneBy: choreObj.currentUser,
                     lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                    lastDonePhoto: this.state.photoURL,
+                    lastDonePhoto: storageURL,
                     recursiveChore: choreObj.recursiveChore,
                     selectedUsers: choreObj.selectedUsers,
                     status: 'Incomplete'
@@ -248,43 +261,44 @@ class ChoresTab extends Component {
                 description: choreObj.description,
                 lastDoneBy: choreObj.currentUser,
                 lastDoneDate: moment().format("MM/DD/YYYY h:mm a"),
-                lastDonePhoto: this.state.photoURL,
+                lastDonePhoto: storageURL,
                 recursiveChore: choreObj.recursiveChore,
                 selectedUsers: choreObj.selectedUsers,
                 status: 'Complete',
             };
         }
 
-        console.log(chore);
-
         res = await getDB({ data: {
                 chore: chore,
                 choreid: choreObj.key,
                 groupid: this.groupid
             }}, "editChore");
-        console.log("Result is ", res)
+        console.log(res)
 
-        this.setState({modalVisible: false, photoURL: ''});
+        this.setState({modalVisible: false, photoURL: '', photoURI: ''});
     }
 
     onCompleteClicked(data) {
         console.log("Complete button pressed");
+        this._swipeListView.safeCloseOpenRow();
         this.setState({modalVisible: true, currentSwipedKey: data.item.key});
     }
 
-    onImageButtonPressed() {
-        ImagePicker.showImagePicker(options, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else if (response.customButton) {
-                console.log('User tapped custom button: ', response.customButton);
-            } else {
-                const source = { uri: response.data };
-                this.setState({
-                    photoURL: source.uri,
-                });
+	onImageButtonPressed(){
+	    ImagePicker.showImagePicker(options, async (response) => {
+			if (response.didCancel) {
+              console.log('User cancelled image picker');
+			} else if (response.error) {
+              console.log('ImagePicker Error: ', response.error);
+			} else if (response.customButton) {
+			  console.log('User tapped custom button: ', response.customButton);
+			} else {
+				const source = { data: response.data, uri: response.uri };
+
+				this.setState({
+					photoURL: source.data,
+					photoURI: source.uri
+			  });
             }
         });
     }
@@ -407,6 +421,7 @@ class ChoresTab extends Component {
                             previewOpenValue={-40}
                             previewOpenDelay={5000}
                             onRowDidOpen={this.onRowDidOpen}
+                            ref={ref => this._swipeListView = ref}
                         />
                     </View>
 
