@@ -21,7 +21,6 @@ class ChoresTab extends Component {
         {key: '4', name: 'Cleaning', status: 'in progress'},
         {key: '5', name: 'Cleaning', status: 'in progress'},
         {key: '6', name: 'Cleaning', status: 'in progress'},
-
     ]
 
     state = {
