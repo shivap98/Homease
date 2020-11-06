@@ -48,6 +48,7 @@ class ChoresTab extends Component {
 	}
 
 	async getDbInfo(uid, groupid) {
+        this.setState({allChoresList: [], myChoresList: []})
 		chores = await getDB({data: {groupid: groupid}}, 'getChoresByGroupID')
 		var allChoresList = []
 		var myChoresList = []

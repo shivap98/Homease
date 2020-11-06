@@ -38,6 +38,7 @@ class Account extends Component {
 	}
 
 	async getDbUserInfo(groupid){
+        this.setState({ members: [] })
 		grp = await getDB({data: {groupid: groupid} }, "getGroupFromGroupID")
 		mems = grp.result.users
 		values = []
