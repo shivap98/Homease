@@ -263,8 +263,25 @@ class Chore extends Component{
         this.setState({modalVisible: true});
     }
 
-    onInProgressButtonClicked() {
+    async onInProgressButtonClicked() {
         console.log("In Progress button pressed")
+
+        this.setState({
+            status: "In Progress"
+        })
+
+        chore = this.packageChoreObj()
+        chore.status = "In Progress"
+
+        res = await getDB({
+            data: {
+                chore: chore,
+                choreid: this.state.choreid,
+                groupid: this.state.groupid
+            }
+        }, "editChore");
+
+        console.log(res)
     }
     async onDeleteButtonClicked() {
         console.log("Delete button pressed")
@@ -545,7 +562,24 @@ class Chore extends Component{
                                     color={theme.buttonColor}
                                     style={styles.buttonContainedStyle}
                                     mode="contained"
-                                    onPress={() => {this.onInProgressButtonClicked()}}
+                                    onPress={() => {
+                                        Alert.alert(
+                                            'This will mark the chore \'In Progress\'. Are you sure?',
+                                            '',
+                                            [
+                                                {
+                                                    text: 'No',
+                                                    onPress: () => { },
+                                                    style: 'cancel',
+                                                },
+                                                {
+                                                    text: 'Yes',
+                                                    onPress: () => { this.onInProgressButtonClicked() },
+                                                }
+                                            ],
+                                            { cancelable: false },
+                                        );
+                                    }}
                                 >
                                     <Text style={componentStyles.smallButtonTextStyle}>
                                                 In Progress
