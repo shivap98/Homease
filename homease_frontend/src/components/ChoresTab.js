@@ -101,7 +101,7 @@ class ChoresTab extends Component {
 		this.setState({allChoresList, myChoresList})
 	}
 
-	async componentWillMount(){
+	async componentDidMount(){
 		var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid

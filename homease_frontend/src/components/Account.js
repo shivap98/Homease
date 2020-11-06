@@ -37,8 +37,8 @@ class Account extends Component {
 		}
 	}
 
-	async getDbUserInfo(res){
-		grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+	async getDbUserInfo(groupid){
+		grp = await getDB({data: {groupid: groupid} }, "getGroupFromGroupID")
 		mems = grp.result.users
 		values = []
 		for (var key in mems) {
@@ -78,11 +78,10 @@ class Account extends Component {
 		}
 
 		if(res.result.groupid){
-
-			firebase.database().ref('/groups/'+res.result.groupid + '/users/').on('value', (snapshot) => {
-				this.getDbUserInfo(res)
-			})
-			
+            let groupid = res.result.groupid
+			firebase.database().ref('/').on('value', (snapshot) => {
+				this.getDbUserInfo(groupid)
+            })
         }
 	}
 
@@ -100,11 +99,15 @@ class Account extends Component {
         }
       };
 
-    onAdminPressed (){
+    async onAdminPressed(uid) {
         console.log("Pressed admin button");
+        res = await getDB({ data: {
+            uid: uid,
+        }}, "makeAdmin");
+        console.log(res)
     }
 
-    onRemovePressed (uid){
+    onRemovePressed(uid) {
         if (uid == this.state.uid) {
             this.onLeaveGroupPressed(null);
         } else {
@@ -158,8 +161,8 @@ class Account extends Component {
 						key={item.uid}
 						right={props =>
 							<CardSection>
-								<Button onPress={() => {this.onAdminPressed()}}><Text>Admin</Text></Button>
-								<Button onPress={() => {this.onRemovePressed(item.uid)}}><Text>Remove</Text></Button>
+								<Button onPress={() => {this.onAdminPressed(item.uid)}}><Text>Admin</Text></Button>
+								<Button onPress={async = () => {this.onRemovePressed(item.uid)}}><Text>Remove</Text></Button>
 							</CardSection>
 						}
 					/>

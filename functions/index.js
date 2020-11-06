@@ -421,3 +421,37 @@ exports.deleteChore = functions.https.onCall((data, context) => {
 			return "fail3"
 		})
 });
+
+exports.makeAdmin = functions.https.onCall((data, context) => {
+
+	if (data.uid == "" || data.uid == null) {
+		return "fail"
+	}
+
+	var userRef = firebase.database().ref("users/" + data.uid + "/");
+
+	return userRef.update({
+		admin: true,
+	}).then((data) => {
+		return "succes"
+	}).catch((error) => {
+		return "fail"
+	})
+});
+
+exports.removeAdmin = functions.https.onCall((data, context) => {
+
+	if (data.uid == "" || data.uid == null) {
+		return "fail"
+	}
+
+	var userRef = firebase.database().ref("users/" + data.uid + "/");
+
+	return userRef.update({
+		admin: false,
+	}).then((data) => {
+		return "succes"
+	}).catch((error) => {
+		return "fail"
+	})
+});

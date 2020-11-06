@@ -42,8 +42,9 @@ class CreateChore extends Component{
 		})
 	}
 
-	async componentWillMount(){
-		var uid = null
+    async componentDidMount() {
+        this.props.navigation.setOptions({title: 'Create Chore'})
+        var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid
 
@@ -59,10 +60,6 @@ class CreateChore extends Component{
 				this.getDbUserInfo(res)
 			})
 		}
-	}
-
-    componentDidMount() {
-        this.props.navigation.setOptions({title: 'Create Chore'})
     }
 
     onSelectPressed(selectedUser, index){

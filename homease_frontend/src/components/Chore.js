@@ -343,7 +343,7 @@ class Chore extends Component{
                     >
                         <Text style={componentStyles.smallButtonTextStyle}>
                             Complete
-                                    </Text>
+                        </Text>
                     </Button>
 
 
