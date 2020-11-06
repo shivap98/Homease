@@ -12,6 +12,14 @@ import moment from 'moment';
 import paperTheme from './common/paperTheme';
 import ImagePicker from 'react-native-image-picker';
 
+const options = {
+    title: 'Select Avatar',
+    storageOptions: {
+        skipBackup: true,
+        path: 'images',
+    },
+};
+
 class ChoresTab extends Component {
 
     mockData = [
@@ -167,11 +175,9 @@ class ChoresTab extends Component {
 
     async onDoneButtonClicked() {
 
-        // console.log("Data ", JSON.stringify(data));
         let chore = {}
         let choreKey = this.state.currentSwipedKey;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
-        // console.log(data);
 
         if (choreObj.recursiveChore) {
             let mems = choreObj.selectedUsers;
@@ -276,11 +282,49 @@ class ChoresTab extends Component {
         });
     }
 
+    async onInProgressButtonClicked(key) {
+        console.log("In Progress button pressed and key is : ", JSON.stringify(key));
+
+        let chore = {}
+        let choreKey = key;
+        let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
+        console.log("Chores is: ", JSON.stringify(choreObj));
+
+        choreObj.status = "In Progress";
+
+        console.log("Chore is now : ", JSON.stringify(choreObj));
+
+        // chore = this.packageChoreObj()
+        chore = {
+            choreName: choreObj.name,
+            currentUser: choreObj.currentUser,
+            description: choreObj.description,
+            lastDoneBy: choreObj.lastDoneBy,
+            lastDoneDate: choreObj.lastDoneDate,
+            lastDonePhoto: this.state.photoURL,
+            recursiveChore: choreObj.recursiveChore,
+            selectedUsers: choreObj.selectedUsers,
+            status: choreObj.status,
+        };
+
+        console.log("Chore is ", JSON.stringify(chore));
+
+        res = await getDB({
+            data: {
+                chore: chore,
+                choreid: choreObj.key,
+                groupid: this.groupid
+            }
+        }, "editChore");
+
+        console.log("Result is ", JSON.stringify(res));
+    }
+
     renderSwipeOptions = (data, rowMap) => (
         <View style={styles.rowBack}>
             <TouchableOpacity
                 style={[styles.backRightBtn, styles.inProgressButtonStyle]}
-                onPress={() => console.log('Clicked in progress for', data.item.key)}
+                onPress={async () => {await this.onInProgressButtonClicked(data.item.key)}}
             >
                 <Icon name='progress-check' size={30}/>
             </TouchableOpacity>

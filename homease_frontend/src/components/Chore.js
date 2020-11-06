@@ -47,7 +47,7 @@ class Chore extends Component{
     }
 
     packageChoreObj() {
-        chore = {
+        let chore = {
             choreName: this.state.choreName,
             currentUser: this.state.currentUser,
             description: this.state.description,
