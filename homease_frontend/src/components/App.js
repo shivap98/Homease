@@ -27,17 +27,19 @@ const Tab = createBottomTabNavigator();
 class App extends Component<Props> {
 
 	componentDidMount() {
-		firebase.initializeApp({
-			apiKey: "AIzaSyDifrMqo7F-1AqDzwzWxwKdH_5Ge_TboRc",
-			authDomain: "homease-9de86.firebaseapp.com",
-			databaseURL: "https://homease-9de86.firebaseio.com",
-			projectId: "homease-9de86",
-			storageBucket: "homease-9de86.appspot.com",
-			messagingSenderId: "1089297007765",
-			appId: "1:1089297007765:web:b9ebd88fb7f4f30a46c79c",
-			measurementId: "G-6WEMEMJBH4"
-		  }
-		);
+		if (firebase.apps.length === 0) {
+			firebase.initializeApp({
+				apiKey: "AIzaSyDifrMqo7F-1AqDzwzWxwKdH_5Ge_TboRc",
+				authDomain: "homease-9de86.firebaseapp.com",
+				databaseURL: "https://homease-9de86.firebaseio.com",
+				projectId: "homease-9de86",
+				storageBucket: "homease-9de86.appspot.com",
+				messagingSenderId: "1089297007765",
+				appId: "1:1089297007765:web:b9ebd88fb7f4f30a46c79c",
+				measurementId: "G-6WEMEMJBH4"
+			  }
+			);
+		}
 	}
 
 	Home = () => {

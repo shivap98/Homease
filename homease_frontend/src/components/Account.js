@@ -25,7 +25,8 @@ class Account extends Component {
         venmoUsername: '',
         groupid: '',
         groupCode: '',
-        outOfHouse: false
+        outOfHouse: false,
+        users: {}
     };
 
     constructor(props) {
@@ -48,7 +49,8 @@ class Account extends Component {
 				members: values, 
 				group: grp.result, 
 				groupName: grp.result.groupName,
-				groupCode: grp.result.groupCode
+                groupCode: grp.result.groupCode,
+                users: grp.result.users
 		})
 	}
 	
@@ -70,7 +72,8 @@ class Account extends Component {
 				venmoUsername: res.result.venmoUsername,
 				phoneNumber: res.result.phoneNumber,
                 name: res.result.firstName + " " + res.result.lastName,
-                groupid: res.result.groupid
+                groupid: res.result.groupid,
+                outOfHouse: res.result.outOfHouse
             })
 		}
 
@@ -241,6 +244,65 @@ class Account extends Component {
         }
     }
 
+    async onOutOfHouseToggle() {
+        let outOfHouse = !this.state.outOfHouse
+        getDB({ data: {
+            uid: this.state.uid,
+            phoneNumber: this.state.phoneNumber,
+            venmoUsername: this.state.venmoUsername,
+            outOfHouse: outOfHouse
+        }}, "editUser");
+        console.log(outOfHouse)
+        if (outOfHouse) {
+            await this.getDbInfo()
+        }
+        this.setState({outOfHouse: outOfHouse})
+    }
+
+    async getDbInfo(uid, res) {
+		chores = await getDB({data: {groupid: this.state.groupid}}, 'getChoresByGroupID')
+        let users = this.state.users
+        let usersMap = {}
+        for (var key in users) {
+            var user = await getDB({ data: { uid: users[key] } }, "getUser");
+            usersMap[users[key]] = user.result
+        }
+
+		for(var key in chores.result){
+            let chore = chores.result[key]
+            if (chore.selectedUsers.length > 1 && chore.currentUser == this.state.uid) {
+                let nextUserKey = -1
+                for (var userKey in chore.selectedUsers) {
+                    if (chore.selectedUsers[userKey] == this.state.uid) {
+                        nextUserKey = userKey
+                    }
+                }
+                nextUserKey = (nextUserKey + 1) % chore.selectedUsers.length
+
+                for (var i = 0; i < chore.selectedUsers.length; i++) {
+                    let userUID = chore.selectedUsers[nextUserKey]
+                    if (usersMap[userUID].outOfHouse == false) {
+                        break
+                    }
+                    nextUserKey = (nextUserKey + 1) % chore.selectedUsers.length
+                }
+
+                let nextUserUID = chore.selectedUsers[nextUserKey]
+                chore.currentUser = nextUserUID
+                chore.status = 'Incomplete'
+                console.log(
+                    'removed user from chore id', key
+                )
+
+                res = await getDB({ data: {
+                    chore: chore,
+                    choreid: key,
+                    groupid: this.state.groupid
+                }}, "editChore");
+            }
+		}
+	}
+
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
@@ -344,14 +406,8 @@ class Account extends Component {
                                     <Switch
                                         value={this.state.outOfHouse}
                                         style={{margin: 15}}
-                                        onValueChange={() => {
-											getDB({ data: {
-												uid: this.state.uid,
-												phoneNumber: this.state.phoneNumber,
-												venmoUsername: this.state.venmoUsername,
-												outOfHouse: !this.state.outOfHouse
-											}}, "editUser");
-                                            this.setState({outOfHouse: !this.state.outOfHouse})
+                                        onValueChange={async = () => {
+                                            this.onOutOfHouseToggle()
                                         }}
                                     />
                                 </CardSection>
