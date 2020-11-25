@@ -15,6 +15,7 @@ import ChoresTab from './ChoresTab';
 import CreateChore from './CreateChore';
 import CreateOrJoin from './CreateOrJoinGroup';
 import CreateGroup from './CreateGroup';
+import ExpensesTab from './ExpensesTab';
 import JoinGroup from './JoinGroup';
 import CheckList from './CheckList';
 import {NavigationContainer} from '@react-navigation/native';
@@ -59,6 +60,7 @@ class App extends Component<Props> {
 			>
 				<Tab.Screen name="Chores" component={ChoresTab} />
 				<Tab.Screen name="Lists" component={CheckList} />
+				<Tab.Screen name="Expenses" component={ExpensesTab} />
 				<Tab.Screen name="Account" component={Account} />
 			</Tab.Navigator>
 		);
