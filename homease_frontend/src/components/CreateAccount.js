@@ -134,7 +134,6 @@ class CreateAccount extends Component{
 								value={this.state.password}
 								secureTextEntry
                                 onChangeText={textString => this.setState({password: textString})}
-
                             />
                             <TextInput
                                 style={styles.textInputStyle}
