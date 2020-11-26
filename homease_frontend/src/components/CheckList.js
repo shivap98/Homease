@@ -4,28 +4,24 @@ import theme from './common/theme';
 import CheckBox from '@react-native-community/checkbox';
 import componentStyles from './common/componentStyles';
 
-var list_size = 2;
 
 var mockList = [
     {
       name: 'Kevin',
-      id:0,
-      key: 'key1',
+      id:'asdas',
       checked:false
     },
     {
       name: 'John',
-      id:1,
-      key: 'key2',
+      id:'asdfas',
       checked:false
     },
 ];
 
 // Mock more data
 // for (let index = 2; index < 20; index++) {
-//     mockList.push({name: 'A' + index, id: index, key: 'key' + index, checked: false})
+//     mockList.push({name: 'A' + index, id: 'B' + index, checked: false})
 // }
-// list_size = 20;
 
 class CheckList extends Component {
 
@@ -34,18 +30,31 @@ class CheckList extends Component {
 		list: mockList,
     };
 
+    mockIDGenerator(length) {
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < length; i++ ) {
+           result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+     }
+
 
 	componentDidMount(){
         //TODO: attach hook to DB to look for changes
         //TODO: inside the get DB call Keyboard.dismiss() so that if user currently editing, changes are discarded
 
 
-        //TODO: when rendering lists, use list_size for indexing as array and increment
+        
     }
 
     checkThisBox = (itemID) => {
         let list=this.state.list
-        list[itemID].checked = !list[itemID].checked
+        console.log('checkbox for ' + itemID)
+        let item_index = list.findIndex(item => item.id === itemID)
+
+        list[item_index].checked = !list[item_index].checked
 
         //TODO: add code to update DB
 
@@ -54,30 +63,71 @@ class CheckList extends Component {
 
     changeText = (itemID, text) => {
         let list=this.state.list
-        list[itemID].name = text
+        let item_index = list.findIndex(item => item.id === itemID)
+        list[item_index].name = text
         this.setState({list:list})
     }
 
     updateText = (itemID) => {
+        let list=this.state.list
         console.log('update text for ' + itemID)
-
-        //TODO: add code to update text for list[itemID].key
+        let item_index = list.findIndex(item => item.id === itemID)
+        //TODO: add code to update text for itemID
     }
 
     addItem() {
-        console.log('add item')
+        
         let list=this.state.list
-        list.push({name: '', id: list_size, key: 'key' + list_size, checked: false})
-        list_size += 1
+        //TODO: get id from firebase - random UID to save to database
+        let id = this.mockIDGenerator(5)
+
+        console.log('add item id ' + id)
+        list.push({name: '', id: id, checked: false})
         this.setState({list:list})
         //TODO: update the DB
         
     }
 
+    deleteItem(itemID) {
+        console.log('delete item ' + itemID)
+        //TODO: delete item
+        const list = this.state.list.filter(item => item.id !== itemID);
+        this.setState({list:list})
+        //TODO: update DB
+    }
+
+    deleteItemButtonVisibility(item) {
+        if (item.checked) {
+            return (
+                <View
+                    style={{
+                        alignItems:'center',
+                        justifyContent:'center',
+                        
+                    }}
+                >
+                    <TouchableOpacity
+                        onPress={() => this.deleteItem(item.id)}
+                    >
+                        <Text
+                            style={{
+                                fontWeight: 'bold',
+                                color: 'white',
+                                fontSize: 20,
+                            }}
+                        >
+                            X
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )
+        }
+    }
+
     renderItem = ({ item }) => (
         <View style={{margin: 10, justifyContent: 'flex-start', flexDirection: 'row'}}>
             <CheckBox
-                value={this.state.list[item.id].checked}
+                value={item.checked}
                 onChange={() => this.checkThisBox(item.id)}
             />
             <TextInput
@@ -87,6 +137,7 @@ class CheckList extends Component {
                 onBlur={() => this.updateText(item.id)}
                 editable={!item.checked}
             />
+            {this.deleteItemButtonVisibility(item)}
         </View>
     )
 
