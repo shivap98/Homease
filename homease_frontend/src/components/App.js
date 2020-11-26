@@ -10,6 +10,7 @@ import firebase from 'firebase';
 import LoginPage from './LoginPage';
 import CreateAccount from './CreateAccount';
 import Account from './Account';
+import AddExpense from './AddExpense';
 import Chore from './Chore';
 import ChoresTab from './ChoresTab';
 import CreateChore from './CreateChore';
@@ -111,6 +112,10 @@ class App extends Component<Props> {
 					<Stack.Screen
 						name="Chore"
 						component={Chore}
+					/>
+					<Stack.Screen
+						name="AddExpense"
+						component={AddExpense}
 					/>
 				</Stack.Navigator>
 			</NavigationContainer>
