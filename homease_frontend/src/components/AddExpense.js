@@ -58,7 +58,22 @@ class AddExpense extends Component{
     onAddExpenseClicked(){
         let users = this.state.users;
         let hasSelectedUsers = users.some(user => user.selected === true);
-        if(!(parseFloat(this.state.amount) > 0.0)){
+        if(this.state.title.length === 0){
+            Alert.alert(
+                'Oops!',
+                'Please enter a title!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+        }
+        else if(!(parseFloat(this.state.amount) > 0.0)){
             Alert.alert(
                 'Oops!',
                 'Please enter amount greater than 0!',
