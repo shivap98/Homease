@@ -14,7 +14,8 @@ class AddExpense extends Component{
         users: [
             {userID: '1', name: 'Aman Wali', selected: false},
             {userID: '2', name: 'Kartik Mittal', selected: false},
-            {userID: '3', name: 'Abhignan Daravana'}
+            {userID: '3', name: 'Sehaj Randhawa', selected: false},
+            {userID: '4', name: 'Shiv Paul', selected: false}
         ],
         selectedUsers: [],
     };
@@ -26,15 +27,15 @@ class AddExpense extends Component{
 
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
-        console.log("selected users at time of click"+this.state.selectedUsers);
+        console.log("selected users at time of click "+this.state.selectedUsers);
         let users = this.state.users;
 
         users[index].selected = !selectedUser.selected;
         let selectedUsers = this.state.selectedUsers;
         if(users[index].selected === true){
-            selectedUsers.push(users[index].uid);
+            selectedUsers.push(users[index].userID);
         }else{
-            selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
+            selectedUsers = selectedUsers.filter(user => user !== users[index].userID);
         }
         this.setState({users: users, selectedUsers: selectedUsers});
     }

@@ -10,20 +10,17 @@ class ExpensesTab extends Component{
 
     state = {
         mockExpenses: [
-            {desc: 'First expense', paidBy: '1', amount: 10, dateTime: 'Thu Nov 26 2020 02:51:31 GMT-0500 (EST)'},
-            {desc: 'Second expense', paidBy: '2', amount: 30, dateTime: 'Thu Nov 26 2020 01:51:31 GMT-0500 (EST)'},
-            {desc: 'Third expense', paidBy: '1', amount: 20, dateTime: 'Thu Nov 26 2020 03:51:31 GMT-0500 (EST)'}
+            {id: '1', title: 'First expense', description: 'Random Description', paidBy: '1', amount: 10, dateTime: 'Thu Nov 26 2020 02:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3']},
+            {id: '2', title: 'Second expense', description: 'Random Description', paidBy: '2', amount: 30, dateTime: 'Thu Nov 26 2020 01:51:31 GMT-0500 (EST)', splitBetweenUsers:['2', '3', '1']},
+            {id: '3', title: 'Third expense', description: 'Random Description', paidBy: '1', amount: 20, dateTime: 'Thu Nov 26 2020 03:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3', '4']}
         ],
         users: [
             {userID: '1', name: 'Aman Wali'},
             {userID: '2', name: 'Kartik Mittal'},
-            {userID: '3', name: 'Abhignan Daravana'}
+            {userID: '3', name: 'Sehaj Randhawa'},
+            {userID: '4', name: 'Shiv Paul'}
         ],
     };
-
-    onExpensePressed(expense){
-        console.log("Clicked expense ",expense.desc);
-    }
 
     getUserFromID(id){
         let users = this.state.users;
@@ -68,10 +65,10 @@ class ExpensesTab extends Component{
                 return(
                     <View>
                         <List.Item
-                            title={item.desc}
+                            title={item.title}
                             key={index}
                             description={this.showItemDate(item)}
-                            onPress={() => {this.props.navigation.navigate('Expense')}}
+                            onPress={() => {this.props.navigation.navigate('Expense', {key: item.id})}}
                             right={props =>
                                 <CardSection>
                                         <Text style={styles.amountTextStyle}>
