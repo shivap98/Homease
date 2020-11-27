@@ -11,11 +11,13 @@ import LoginPage from './LoginPage';
 import CreateAccount from './CreateAccount';
 import Account from './Account';
 import AddExpense from './AddExpense';
+import Balances from './Balances';
 import Chore from './Chore';
 import ChoresTab from './ChoresTab';
 import CreateChore from './CreateChore';
 import CreateOrJoin from './CreateOrJoinGroup';
 import CreateGroup from './CreateGroup';
+import Expense from './Expense';
 import ExpensesTab from './ExpensesTab';
 import JoinGroup from './JoinGroup';
 import CheckList from './CheckList';
@@ -116,6 +118,14 @@ class App extends Component<Props> {
 					<Stack.Screen
 						name="AddExpense"
 						component={AddExpense}
+					/>
+					<Stack.Screen
+						name="Balances"
+						component={Balances}
+					/>
+					<Stack.Screen
+						name="Expense"
+						component={Expense}
 					/>
 				</Stack.Navigator>
 			</NavigationContainer>

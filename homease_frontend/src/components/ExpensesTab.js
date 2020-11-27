@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView, LayoutAnimation} from 'react-native';
+import {Text, View, ScrollView} from 'react-native';
 import theme from './common/theme';
 import {Button, FAB, List, Provider as PaperProvider, Divider} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
@@ -19,27 +19,7 @@ class ExpensesTab extends Component{
             {userID: '2', name: 'Kartik Mittal'},
             {userID: '3', name: 'Abhignan Daravana'}
         ],
-        expensesExpanded: true
     };
-
-    onBalanceClicked(){
-        let d1 = Date().toString();//.substr(0, 24);
-        console.log("Clicked balance button at ", d1);
-        let d2 = new Date(this.state.mockExpenses[0].dateTime);
-        let d3 = new Date(this.state.mockExpenses[1].dateTime);
-        let d4 = new Date(this.state.mockExpenses[2].dateTime);
-        console.log("D2 is ", d2.toString());
-        console.log("D3 is ", d3.toString());
-        console.log("D4 is ", d4.toString());
-        if(d2 < d3){
-            console.log(d2.toString(), " is lower than ", d3.toString());
-        }else if(d3 < d2){
-            console.log(d3.toString(), " is lower than ", d2.toString());
-        }else{
-            console.log("Equal");
-        }
-        console.log("Test");
-    }
 
     onExpensePressed(expense){
         console.log("Clicked expense ",expense.desc);
@@ -79,15 +59,10 @@ class ExpensesTab extends Component{
         return comparison;
     }
 
-    sortExpenses(expenses){
-        console.log("TEst");
-        return expenses.sort(this.compareDate);
-    }
-
     renderListOfExpenses(){
         console.log("List of expenses clicked");
         let expenses = this.state.mockExpenses;
-        expenses = this.sortExpenses(expenses);
+        expenses = expenses.sort(this.compareDate);
         if(expenses){
             return expenses.map((item, index)=>{
                 return(
@@ -96,7 +71,7 @@ class ExpensesTab extends Component{
                             title={item.desc}
                             key={index}
                             description={this.showItemDate(item)}
-                            onPress={() => {this.onExpensePressed(item)}}
+                            onPress={() => {this.props.navigation.navigate('Expense')}}
                             right={props =>
                                 <CardSection>
                                         <Text style={styles.amountTextStyle}>
@@ -106,9 +81,7 @@ class ExpensesTab extends Component{
                             }
                         />
                         {this.showDivider(expenses, index)}
-                        {/*<Divider style={{backgroundColor: 'white'}}/>*/}
                     </View>
-
                 )
             })
         }
@@ -124,14 +97,13 @@ class ExpensesTab extends Component{
                                 color={theme.buttonColor}
                                 style={styles.buttonContainedStyle}
                                 mode="contained"
-                                onPress={() => {this.onBalanceClicked()}}
+                                onPress={() => {this.props.navigation.navigate('Balances');}}
                             >
                                 View Balances
                             </Button>
                             <Text style={styles.cardHeaderTextStyle}>List of expenses in group</Text>
                             {this.renderListOfExpenses()}
                         </View>
-                        {/*<View style={componentStyles.cardSectionWithBorderStyle}></View>*/}
                     </ScrollView>
                 </PaperProvider>
                 <FAB
