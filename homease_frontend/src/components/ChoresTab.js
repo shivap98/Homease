@@ -94,7 +94,7 @@ class ChoresTab extends Component {
 
             res = await getDB({data: {uid: currentUser} }, "getUser")
             var currentUserName = res.result.firstName + " " + res.result.lastName
-            
+
             if (currentUser === uid && status !== 'Complete') {
                 myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName})
             } else {
@@ -185,7 +185,7 @@ class ChoresTab extends Component {
     async onDoneButtonClicked() {
 
         console.log("CLICKED DONE.")
-        
+
         let chore = {}
         let choreKey = this.state.currentSwipedKey;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
@@ -195,7 +195,7 @@ class ChoresTab extends Component {
             const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
 
             imageRef = storage().ref(choreKey)
-            
+
             await imageRef.putFile(uploadUri);
             storageURL = await imageRef.getDownloadURL()
         }
@@ -411,6 +411,9 @@ class ChoresTab extends Component {
 
                 <ScrollView>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>Reminders for group</Text>
+                    </View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
                         <SwipeListView
                             data={this.state.myChoresList}
@@ -425,7 +428,6 @@ class ChoresTab extends Component {
                             ref={ref => this._swipeListView = ref}
                         />
                     </View>
-
                     <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
                         <SwipeListView

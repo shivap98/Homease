@@ -21,7 +21,8 @@ class CreateChore extends Component{
         selectedUsers:[],
         recursiveChore: false,
         description: '',
-        multiLine: true
+        multiLine: true,
+        isChore: true
     };
 
     constructor(props) {
@@ -64,30 +65,46 @@ class CreateChore extends Component{
 
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
-        console.log("selected users at time of click"+this.state.selectedUsers);
-        let users = this.state.users;
-        if(this.state.recursiveChore === true) {
-            users[index].selected = !selectedUser.selected;
-            let selectedUsers = this.state.selectedUsers;
-            if(users[index].selected === true){
-                selectedUsers.push(users[index].uid);
-            }else{
-                selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
-            }
-            this.setState({users: users, selectedUsers: selectedUsers});
-        }else{
-            if(selectedUser.selected === false){
-                console.log("Clicked new user");
-                users = users.map(user => {
-                    user.selected=false;
-                    return user;
-                });
-                users[index].selected = true;
-                let selectedUsers = [];
-                selectedUsers.push(users[index].uid);
+        if(!this.state.isChore){
+            Alert.alert(
+                'Oops!',
+                'Reminders are automatically assigned to entire group!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+        }else {
+            console.log("selected users at time of click" + this.state.selectedUsers);
+            let users = this.state.users;
+            if (this.state.recursiveChore === true) {
+                users[index].selected = !selectedUser.selected;
+                let selectedUsers = this.state.selectedUsers;
+                if (users[index].selected === true) {
+                    selectedUsers.push(users[index].uid);
+                } else {
+                    selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
+                }
                 this.setState({users: users, selectedUsers: selectedUsers});
-            }else{
-                console.log("Clicked selected user again");
+            } else {
+                if (selectedUser.selected === false) {
+                    console.log("Clicked new user");
+                    users = users.map(user => {
+                        user.selected = false;
+                        return user;
+                    });
+                    users[index].selected = true;
+                    let selectedUsers = [];
+                    selectedUsers.push(users[index].uid);
+                    this.setState({users: users, selectedUsers: selectedUsers});
+                } else {
+                    console.log("Clicked selected user again");
+                }
             }
         }
     }
@@ -161,61 +178,156 @@ class CreateChore extends Component{
         this.props.navigation.goBack()
     }
 
+    renderChoreOrReminder(){
+        if(this.state.isChore){
+            return(
+                <View>
+                    <TextInput
+                        style={styles.textInputStyle}
+                        label='Chore Name'
+                        mode='outlined'
+                        value={this.state.choreName}
+                        onChangeText={textString => this.setState({choreName: textString})}
+                    />
+                    <CardSection>
+                        <Text style={{
+                            fontWeight: 'bold',
+                            flex: 1,
+                            marginTop: 7,
+                            marginRight: 15,
+                            color: 'white',
+                            textAlign: 'center'
+                        }}>
+                            Recurring chore?
+                        </Text>
+                        <Switch
+                            value={this.state.recursiveChore}
+                            onValueChange={() => {
+                                this.onRecursiveClicked();
+                            }}
+                        />
+                    </CardSection>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>GROUP MEMBERS</Text>
+                        <List.Accordion
+                            title="List of members in group"
+                            onPress={() => {LayoutAnimation.easeInEaseOut()}}
+                        >
+                            {this.renderListOfMembers()}
+                        </List.Accordion>
+                    </View>
+                    <TextInput
+                        style={styles.textInputStyle}
+                        label='Chore Description'
+                        mode='outlined'
+                        multiline= {true}
+                        value={this.state.description}
+                        onChangeText={textString => this.setState({description: textString})}
+                    />
+                </View>
+            )
+        }else{
+            return(
+                <View>
+                    <TextInput
+                        style={styles.textInputStyle}
+                        label='Reminder Name'
+                        mode='outlined'
+                        value={this.state.choreName}
+                        onChangeText={textString => this.setState({choreName: textString})}
+                    />
+                    <View style={{margin: 5}}/>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>GROUP MEMBERS</Text>
+                        {/*<List.Accordion*/}
+                            {/*title="List of members in group"*/}
+                            {/*onPress={() => {LayoutAnimation.easeInEaseOut()}}*/}
+                        {/*>*/}
+                            {this.renderListOfMembers()}
+                        {/*</List.Accordion>*/}
+                    </View>
+                    <TextInput
+                        style={styles.textInputStyle}
+                        label='Reminder Description'
+                        mode='outlined'
+                        multiline= {true}
+                        value={this.state.description}
+                        onChangeText={textString => this.setState({description: textString})}
+                    />
+                </View>
+            )
+        }
+    }
+
+    choreButtonColor(){
+        if(this.state.isChore) {
+            return theme.buttonColor;
+        }
+        return 'grey'
+    }
+
+    reminderButtonColor(){
+        if(!this.state.isChore){
+            return theme.buttonColor;
+        }
+        return 'grey'
+    }
+
+    onChorePressed(){
+        if(!this.state.isChore){
+            this.setState({isChore: true, choreName: '', description: '', recursiveChore: false, selectedUsers: []})
+        }
+    }
+
+    onReminderPressed(){
+        let users=this.state.users;
+        let selectedUsers = users.map((user) => user.uid);
+        users = users.map(user => {
+            if(selectedUsers.includes(user.uid)){
+                user.selected = true;
+            }else{
+                user.selected = false;
+            }
+            return user;
+        });
+        console.log("selectedUsers is ", selectedUsers);
+        if(this.state.isChore){
+            this.setState({users: users, isChore: false, choreName: '', description: '', recursiveChore: false, selectedUsers: selectedUsers})
+        }
+    }
+
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <PaperProvider theme={paperTheme}>
                     <ScrollView>
+                        <View style={styles.optionsViewStyle}>
+                            <Button
+                                color={this.choreButtonColor()}
+                                style={styles.optionsButtonStyle}
+                                mode="contained"
+                                onPress={() => {this.onChorePressed()}}
+                            >
+                                Chore
+                            </Button>
+                            <Button
+                                color={this.reminderButtonColor()}
+                                style={styles.optionsButtonStyle}
+                                mode="contained"
+                                onPress={() => {this.onReminderPressed()}}
+                            >
+                                Reminder
+                            </Button>
+                        </View>
                         <View style={styles.viewStyle}>
-                            <TextInput
-                                style={styles.textInputStyle}
-                                label='Chore Name'
-                                mode='outlined'
-                                value={this.state.choreName}
-                                onChangeText={textString => this.setState({choreName: textString})}
-                            />
-                            <CardSection>
-                                <Text style={{
-                                    fontWeight: 'bold',
-                                    flex: 1,
-                                    marginTop: 7,
-                                    marginRight: 15,
-                                    color: 'white',
-                                    textAlign: 'center'
-                                }}>
-                                    Recurring chore?
-                                </Text>
-                                <Switch
-                                    value={this.state.recursiveChore}
-                                    onValueChange={() => {
-                                        this.onRecursiveClicked();
-                                    }}
-                                />
-                            </CardSection>
-                            <View style={componentStyles.cardSectionWithBorderStyle}>
-                                <Text style={styles.cardHeaderTextStyle}>GROUP MEMBERS</Text>
-                                <List.Accordion
-                                    title="List of members in group"
-                                    onPress={() => {LayoutAnimation.easeInEaseOut()}}
-                                >
-                                    {this.renderListOfMembers()}
-                                </List.Accordion>
-                            </View>
-                            <TextInput
-                                style={styles.textInputStyle}
-                                label='Chore Description'
-                                mode='outlined'
-                                multiline= {true}
-                                value={this.state.description}
-                                onChangeText={textString => this.setState({description: textString})}
-                            />
+                            {this.renderChoreOrReminder()}
                             <Button
                                 color={theme.buttonColor}
                                 style={styles.buttonContainedStyle}
                                 mode="contained"
                                 onPress={() => {this.onCreateChoreClicked()}}
                             >
-                                Create chore
+                                Create
                             </Button>
                         </View>
                     </ScrollView>
@@ -227,8 +339,25 @@ class CreateChore extends Component{
 
 const styles = {
 
+    optionsViewStyle: {
+        marginTop: 10,
+        padding: 12,
+        flex: 1,
+        flexDirection: 'row'
+    },
+
+    optionsButtonStyle: {
+        height: 47,
+        justifyContent: 'center',
+        flex: 1,
+        marginTop: 25,
+        marginLeft: 5,
+        marginRight: 5
+    },
+
     viewStyle: {
         margin: 10,
+        marginTop: -20,
         padding: 12,
         flex: 1,
     },
