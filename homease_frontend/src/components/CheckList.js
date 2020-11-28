@@ -136,7 +136,7 @@ class CheckList extends Component {
         let id = this.mockIDGenerator(5)
 
 		console.log('add item id ' + id)
-		toAdd = {name: "milk", checked: false, id}
+		toAdd = {name: "", checked: false, id}
         list.push(toAdd)
 		this.setState({list:list})
 
