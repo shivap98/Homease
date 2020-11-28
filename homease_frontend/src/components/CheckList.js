@@ -1,21 +1,24 @@
 import React, {Component} from 'react';
 import {Text, View, TextInput, FlatList, TouchableOpacity, ScrollView} from 'react-native';
 import theme from './common/theme';
+import getDB from './Cloud';
+import auth from '@react-native-firebase/auth';
+import firebase from 'firebase';
 import CheckBox from '@react-native-community/checkbox';
 import componentStyles from './common/componentStyles';
 
 
 var mockList = [
-    {
-      name: 'Kevin',
-      id:'asdas',
-      checked:false
-    },
-    {
-      name: 'John',
-      id:'asdfas',
-      checked:false
-    },
+    // {
+    //   name: 'Kevin',
+    //   id:'asdas',
+    //   checked:false
+    // },
+    // {
+    //   name: 'John',
+    //   id:'asdfas',
+    //   checked:false
+    // },
 ];
 
 // Mock more data
@@ -41,11 +44,29 @@ class CheckList extends Component {
      }
 
 
-	componentDidMount(){
+	 async componentDidMount(){
         //TODO: attach hook to DB to look for changes
         //TODO: inside the get DB call Keyboard.dismiss() so that if user currently editing, changes are discarded
 
+		var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
 
+            this.setState({uid: auth().currentUser.uid})
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({uid: firebase.auth().currentUser.uid})
+        }
+		res = await getDB({data: {uid: uid} }, "getUser")
+
+		if(res.result.groupid){
+            this.groupid = res.result.groupid
+            this.setState({groupid: this.groupid})
+
+			// firebase.database().ref('/').on('value', (snapshot) => {
+			// 	this.getDbInfo(uid, this.state.groupid)
+			// })
+		}
         
     }
 
@@ -75,16 +96,29 @@ class CheckList extends Component {
         //TODO: add code to update text for itemID
     }
 
-    addItem() {
+    async addItem() {
         
         let list=this.state.list
         //TODO: get id from firebase - random UID to save to database
         let id = this.mockIDGenerator(5)
 
-        console.log('add item id ' + id)
-        list.push({name: '', id: id, checked: false})
-        this.setState({list:list})
-        //TODO: update the DB
+		console.log('add item id ' + id)
+		toAdd = {name: "milk", checked: false, id}
+        list.push(toAdd)
+		this.setState({list:list})
+
+		//TODO: update the DB
+
+		// console.log("Groupid: " + this.state.groupid)
+		// console.log("list: " + this.state.list)
+		
+		let res = await getDB({ data: {
+			groupid: this.state.groupid,
+			item: toAdd
+		}},
+		"addItemOnSharedList");
+
+		console.log(res)
         
     }
 
