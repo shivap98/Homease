@@ -102,7 +102,7 @@ class CheckList extends Component {
 			groupid: this.state.groupid,
 			item: list[item_index]
 		}},
-		"addItemOnSharedList");
+		"editSharedList");
 		
     }
 
@@ -111,8 +111,6 @@ class CheckList extends Component {
         let item_index = list.findIndex(item => item.id === itemID)
         list[item_index].name = text
 		this.setState({list:list})
-		
-		
     }
 
     updateText = async(itemID) => {
@@ -120,11 +118,12 @@ class CheckList extends Component {
         console.log('update text for ' + itemID)
         let item_index = list.findIndex(item => item.id === itemID)
 		//TODO: add code to update text for itemID
+		console.log(list[item_index].id)
 		let res = await getDB({ data: {
 			groupid: this.state.groupid,
 			item: list[item_index]
 		}},
-		"addItemOnSharedList");
+		"editSharedList");
 
 		console.log(res)
     }
@@ -149,7 +148,6 @@ class CheckList extends Component {
 		"addItemOnSharedList");
 
 		console.log(res)
-        
     }
 
     async deleteItem(itemID) {
@@ -161,9 +159,9 @@ class CheckList extends Component {
 		
 		let res = await getDB({ data: {
 			groupid: this.state.groupid,
-			item: {id: itemID}
+			item: {id: itemID, delete: true}
 		}},
-		"addItemOnSharedList");
+		"editSharedList");
 
 		console.log(res)
     }

@@ -463,13 +463,30 @@ exports.addItemOnSharedList = functions.https.onCall((data, context) => {
 	}
 
 	var groupid = data.groupid.replace("#", "*");
-	var groupref = firebase.database().ref("groups/" + groupid + "/sharedList/" + data.item.id +"/");
+	var groupref = firebase.database().ref("groups/" + groupid + "/sharedList/");
 
-	if(!data.item.name){
+	var newGroupRef = groupref.push();
+	var newID = newGroupRef.key
+
+	var groupref1 = firebase.database().ref("groups/" + groupid + "/sharedList/" + newID +"/");
+
+	return groupref1.set({...data.item, id: newID})
+});
+
+exports.editSharedList = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/sharedList/" + data.item.id +"/");
+	
+	if(data.item.delete){
 		return groupref.set({})
 	}
 	else {
-		return groupref.set(data.item)
+		return groupref.update(data.item)
 	}
 });
 
