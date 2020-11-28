@@ -82,11 +82,19 @@ class CheckList extends Component {
         this.setState({list:list})
     }
 
-    changeText = (itemID, text) => {
+    changeText = async (itemID, text) => {
         let list=this.state.list
         let item_index = list.findIndex(item => item.id === itemID)
         list[item_index].name = text
-        this.setState({list:list})
+		this.setState({list:list})
+		
+		let res = await getDB({ data: {
+			groupid: this.state.groupid,
+			item: list[item_index]
+		}},
+		"addItemOnSharedList");
+
+		console.log(res)
     }
 
     updateText = (itemID) => {
