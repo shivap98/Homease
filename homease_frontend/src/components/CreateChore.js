@@ -1,6 +1,6 @@
 import React, {Component} from "react";
-import {ScrollView, View, Text, Alert, LayoutAnimation} from 'react-native';
-import {Button, List, Provider as PaperProvider, Switch, TextInput} from 'react-native-paper';
+import {ScrollView, View, Text, Alert, LayoutAnimation, TouchableOpacity} from 'react-native';
+import {Button, List, Provider as PaperProvider, Switch, TextInput, Dialog, Modal, Portal} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import getDB from './Cloud';
@@ -8,6 +8,7 @@ import {CardSection} from './common';
 import componentStyles from './common/componentStyles';
 import auth from '@react-native-firebase/auth';
 import firebase from 'firebase';
+import DatePicker from 'react-native-date-picker';
 
 class CreateChore extends Component{
     state = {
@@ -22,7 +23,9 @@ class CreateChore extends Component{
         recursiveChore: false,
         description: '',
         multiLine: true,
-        isChore: true
+        isChore: true,
+        date: new Date(),
+        modalVisible: false,
     };
 
     constructor(props) {
@@ -178,9 +181,14 @@ class CreateChore extends Component{
         this.props.navigation.goBack()
     }
 
-    renderChoreOrReminder(){
-        if(this.state.isChore){
-            return(
+    onDateButtonPressed(){
+        console.log("Setting dialog to true");
+        this.setState({modalVisible: !this.state.modalVisible})
+    }
+
+    renderChoreOrReminder() {
+        if (this.state.isChore) {
+            return (
                 <View>
                     <TextInput
                         style={styles.textInputStyle}
@@ -211,7 +219,9 @@ class CreateChore extends Component{
                         <Text style={styles.cardHeaderTextStyle}>GROUP MEMBERS</Text>
                         <List.Accordion
                             title="List of members in group"
-                            onPress={() => {LayoutAnimation.easeInEaseOut()}}
+                            onPress={() => {
+                                LayoutAnimation.easeInEaseOut()
+                            }}
                         >
                             {this.renderListOfMembers()}
                         </List.Accordion>
@@ -220,14 +230,14 @@ class CreateChore extends Component{
                         style={styles.textInputStyle}
                         label='Chore Description'
                         mode='outlined'
-                        multiline= {true}
+                        multiline={true}
                         value={this.state.description}
                         onChangeText={textString => this.setState({description: textString})}
                     />
                 </View>
             )
-        }else{
-            return(
+        } else {
+            return (
                 <View>
                     <TextInput
                         style={styles.textInputStyle}
@@ -240,17 +250,18 @@ class CreateChore extends Component{
                     <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>GROUP MEMBERS</Text>
                         {/*<List.Accordion*/}
-                            {/*title="List of members in group"*/}
-                            {/*onPress={() => {LayoutAnimation.easeInEaseOut()}}*/}
+                        {/*title="List of members in group"*/}
+                        {/*onPress={() => {LayoutAnimation.easeInEaseOut()}}*/}
                         {/*>*/}
-                            {this.renderListOfMembers()}
+                        {this.renderListOfMembers()}
                         {/*</List.Accordion>*/}
                     </View>
+                    <Button onPress={()=>{this.onDateButtonPressed()}}>Click to select Date for reminder</Button>
                     <TextInput
                         style={styles.textInputStyle}
                         label='Reminder Description'
                         mode='outlined'
-                        multiline= {true}
+                        multiline={true}
                         value={this.state.description}
                         onChangeText={textString => this.setState({description: textString})}
                     />
@@ -292,7 +303,44 @@ class CreateChore extends Component{
         });
         console.log("selectedUsers is ", selectedUsers);
         if(this.state.isChore){
-            this.setState({users: users, isChore: false, choreName: '', description: '', recursiveChore: false, selectedUsers: selectedUsers})
+            this.setState({users: users, isChore: false, choreName: '', description: '', recursiveChore: false, selectedUsers: selectedUsers, date: new Date()})
+        }
+    }
+
+    async onCreatePressed() {
+        if (this.state.isChore) {
+            await this.onCreateChoreClicked();
+        }else{
+            console.log("Date is ", this.state.date.toString());
+            if(this.state.date < new Date()){
+                Alert.alert(
+                    'Oops!',
+                    'Please select a date in the future!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
+
+                    ],
+                    {cancelable: false},
+                );
+            }else if(this.state.choreName.length === 0){
+                Alert.alert(
+                    'Oops!',
+                    'Reminder name cannot be empty!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
+
+                    ],
+                    {cancelable: false},
+                );
+            }
         }
     }
 
@@ -300,6 +348,24 @@ class CreateChore extends Component{
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <PaperProvider theme={paperTheme}>
+                    <Portal>
+                        <Modal
+                            visible={this.state.modalVisible}
+                            onDismiss = {() => { this.onDateButtonPressed() }}
+                            contentContainerStyle={styles.containerStyle}
+                        >
+                            <Button>Select Date</Button>
+                            {/*<Text style={styles.modalHeaderTextStyle}>Select Date</Text>*/}
+                            <DatePicker
+                                date={this.state.date}
+                                textColor={theme.buttonTextColor}
+                                onDateChange={date => {this.setState({date: date})}}
+                            />
+                            <Button onPress={()=>{this.onDateButtonPressed()}}>
+                                Done
+                            </Button>
+                        </Modal>
+                    </Portal>
                     <ScrollView>
                         <View style={styles.optionsViewStyle}>
                             <Button
@@ -325,7 +391,7 @@ class CreateChore extends Component{
                                 color={theme.buttonColor}
                                 style={styles.buttonContainedStyle}
                                 mode="contained"
-                                onPress={() => {this.onCreateChoreClicked()}}
+                                onPress={() => {this.onCreatePressed()}}
                             >
                                 Create
                             </Button>
@@ -393,6 +459,16 @@ const styles = {
         flex: 1,
         color: theme.buttonTextColor,
         textAlign: 'center'
+    },
+    containerStyle : {
+        backgroundColor: theme.backgroundColor,
+        padding: 20,
+    },
+    modalHeaderTextStyle:{
+        textColor: theme.buttonColor,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: theme.bigButtonFontSize
     }
 };
 
