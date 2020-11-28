@@ -28,7 +28,7 @@ exports.editUser = functions.https.onCall((data, context) => {
 		venmoUsername: data.venmoUsername,
 		outOfHouse: data.outOfHouse
 	}).then((data) => {
-		return "succes"
+		return "success"
 	}).catch((error) => {
 		return "fail"
 	})
@@ -433,7 +433,7 @@ exports.makeAdmin = functions.https.onCall((data, context) => {
 	return userRef.update({
 		admin: true,
 	}).then((data) => {
-		return "succes"
+		return "success"
 	}).catch((error) => {
 		return "fail"
 	})
@@ -450,8 +450,57 @@ exports.removeAdmin = functions.https.onCall((data, context) => {
 	return userRef.update({
 		admin: false,
 	}).then((data) => {
-		return "succes"
+		return "success"
 	}).catch((error) => {
 		return "fail"
 	})
 });
+
+exports.addItemOnSharedList = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/sharedList/" + data.item.id +"/");
+
+	if(!data.item.name){
+		return groupref.set({})
+	}
+	else {
+		return groupref.set(data.item)
+	}
+});
+
+exports.getSharedList = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			var listRef = firebase.database().ref("groups/" + groupid + "/sharedList/");
+
+			return listRef.once("value")
+				.then(function (snapshot) {
+
+					return snapshot.val()
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
+
+
