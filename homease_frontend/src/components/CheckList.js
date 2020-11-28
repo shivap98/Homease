@@ -41,7 +41,24 @@ class CheckList extends Component {
            result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;
-     }
+	 }
+	 
+	 async getSharedList(res){
+		let result = await getDB({ data: {
+			groupid: res.result.groupid,
+		}},
+		"getSharedList");
+
+		list = result.result
+		values = []
+		for (var key in list) {
+			values.push(list[key]);
+		}
+		console.log(values)
+		this.setState({list: values})
+
+		console.log(result)
+	 }
 
 
 	 async componentDidMount(){
@@ -61,16 +78,16 @@ class CheckList extends Component {
 
 		if(res.result.groupid){
             this.groupid = res.result.groupid
-            this.setState({groupid: this.groupid})
+			this.setState({groupid: this.groupid})
 
-			// firebase.database().ref('/').on('value', (snapshot) => {
-			// 	this.getDbInfo(uid, this.state.groupid)
-			// })
+			firebase.database().ref('/groups/'+res.result.groupid + '/sharedList/').on('value', (snapshot) => {
+				this.getSharedList(res)
+			})
 		}
         
     }
 
-    checkThisBox = (itemID) => {
+    checkThisBox = async (itemID) => {
         let list=this.state.list
         console.log('checkbox for ' + itemID)
         let item_index = list.findIndex(item => item.id === itemID)
@@ -79,7 +96,14 @@ class CheckList extends Component {
 
         //TODO: add code to update DB
 
-        this.setState({list:list})
+		this.setState({list:list})
+
+		let res = await getDB({ data: {
+			groupid: this.state.groupid,
+			item: list[item_index]
+		}},
+		"addItemOnSharedList");
+		
     }
 
     changeText = async (itemID, text) => {
@@ -88,6 +112,14 @@ class CheckList extends Component {
         list[item_index].name = text
 		this.setState({list:list})
 		
+		
+    }
+
+    updateText = async(itemID) => {
+        let list=this.state.list
+        console.log('update text for ' + itemID)
+        let item_index = list.findIndex(item => item.id === itemID)
+		//TODO: add code to update text for itemID
 		let res = await getDB({ data: {
 			groupid: this.state.groupid,
 			item: list[item_index]
@@ -95,13 +127,6 @@ class CheckList extends Component {
 		"addItemOnSharedList");
 
 		console.log(res)
-    }
-
-    updateText = (itemID) => {
-        let list=this.state.list
-        console.log('update text for ' + itemID)
-        let item_index = list.findIndex(item => item.id === itemID)
-        //TODO: add code to update text for itemID
     }
 
     async addItem() {
