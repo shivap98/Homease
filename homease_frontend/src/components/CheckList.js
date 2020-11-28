@@ -108,9 +108,6 @@ class CheckList extends Component {
 		this.setState({list:list})
 
 		//TODO: update the DB
-
-		// console.log("Groupid: " + this.state.groupid)
-		// console.log("list: " + this.state.list)
 		
 		let res = await getDB({ data: {
 			groupid: this.state.groupid,
@@ -122,12 +119,20 @@ class CheckList extends Component {
         
     }
 
-    deleteItem(itemID) {
+    async deleteItem(itemID) {
         console.log('delete item ' + itemID)
         //TODO: delete item
         const list = this.state.list.filter(item => item.id !== itemID);
         this.setState({list:list})
-        //TODO: update DB
+		//TODO: update DB
+		
+		let res = await getDB({ data: {
+			groupid: this.state.groupid,
+			item: {id: itemID}
+		}},
+		"addItemOnSharedList");
+
+		console.log(res)
     }
 
     deleteItemButtonVisibility(item) {
