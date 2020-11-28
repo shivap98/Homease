@@ -248,6 +248,31 @@ class Account extends Component {
         }
     }
 
+    outOfHouseTogggleVisibility() {
+        if ( this.state.groupid && this.state.groupid != '') { 
+            return (
+                <CardSection>
+                    <Text style={{
+                        flex: 1,
+                        margin: 15,
+                        fontSize: 20,
+                        color: 'white',
+                        textAlign: 'left'
+                    }}>
+                        Out of house
+                    </Text>
+                    <Switch
+                        value={this.state.outOfHouse}
+                        style={{margin: 15}}
+                        onValueChange={async = () => {
+                            this.onOutOfHouseToggle()
+                        }}
+                    />
+                </CardSection>
+            );
+        }
+    }
+
     async onOutOfHouseToggle() {
         let outOfHouse = !this.state.outOfHouse
         getDB({ data: {
@@ -397,24 +422,7 @@ class Account extends Component {
                                     keyboardAppearance='dark'
                                     onChangeText={textString => this.setState({venmoUsername: textString})}
                                 />
-                                <CardSection>
-                                    <Text style={{
-                                        flex: 1,
-                                        margin: 15,
-                                        fontSize: 20,
-                                        color: 'white',
-                                        textAlign: 'left'
-                                    }}>
-                                        Out of house
-                                    </Text>
-                                    <Switch
-                                        value={this.state.outOfHouse}
-                                        style={{margin: 15}}
-                                        onValueChange={async = () => {
-                                            this.onOutOfHouseToggle()
-                                        }}
-                                    />
-                                </CardSection>
+                                {this.outOfHouseTogggleVisibility()}
                             </View>
                             {this.groupSectionVisibility()}
                             <Button 

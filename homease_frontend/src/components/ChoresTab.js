@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, TouchableOpacity, TouchableHighlight, ScrollView, Alert, Image} from 'react-native';
+import {Text, View, TouchableOpacity, TouchableHighlight, ScrollView, Image} from 'react-native';
 import theme from './common/theme';
 import componentStyles from './common/componentStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
