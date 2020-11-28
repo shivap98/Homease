@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView} from 'react-native';
+import {Text, View, ScrollView, Alert} from 'react-native';
 import theme from './common/theme';
 import paperTheme from './common/paperTheme';
 import componentStyles from './common/componentStyles';
-import {Button, Divider, List, Provider as PaperProvider, TextInput} from 'react-native-paper';
+import {Button, Divider, List, Provider as PaperProvider, Switch, TextInput} from 'react-native-paper';
+import {CardSection} from './common';
 
 class Expense extends Component{
 
@@ -24,6 +25,7 @@ class Expense extends Component{
             {userID: '4', name: 'Shiv Paul', selected: false}
         ],
         selectedUsers: [],
+        edit: false
     };
 
     componentDidMount(){
@@ -48,16 +50,83 @@ class Expense extends Component{
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
         console.log("selected users at time of click"+this.state.selectedUsers);
-        let users = this.state.users;
+        if(!this.state.edit)
+        {
+            Alert.alert(
+                'Oops!',
+                'Please click edit to make changes!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
 
-        users[index].selected = !selectedUser.selected;
-        let selectedUsers = this.state.selectedUsers;
-        if(users[index].selected === true){
-            selectedUsers.push(users[index].userID);
-        }else{
-            selectedUsers = selectedUsers.filter(user => user !== users[index].userID);
+                ],
+                {cancelable: false},
+            );
+        }else {
+            let users = this.state.users;
+
+            users[index].selected = !selectedUser.selected;
+            let selectedUsers = this.state.selectedUsers;
+            if (users[index].selected === true) {
+                selectedUsers.push(users[index].userID);
+            } else {
+                selectedUsers = selectedUsers.filter(user => user !== users[index].userID);
+            }
+            this.setState({users: users, selectedUsers: selectedUsers});
         }
-        this.setState({users: users, selectedUsers: selectedUsers});
+    }
+
+    onSavePressed(){
+        let users = this.state.users;
+        let hasSelectedUsers = users.some(user => user.selected === true);
+        if(this.state.title.length === 0){
+            Alert.alert(
+                'Oops!',
+                'Title cannot be empty!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+        }
+        else if(!(parseFloat(this.state.amount) > 0.0)){
+            Alert.alert(
+                'Oops!',
+                'Please enter amount greater than 0!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+        }else if(hasSelectedUsers === false){
+            Alert.alert(
+                'Oops!',
+                'Please select at least one user to split the expense with!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+        }
+        console.log("Clicked Save expense");
     }
 
     renderListOfMembers (){
@@ -82,9 +151,29 @@ class Expense extends Component{
                 <PaperProvider theme={paperTheme}>
                     <ScrollView>
                         <View style={styles.viewStyle}>
+                            <CardSection>
+                                <Text style={{
+                                    fontWeight: 'bold',
+                                    flex: 1,
+                                    marginTop: 7,
+                                    marginRight: 15,
+                                    color: 'white',
+                                    textAlign: 'right'
+                                }}>
+                                    EDIT
+                                </Text>
+                                <Switch
+                                    value={this.state.edit}
+                                    onValueChange={() => {
+                                        console.log("Edit clicked");
+                                        this.setState({edit: !this.state.edit})
+                                    }}
+                                />
+                            </CardSection>
                             <View style={{flexDirection: 'row'}}>
                                 <TextInput
                                     style={styles.titleInputStyle}
+                                    editable={this.state.edit}
                                     label='Expense Title'
                                     mode='outlined'
                                     value={this.state.title}
@@ -96,6 +185,7 @@ class Expense extends Component{
                                     mode='outlined'
                                     value={'$'+this.state.amount}
                                     keyboardType='numeric'
+                                    editable={this.state.edit}
                                     maxLength={8}
                                     onChangeText={textString => this.setState({amount: textString.replace(/[^0-9.]/g, '')})}
                                 />
@@ -104,6 +194,7 @@ class Expense extends Component{
                                 style={styles.textInputStyle}
                                 label='Expense Description'
                                 mode='outlined'
+                                editable={this.state.edit}
                                 multiline= {true}
                                 value={this.state.description}
                                 onChangeText={textString => this.setState({description: textString})}
@@ -118,7 +209,7 @@ class Expense extends Component{
                                 color={theme.buttonColor}
                                 style={styles.buttonContainedStyle}
                                 mode="contained"
-                                onPress={() => {console.log("Clicked")}}
+                                onPress={() => {this.onSavePressed()}}
                             >
                                 Save expense
                             </Button>
