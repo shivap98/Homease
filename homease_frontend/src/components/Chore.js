@@ -62,8 +62,8 @@ class Chore extends Component{
             selectedUsers: this.state.selectedUsers,
             status: this.state.status,
             reminderActive: this.state.reminderActive,
-            isChore = this.state.isChore,
-            timestamp = this.state.timestamp
+            isChore: this.state.isChore,
+            timestamp: this.state.timestamp
         }
 
         return chore

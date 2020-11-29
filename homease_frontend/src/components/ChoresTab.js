@@ -94,7 +94,7 @@ class ChoresTab extends Component {
 
             res = await getDB({data: {uid: currentUser} }, "getUser")
             var currentUserName = res.result.firstName + " " + res.result.lastName
-            
+
             if (currentUser === uid && status !== 'Complete') {
                 myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName})
             } else {
@@ -185,7 +185,7 @@ class ChoresTab extends Component {
     async onDoneButtonClicked() {
 
         console.log("CLICKED DONE.")
-        
+
         let chore = {}
         let choreKey = this.state.currentSwipedKey;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
@@ -195,7 +195,7 @@ class ChoresTab extends Component {
             const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
 
             imageRef = storage().ref(choreKey)
-            
+
             await imageRef.putFile(uploadUri);
             storageURL = await imageRef.getDownloadURL()
         }
@@ -331,9 +331,9 @@ class ChoresTab extends Component {
             recursiveChore: choreObj.recursiveChore,
             selectedUsers: choreObj.selectedUsers,
             status: choreObj.status,
-            reminderActive = choreObj.reminderActive,
-            isChore = choreObj.isChore,
-            timestamp = choreObj.timestamp
+            reminderActive: choreObj.reminderActive,
+            isChore: choreObj.isChore,
+            timestamp: choreObj.timestamp
         };
 
         console.log("Chore is ", JSON.stringify(chore));
