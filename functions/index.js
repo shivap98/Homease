@@ -28,7 +28,7 @@ exports.editUser = functions.https.onCall((data, context) => {
 		venmoUsername: data.venmoUsername,
 		outOfHouse: data.outOfHouse
 	}).then((data) => {
-		return "succes"
+		return "success"
 	}).catch((error) => {
 		return "fail"
 	})
@@ -261,7 +261,10 @@ exports.createChore = functions.https.onCall((data, context) => {
 		status: data.status,
 		lastDoneDate: "",
 		lastDoneBy: "",
-		lastDonePhoto: ""
+		lastDonePhoto: "",
+		reminderActive: data.reminderActive,
+		isChore: data.isChore,
+		timestamp: data.timestamp
 	}
 
 	return groupref.once("value")
@@ -433,7 +436,7 @@ exports.makeAdmin = functions.https.onCall((data, context) => {
 	return userRef.update({
 		admin: true,
 	}).then((data) => {
-		return "succes"
+		return "success"
 	}).catch((error) => {
 		return "fail"
 	})
@@ -450,8 +453,74 @@ exports.removeAdmin = functions.https.onCall((data, context) => {
 	return userRef.update({
 		admin: false,
 	}).then((data) => {
-		return "succes"
+		return "success"
 	}).catch((error) => {
 		return "fail"
 	})
 });
+
+exports.addItemOnSharedList = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/sharedList/");
+
+	var newGroupRef = groupref.push();
+	var newID = newGroupRef.key
+
+	var groupref1 = firebase.database().ref("groups/" + groupid + "/sharedList/" + newID +"/");
+
+	return groupref1.set({...data.item, id: newID})
+});
+
+exports.editSharedList = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/sharedList/" + data.item.id +"/");
+	
+	if(data.item.delete){
+		return groupref.set({})
+	}
+	else {
+		return groupref.update(data.item)
+	}
+});
+
+exports.getSharedList = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			var listRef = firebase.database().ref("groups/" + groupid + "/sharedList/");
+
+			return listRef.once("value")
+				.then(function (snapshot) {
+
+					return snapshot.val()
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
+
+
