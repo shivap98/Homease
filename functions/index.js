@@ -261,7 +261,9 @@ exports.createChore = functions.https.onCall((data, context) => {
 		status: data.status,
 		lastDoneDate: "",
 		lastDoneBy: "",
-		lastDonePhoto: ""
+		lastDonePhoto: "",
+		isChore: data.isChore,
+		timestamp: data.timestamp
 	}
 
 	return groupref.once("value")
