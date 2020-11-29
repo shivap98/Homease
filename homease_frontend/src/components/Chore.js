@@ -41,9 +41,9 @@ class Chore extends Component{
 		previousUser: "",
         edit: false,
         loggedInUID: "temp",
-        reminderActive = false,
-        isChore = false,
-        timestamp = ""
+        reminderActive: false,
+        isChore: false,
+        timestamp: ""
     };
 
     constructor(props) {
@@ -430,11 +430,11 @@ class Chore extends Component{
             const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
 
             imageRef = storage().ref(this.state.choreid)
-    
+
             await imageRef.putFile(uploadUri);
             storageURL = await imageRef.getDownloadURL()
         }
-		
+
         let chore = this.packageChoreObj()
 
         if (this.state.recursiveChore) {
@@ -468,7 +468,7 @@ class Chore extends Component{
                     nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
                 }
                 let nextUserUID = this.state.selectedUsers[nextUserKey]
-                
+
                 chore.currentUser = nextUserUID
                 chore.lastDoneBy = this.state.currentUser
                 chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
@@ -482,7 +482,7 @@ class Chore extends Component{
             chore.lastDonePhoto = storageURL
             chore.status = 'Complete'
 		}
-		
+
         res = await getDB({ data: {
             chore: chore,
             choreid: this.state.choreid,
@@ -500,7 +500,7 @@ class Chore extends Component{
         console.log("Modal Closed");
         this.setState({modalVisible: false, photoURL: '', photoURI: ''});
 	}
-	
+
 	onImageButtonPressed(){
 	    ImagePicker.showImagePicker(options, async (response) => {
 			if (response.didCancel) {
@@ -668,7 +668,7 @@ class Chore extends Component{
                             </View>
                             {this.renderProgressButtons()}
 
-                            
+
                             <Button
                                 color={theme.buttonColor}
                                 style={{...styles.buttonContainedStyle, marginLeft: 15, marginRight: 15}}
