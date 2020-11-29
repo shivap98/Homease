@@ -323,6 +323,10 @@ class Account extends Component {
                     'removed user from chore id', key
                 )
 
+                chore.reminderActive = false
+                chore.isChore = false
+                chore.timestamp = ""
+
                 res = await getDB({ data: {
                     chore: chore,
                     choreid: key,

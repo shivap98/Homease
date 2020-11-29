@@ -262,6 +262,7 @@ exports.createChore = functions.https.onCall((data, context) => {
 		lastDoneDate: "",
 		lastDoneBy: "",
 		lastDonePhoto: "",
+		reminderActive: data.reminderActive,
 		isChore: data.isChore,
 		timestamp: data.timestamp
 	}

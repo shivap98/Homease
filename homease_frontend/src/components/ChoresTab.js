@@ -269,6 +269,10 @@ class ChoresTab extends Component {
             };
         }
 
+        chore.reminderActive = false
+        chore.isChore = false
+        chore.timestamp = ""
+
         res = await getDB({ data: {
                 chore: chore,
                 choreid: choreObj.key,
@@ -327,6 +331,9 @@ class ChoresTab extends Component {
             recursiveChore: choreObj.recursiveChore,
             selectedUsers: choreObj.selectedUsers,
             status: choreObj.status,
+            reminderActive = choreObj.reminderActive,
+            isChore = choreObj.isChore,
+            timestamp = choreObj.timestamp
         };
 
         console.log("Chore is ", JSON.stringify(chore));

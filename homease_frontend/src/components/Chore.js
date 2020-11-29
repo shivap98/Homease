@@ -40,7 +40,10 @@ class Chore extends Component{
         photoURI: '',
 		previousUser: "",
         edit: false,
-        loggedInUID: "temp"
+        loggedInUID: "temp",
+        reminderActive = false,
+        isChore = false,
+        timestamp = ""
     };
 
     constructor(props) {
@@ -58,6 +61,9 @@ class Chore extends Component{
             recursiveChore: this.state.recursiveChore,
             selectedUsers: this.state.selectedUsers,
             status: this.state.status,
+            reminderActive: this.state.reminderActive,
+            isChore = this.state.isChore,
+            timestamp = this.state.timestamp
         }
 
         return chore
