@@ -316,7 +316,6 @@ class ChoresTab extends Component {
 
         console.log("Chore is now : ", JSON.stringify(choreObj));
 
-        // chore = this.packageChoreObj()
         chore = {
             choreName: choreObj.name,
             currentUser: choreObj.currentUser,
@@ -412,6 +411,7 @@ class ChoresTab extends Component {
                 <ScrollView>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>Reminders for group</Text>
+                        <Button onPress={()=>{this.props.navigation.navigate('Chore', {key: 'temp', groupid: this.groupid})}}>Click for reminder tab</Button>
                     </View>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>My Chores</Text>

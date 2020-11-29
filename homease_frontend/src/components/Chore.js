@@ -40,7 +40,8 @@ class Chore extends Component{
         photoURI: '',
 		previousUser: "",
         edit: false,
-        loggedInUID: "temp"
+        loggedInUID: "temp",
+        isChore: false
     };
 
     constructor(props) {
@@ -78,14 +79,30 @@ class Chore extends Component{
         let groupid = this.props.route.params.groupid;
         let choreid = this.props.route.params.key;
 
-        let chore = await getDB({ data: {
-                groupid: groupid,
-                choreid: choreid
-            }},
-            "getChoreByID");
-
-        chore = chore.result;
-
+        // var chore;
+        // if(this.state.isChore) {
+        //     let chore = await getDB({
+        //             data: {
+        //                 groupid: groupid,
+        //                 choreid: choreid
+        //             }
+        //         },
+        //         "getChoreByID");
+        //
+        //     chore = chore.result;
+        // }else{
+            let chore = {
+                choreName: 'Reminder Test',
+                currentUser: '',
+                description: 'Tester',
+                lastDoneBy: '',
+                lastDoneDate: '',
+                recursiveChore: false,
+                status: 'Incomplete',
+                selectedUsers: ['JOGk246BujUq1n9cPROZrIEdLgl2', 'k8nElJORKFgv9FC0ZoJOOeBVnX43', '4YAyqqNG4kc5cTS3t61PHbZKIC92', 'MDL3Cua6XXQxWb2fJ8fd3wuYz9d2'],
+            }
+        // }
+        console.log("Chore is ", chore);
 
         let groupInfo = await getDB({ data: {
             groupid: groupid
@@ -98,6 +115,7 @@ class Chore extends Component{
             var user = await getDB({ data: { uid: mems[ key ] } }, "getUser");
             users.push({ name: user.result.firstName + " " + user.result.lastName, uid: mems[ key ], outOfHouse: user.result.outOfHouse });
         }
+        console.log("users are ", users);
 
         users = users.map(user => {
             if(chore.selectedUsers.includes(user.uid)){
@@ -127,56 +145,75 @@ class Chore extends Component{
 
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
-        if(this.state.edit === true) {
-            let users = this.state.users;
-            if (this.state.recursiveChore === true) {
-                if(users[index].uid === this.state.currentUser){
-                    Alert.alert(
-                        'Oops!',
-                        'Current user cannot be removed from Recurring Chores',
-                        [
-                            {
-                                text: 'OK',
-                                onPress: () => {},
-                                style: 'cancel',
-                            },
+        if(this.state.isChore) {
+            if (this.state.edit === true) {
+                let users = this.state.users;
+                if (this.state.recursiveChore === true) {
+                    if (users[index].uid === this.state.currentUser) {
+                        Alert.alert(
+                            'Oops!',
+                            'Current user cannot be removed from Recurring Chores',
+                            [
+                                {
+                                    text: 'OK',
+                                    onPress: () => {
+                                    },
+                                    style: 'cancel',
+                                },
 
-                        ],
-                        {cancelable: false},
-                    );
-                }else {
-                    users[index].selected = !selectedUser.selected;
-                    let selectedUsers = this.state.selectedUsers;
-                    if (users[index].selected === true) {
-                        selectedUsers.push(users[index].uid);
+                            ],
+                            {cancelable: false},
+                        );
                     } else {
-                        selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
+                        users[index].selected = !selectedUser.selected;
+                        let selectedUsers = this.state.selectedUsers;
+                        if (users[index].selected === true) {
+                            selectedUsers.push(users[index].uid);
+                        } else {
+                            selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
+                        }
+                        this.setState({users: users, selectedUsers: selectedUsers});
                     }
-                    this.setState({users: users, selectedUsers: selectedUsers});
+                } else {
+                    if (selectedUser.selected === false) {
+                        console.log("Clicked new user");
+                        users = users.map(user => {
+                            user.selected = false;
+                            return user;
+                        });
+                        users[index].selected = true;
+                        let selectedUsers = [];
+                        selectedUsers.push(users[index].uid);
+                        this.setState({users: users, selectedUsers: selectedUsers, currentUser: selectedUsers[0]});
+                    } else {
+                        console.log("Clicked selected user again");
+                    }
                 }
             } else {
-                if (selectedUser.selected === false) {
-                    console.log("Clicked new user");
-                    users = users.map(user => {
-                        user.selected = false;
-                        return user;
-                    });
-                    users[index].selected = true;
-                    let selectedUsers = [];
-                    selectedUsers.push(users[index].uid);
-                    this.setState({users: users, selectedUsers: selectedUsers, currentUser: selectedUsers[0]});
-                } else {
-                    console.log("Clicked selected user again");
-                }
+                Alert.alert(
+                    'Oops!',
+                    'Click the edit button to update chore assignments',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                            },
+                            style: 'cancel',
+                        },
+
+                    ],
+                    {cancelable: false},
+                );
             }
-        } else {
+        }else{
             Alert.alert(
                 'Oops!',
-                'Click the edit button to update chore assignments',
+                'Reminders are assigned to all group members!',
                 [
                     {
                         text: 'OK',
-                        onPress: () => {},
+                        onPress: () => {
+                        },
                         style: 'cancel',
                     },
 
@@ -307,53 +344,108 @@ class Chore extends Component{
     }
 
     renderProgressButtons() {
-        if (this.state.loggedInUID === this.state.currentUser && this.state.status !== 'Complete') {
-            return (
-                <CardSection>
+        if(this.state.isChore) {
+            if (this.state.loggedInUID === this.state.currentUser && this.state.status !== 'Complete') {
+                return (
+                    <CardSection>
+                        <Button
+                            color={theme.buttonColor}
+                            style={styles.buttonContainedStyle}
+                            mode="contained"
+                            onPress={() => {
+                                Alert.alert(
+                                    'This will mark the chore \'In Progress\'. Are you sure?',
+                                    '',
+                                    [
+                                        {
+                                            text: 'No',
+                                            onPress: () => {
+                                            },
+                                            style: 'cancel',
+                                        },
+                                        {
+                                            text: 'Yes',
+                                            onPress: () => {
+                                                this.onInProgressButtonClicked()
+                                            },
+                                        }
+                                    ],
+                                    {cancelable: false},
+                                );
+                            }}
+                        >
+                            <Text style={componentStyles.smallButtonTextStyle}>
+                                In Progress
+                            </Text>
+                        </Button>
+                        <Button
+                            color={theme.buttonColor}
+                            style={styles.buttonContainedStyle}
+                            mode="contained"
+                            onPress={() => {
+                                this.onCompleteClicked()
+                            }}
+                        >
+                            <Text style={componentStyles.smallButtonTextStyle}>
+                                Complete
+                            </Text>
+                        </Button>
+
+
+                    </CardSection>
+                )
+            } else {
+                return (<View/>)
+            }
+        }else{
+            return(
+                <View style={{flexDirection: 'row'}}>
                     <Button
                         color={theme.buttonColor}
                         style={styles.buttonContainedStyle}
                         mode="contained"
                         onPress={() => {
-                            Alert.alert(
-                                'This will mark the chore \'In Progress\'. Are you sure?',
-                                '',
-                                [
-                                    {
-                                        text: 'No',
-                                        onPress: () => { },
-                                        style: 'cancel',
-                                    },
-                                    {
-                                        text: 'Yes',
-                                        onPress: () => { this.onInProgressButtonClicked() },
-                                    }
-                                ],
-                                { cancelable: false },
-                            );
+                            console.log("Clicked complete");
+                            //this.onCompleteClicked()
                         }}
-                    >
-                        <Text style={componentStyles.smallButtonTextStyle}>
-                            In Progress
-                                    </Text>
-                    </Button>
-                    <Button
-                        color={theme.buttonColor}
-                        style={styles.buttonContainedStyle}
-                        mode="contained"
-                        onPress={() => { this.onCompleteClicked() }}
                     >
                         <Text style={componentStyles.smallButtonTextStyle}>
                             Complete
                         </Text>
                     </Button>
-
-
-                </CardSection>
+                    <Button
+                        color={theme.buttonColor}
+                        style={{...styles.buttonContainedStyle, marginLeft: 15, marginRight: 15}}
+                        mode="contained"
+                        color='red'
+                        onPress={() => {
+                            Alert.alert(
+                                'Are you sure?',
+                                '',
+                                [
+                                    {
+                                        text: 'No',
+                                        onPress: () => {
+                                        },
+                                        style: 'cancel',
+                                    },
+                                    {
+                                        text: 'Yes',
+                                        onPress: () => {
+                                            this.onDeleteButtonClicked()
+                                        },
+                                    }
+                                ],
+                                {cancelable: false},
+                            );
+                        }}
+                    >
+                        <Text style={componentStyles.smallButtonTextStyle}>
+                            Delete
+                        </Text>
+                    </Button>
+                </View>
             )
-        }
-        else {
-            return (<View/>)
         }
     }
 
@@ -424,11 +516,11 @@ class Chore extends Component{
             const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
 
             imageRef = storage().ref(this.state.choreid)
-    
+
             await imageRef.putFile(uploadUri);
             storageURL = await imageRef.getDownloadURL()
         }
-		
+
         let chore = this.packageChoreObj()
 
         if (this.state.recursiveChore) {
@@ -462,7 +554,7 @@ class Chore extends Component{
                     nextUserKey = (nextUserKey + 1) % this.state.selectedUsers.length
                 }
                 let nextUserUID = this.state.selectedUsers[nextUserKey]
-                
+
                 chore.currentUser = nextUserUID
                 chore.lastDoneBy = this.state.currentUser
                 chore.lastDoneDate = moment().format("MM/DD/YYYY h:mm a")
@@ -476,7 +568,7 @@ class Chore extends Component{
             chore.lastDonePhoto = storageURL
             chore.status = 'Complete'
 		}
-		
+
         res = await getDB({ data: {
             chore: chore,
             choreid: this.state.choreid,
@@ -494,7 +586,7 @@ class Chore extends Component{
         console.log("Modal Closed");
         this.setState({modalVisible: false, photoURL: '', photoURI: ''});
 	}
-	
+
 	onImageButtonPressed(){
 	    ImagePicker.showImagePicker(options, async (response) => {
 			if (response.didCancel) {
@@ -551,6 +643,148 @@ class Chore extends Component{
         )
     }
 
+    renderChoreOrReminder(){
+        if(this.state.isChore) {
+            return (
+                <View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        {this.displayChoreType()}
+                        <TextInput
+                            style={styles.textInputStyle}
+                            label='Chore Name'
+                            mode='outlined'
+                            theme={{
+                                colors: {
+                                    placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                    text: this.state.edit ? 'white' : theme.lightColor,
+                                    primary: this.state.edit ? 'white' : theme.lightColor,
+                                }
+                            }}
+                            value={this.state.choreName}
+                            onChangeText={textString => this.setState({choreName: textString})}
+                            editable={this.state.edit}
+                        />
+                        <TextInput
+                            style={styles.textInputStyle}
+                            label='Chore Description'
+                            mode='outlined'
+                            theme={{
+                                colors: {
+                                    placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                    text: this.state.edit ? 'white' : theme.lightColor,
+                                    primary: this.state.edit ? 'white' : theme.lightColor,
+                                }
+                            }}
+                            multiline={true}
+                            value={this.state.description}
+                            onChangeText={textString => this.setState({description: textString})}
+                            editable={this.state.edit}
+                        />
+                        <TextInput
+                            style={styles.textInputStyle}
+                            label='Current User'
+                            mode='outlined'
+                            value={this.getCurrentUserName()}
+                            keyboardAppearance='dark'
+                            editable={false}
+                            onChangeText={textString => {
+                            }}
+                        />
+                        {this.showGroupMembers()}
+                    </View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>LAST DONE INFORMATION</Text>
+                        {this.showPreviousUser()}
+                    </View>
+                    {this.renderProgressButtons()}
+
+
+                    <Button
+                        color={theme.buttonColor}
+                        style={{...styles.buttonContainedStyle, marginLeft: 15, marginRight: 15}}
+                        mode="contained"
+                        color='red'
+                        onPress={() => {
+                            Alert.alert(
+                                'Are you sure?',
+                                '',
+                                [
+                                    {
+                                        text: 'No',
+                                        onPress: () => {
+                                        },
+                                        style: 'cancel',
+                                    },
+                                    {
+                                        text: 'Yes',
+                                        onPress: () => {
+                                            this.onDeleteButtonClicked()
+                                        },
+                                    }
+                                ],
+                                {cancelable: false},
+                            );
+                        }}
+                    >
+                        <Text style={componentStyles.smallButtonTextStyle}>
+                            Delete
+                        </Text>
+                    </Button>
+                </View>
+            )
+        }else{
+            return(
+                <View style={componentStyles.cardSectionWithBorderStyle}>
+                    {/*{this.displayChoreType()}*/}
+                    <TextInput
+                        style={styles.textInputStyle}
+                        label='Reminder Name'
+                        mode='outlined'
+                        theme={{
+                            colors: {
+                                placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                text: this.state.edit ? 'white' : theme.lightColor,
+                                primary: this.state.edit ? 'white' : theme.lightColor,
+                            }
+                        }}
+                        value={this.state.choreName}
+                        onChangeText={textString => this.setState({choreName: textString})}
+                        editable={this.state.edit}
+                    />
+                    <TextInput
+                        style={styles.textInputStyle}
+                        label='Reminder Description'
+                        mode='outlined'
+                        theme={{
+                            colors: {
+                                placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                text: this.state.edit ? 'white' : theme.lightColor,
+                                primary: this.state.edit ? 'white' : theme.lightColor,
+                            }
+                        }}
+                        multiline={true}
+                        value={this.state.description}
+                        onChangeText={textString => this.setState({description: textString})}
+                        editable={this.state.edit}
+                    />
+                    {/*<TextInput*/}
+                        {/*style={styles.textInputStyle}*/}
+                        {/*label='Current User'*/}
+                        {/*mode='outlined'*/}
+                        {/*value={this.getCurrentUserName()}*/}
+                        {/*keyboardAppearance='dark'*/}
+                        {/*editable={false}*/}
+                        {/*onChangeText={textString => {*/}
+                        {/*}}*/}
+                    {/*/>*/}
+                    {this.showGroupMembers()}
+                    {this.renderProgressButtons()}
+
+                </View>
+            )
+        }
+    }
+
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
@@ -599,98 +833,23 @@ class Chore extends Component{
                                 <Switch
                                     value={this.state.edit}
                                     onValueChange={async = () => {
-                                        if(this.state.edit === true) {
-                                            getDB({
-                                                data: {
-                                                    groupid: this.state.groupid,
-                                                    choreid: this.state.choreid,
-                                                    chore: this.packageChoreObj()
-                                                }
-                                            }, "editChore");
-                                        }
-                                        this.setState({edit: !this.state.edit})
+                                        //TEMP
+                                        this.setState({edit: !this.state.edit});
+                                        //Delete above line later
+                                        // if(this.state.edit === true) {
+                                        //     getDB({
+                                        //         data: {
+                                        //             groupid: this.state.groupid,
+                                        //             choreid: this.state.choreid,
+                                        //             chore: this.packageChoreObj()
+                                        //         }
+                                        //     }, "editChore");
+                                        // }
+                                        // this.setState({edit: !this.state.edit})
                                     }}
                                 />
                             </CardSection>
-                            <View style={componentStyles.cardSectionWithBorderStyle}>
-                                {this.displayChoreType()}
-                                <TextInput
-                                    style={styles.textInputStyle}
-                                    label='Chore Name'
-                                    mode='outlined'
-                                    theme={{
-                                        colors: {
-                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                            text: this.state.edit ? 'white' : theme.lightColor,
-                                            primary: this.state.edit ? 'white' : theme.lightColor,
-                                        }
-                                    }}
-                                    value={this.state.choreName}
-                                    onChangeText={textString => this.setState({choreName: textString})}
-                                    editable={this.state.edit}
-                                />
-                                <TextInput
-                                    style={styles.textInputStyle}
-                                    label='Chore Description'
-                                    mode='outlined'
-                                    theme={{
-                                        colors: {
-                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
-                                            text: this.state.edit ? 'white' : theme.lightColor,
-                                            primary: this.state.edit ? 'white' : theme.lightColor,
-                                        }
-                                    }}
-                                    multiline= {true}
-                                    value={this.state.description}
-                                    onChangeText={textString => this.setState({description: textString})}
-                                    editable={this.state.edit}
-                                />
-                                <TextInput
-                                        style={styles.textInputStyle}
-                                        label='Current User'
-                                        mode='outlined'
-                                        value={this.getCurrentUserName()}
-                                        keyboardAppearance='dark'
-                                        editable={false}
-                                        onChangeText={textString => {}}
-                                />
-                                {this.showGroupMembers()}
-                            </View>
-                            <View style={componentStyles.cardSectionWithBorderStyle}>
-                                <Text style={styles.cardHeaderTextStyle}>LAST DONE INFORMATION</Text>
-                                {this.showPreviousUser()}
-                            </View>
-                            {this.renderProgressButtons()}
-
-                            
-                            <Button
-                                color={theme.buttonColor}
-                                style={{...styles.buttonContainedStyle, marginLeft: 15, marginRight: 15}}
-                                mode="contained"
-                                color='red'
-                                onPress={() => {
-                                    Alert.alert(
-                                        'Are you sure?',
-                                        '',
-                                        [
-                                            {
-                                                text: 'No',
-                                                onPress: () => {},
-                                                style: 'cancel',
-                                            },
-                                            {
-                                                text: 'Yes',
-                                                onPress: () => {this.onDeleteButtonClicked()},
-                                            }
-                                        ],
-                                        {cancelable: false},
-                                    );
-                                }}
-                            >
-                                <Text style={componentStyles.smallButtonTextStyle}>
-                                            Delete
-                                </Text>
-                            </Button>
+                            {this.renderChoreOrReminder()}
                         </View>
                     </ScrollView>
                 </PaperProvider>

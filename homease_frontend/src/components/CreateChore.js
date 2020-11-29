@@ -249,12 +249,7 @@ class CreateChore extends Component{
                     <View style={{margin: 5}}/>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>GROUP MEMBERS</Text>
-                        {/*<List.Accordion*/}
-                        {/*title="List of members in group"*/}
-                        {/*onPress={() => {LayoutAnimation.easeInEaseOut()}}*/}
-                        {/*>*/}
                         {this.renderListOfMembers()}
-                        {/*</List.Accordion>*/}
                     </View>
                     <Button onPress={()=>{this.onDateButtonPressed()}}>Click to select Date for reminder</Button>
                     <TextInput
