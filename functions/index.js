@@ -523,4 +523,32 @@ exports.getSharedList = functions.https.onCall((data, context) => {
 		})
 });
 
+exports.addExpense = functions.https.onCall((data, context) => {
 
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			if(snapshot.val() == null) {
+				return "Group not found"
+			}
+
+			var expensesRef = firebase.database().ref("groups/" + groupid + "/expenses/");
+
+			return expensesRef.push(data.expense).then(() => {
+				return "success"
+
+			}).catch((error) => {
+				return "fail2"
+			})
+
+		}).catch((error) => {
+			return "fail3"
+		})
+});
