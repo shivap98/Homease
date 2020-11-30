@@ -35,6 +35,7 @@ class ChoresTab extends Component {
     state = {
         myChoresList: [],
         allChoresList: [],
+        remindersList: [],
         photoURL: '',
         modalVisible: false,
         currentSwipedKey: '',
@@ -48,10 +49,11 @@ class ChoresTab extends Component {
 	}
 
 	async getDbInfo(uid, groupid) {
-        this.setState({allChoresList: [], myChoresList: []})
-		chores = await getDB({data: {groupid: groupid}}, 'getChoresByGroupID')
-		var allChoresList = []
-		var myChoresList = []
+        this.setState({allChoresList: [], myChoresList: [], remindersList: []});
+		chores = await getDB({data: {groupid: groupid}}, 'getChoresByGroupID');
+		var allChoresList = [];
+		var myChoresList = [];
+        var remindersList = [];
 		for(key in chores.result){
 			var obj = chores.result[key];
 			var name = '';
@@ -65,6 +67,9 @@ class ChoresTab extends Component {
             var currentUser = '';
             var recursiveChore = '';
             var currentUser = '';
+            var isChore = false;
+            var reminderActive = false;
+            var timestamp
 			for (var prop in obj) {
 				if (!obj.hasOwnProperty(prop)) continue;
 				if(prop == "choreName"){
@@ -89,19 +94,28 @@ class ChoresTab extends Component {
                     recursiveChore = obj[prop];
                 } else if(prop == "currentUser"){
                     currentUser = obj[prop];
+                } else if(prop == "isChore"){
+				    isChore = obj[prop];
+                } else if(prop == "reminderActive"){
+				    reminderActive = obj[prop];
+                } else if(prop == "timestamp"){
+				    timestamp = obj[prop];
                 }
             }
 
             res = await getDB({data: {uid: currentUser} }, "getUser")
             var currentUserName = res.result.firstName + " " + res.result.lastName
 
-            if (currentUser === uid && status !== 'Complete') {
-                myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName})
+            console.log("isChore is ", isChore);
+            if(!isChore){
+                remindersList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
+            } else if (currentUser === uid && status !== 'Complete') {
+                myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
             } else {
-                allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName})
+                allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
             }
 		}
-		this.setState({allChoresList, myChoresList})
+		this.setState({allChoresList, myChoresList, remindersList})
 	}
 
 	async componentDidMount(){
@@ -418,7 +432,14 @@ class ChoresTab extends Component {
                 <ScrollView>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>Reminders for group</Text>
-                        <Button onPress={()=>{this.props.navigation.navigate('Chore', {key: 'temp', groupid: this.groupid})}}>Click for reminder tab</Button>
+                        {/*<Button onPress={()=>{this.props.navigation.navigate('Chore', {key: 'temp', groupid: this.groupid})}}>Click for reminder tab</Button>*/}
+                        <SwipeListView
+                            data={this.state.remindersList}
+                            renderItem={this.renderMyChores}
+                            disableRightSwipe={true}
+                            disableLeftSwipe={true}
+                            onRowDidOpen={this.onRowDidOpen}
+                        />
                     </View>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>My Chores</Text>

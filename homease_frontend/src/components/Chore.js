@@ -11,6 +11,7 @@ import moment from 'moment';
 import firebase from 'firebase';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
+import DatePicker from 'react-native-date-picker';
 
 
 const options = {
@@ -43,7 +44,8 @@ class Chore extends Component{
         loggedInUID: "temp",
         reminderActive: false,
         isChore: false,
-        timestamp: ""
+        timestamp: "",
+        dateModalVisible: false
     };
 
     constructor(props) {
@@ -84,30 +86,15 @@ class Chore extends Component{
         let groupid = this.props.route.params.groupid;
         let choreid = this.props.route.params.key;
 
-        // var chore;
-        // if(this.state.isChore) {
-        //     let chore = await getDB({
-        //             data: {
-        //                 groupid: groupid,
-        //                 choreid: choreid
-        //             }
-        //         },
-        //         "getChoreByID");
-        //
-        //     chore = chore.result;
-        // }else{
-            let chore = {
-                choreName: 'Reminder Test',
-                currentUser: '',
-                description: 'Tester',
-                lastDoneBy: '',
-                lastDoneDate: '',
-                recursiveChore: false,
-                status: 'Incomplete',
-                selectedUsers: ['JOGk246BujUq1n9cPROZrIEdLgl2', 'k8nElJORKFgv9FC0ZoJOOeBVnX43', '4YAyqqNG4kc5cTS3t61PHbZKIC92', 'MDL3Cua6XXQxWb2fJ8fd3wuYz9d2'],
-            }
-        // }
-        console.log("Chore is ", chore);
+        let chore = await getDB({
+                data: {
+                    groupid: groupid,
+                    choreid: choreid
+                }
+            },
+            "getChoreByID");
+
+        chore = chore.result;
 
         let groupInfo = await getDB({ data: {
             groupid: groupid
@@ -144,7 +131,10 @@ class Chore extends Component{
             status: chore.status,
             choreid: choreid,
             groupid: groupid,
-            loggedInUID: uid
+            loggedInUID: uid,
+            reminderActive: chore.reminderActive,
+            isChore: chore.isChore,
+            timestamp: chore.timestamp
         });
     }
 
@@ -370,8 +360,8 @@ class Chore extends Component{
                                         },
                                         {
                                             text: 'Yes',
-                                            onPress: () => {
-                                                this.onInProgressButtonClicked()
+                                            onPress: async () => {
+                                                await this.onInProgressButtonClicked()
                                             },
                                         }
                                     ],
@@ -409,9 +399,8 @@ class Chore extends Component{
                         color={theme.buttonColor}
                         style={styles.buttonContainedStyle}
                         mode="contained"
-                        onPress={() => {
-                            console.log("Clicked complete");
-                            //this.onCompleteClicked()
+                        onPress={async () => {
+                            await this.onReminderCompleteClicked();
                         }}
                     >
                         <Text style={componentStyles.smallButtonTextStyle}>
@@ -472,6 +461,28 @@ class Chore extends Component{
     onCompleteClicked() {
         console.log("Complete button pressed");
         this.setState({modalVisible: true});
+    }
+
+    async onReminderCompleteClicked() {
+        Alert.alert(
+            'Are you sure?',
+            '',
+            [
+                {
+                    text: 'No',
+                    onPress: () => {
+                    },
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: async () => {
+                        await this.onDeleteButtonClicked()
+                    },
+                }
+            ],
+            {cancelable: false},
+        );
     }
 
     async onInProgressButtonClicked() {
@@ -648,6 +659,28 @@ class Chore extends Component{
         )
     }
 
+    onDateButtonPressed(){
+        if(this.state.edit) {
+            console.log("Setting dialog to true");
+            this.setState({dateModalVisible: !this.state.dateModalVisible})
+        }else{
+            Alert.alert(
+                'Oops!',
+                'Please click the Edit button to make changes!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+        }
+
+    }
+
     renderChoreOrReminder(){
         if(this.state.isChore) {
             return (
@@ -783,6 +816,7 @@ class Chore extends Component{
                         {/*}}*/}
                     {/*/>*/}
                     {this.showGroupMembers()}
+                    <Button onPress={()=>{this.onDateButtonPressed()}}>Click to select Date for reminder</Button>
                     {this.renderProgressButtons()}
 
                 </View>
@@ -822,6 +856,24 @@ class Chore extends Component{
                             </Button>
                         </Modal>
                     </Portal>
+                    <Portal>
+                        <Modal
+                            visible={this.state.dateModalVisible}
+                            onDismiss = {() => { this.onDateButtonPressed() }}
+                            contentContainerStyle={styles.containerStyle2}
+                        >
+                            <Button>Select Date</Button>
+                            {/*<Text style={styles.modalHeaderTextStyle}>Select Date</Text>*/}
+                            <DatePicker
+                                date={new Date(this.state.timestamp)}
+                                textColor={theme.buttonTextColor}
+                                onDateChange={date => {this.setState({timestamp: date})}}
+                            />
+                            <Button onPress={()=>{this.onDateButtonPressed()}}>
+                                Done
+                            </Button>
+                        </Modal>
+                    </Portal>
                     <ScrollView>
                         <View style={styles.viewStyle}>
                             <CardSection>
@@ -839,18 +891,57 @@ class Chore extends Component{
                                     value={this.state.edit}
                                     onValueChange={async = () => {
                                         //TEMP
-                                        this.setState({edit: !this.state.edit});
+                                        // this.setState({edit: !this.state.edit});
                                         //Delete above line later
-                                        // if(this.state.edit === true) {
-                                        //     getDB({
-                                        //         data: {
-                                        //             groupid: this.state.groupid,
-                                        //             choreid: this.state.choreid,
-                                        //             chore: this.packageChoreObj()
-                                        //         }
-                                        //     }, "editChore");
-                                        // }
-                                        // this.setState({edit: !this.state.edit})
+                                        if(this.state.edit === true && this.state.isChore) {
+                                            getDB({
+                                                data: {
+                                                    groupid: this.state.groupid,
+                                                    choreid: this.state.choreid,
+                                                    chore: this.packageChoreObj()
+                                                }
+                                            }, "editChore");
+                                        }else if(this.state.edit === true && !this.state.isChore){
+                                            if(this.state.timestamp < new Date()){
+                                                Alert.alert(
+                                                    'Oops!',
+                                                    'Please select a timestamp in the future!',
+                                                    [
+                                                        {
+                                                            text: 'OK',
+                                                            onPress: () => {},
+                                                            style: 'cancel',
+                                                        },
+
+                                                    ],
+                                                    {cancelable: false},
+                                                );
+                                            }else if(this.state.choreName.length === 0) {
+                                                Alert.alert(
+                                                    'Oops!',
+                                                    'Reminder name cannot be empty!',
+                                                    [
+                                                        {
+                                                            text: 'OK',
+                                                            onPress: () => {
+                                                            },
+                                                            style: 'cancel',
+                                                        },
+
+                                                    ],
+                                                    {cancelable: false},
+                                                );
+                                            }else{
+                                                getDB({
+                                                    data: {
+                                                        groupid: this.state.groupid,
+                                                        choreid: this.state.choreid,
+                                                        chore: this.packageChoreObj()
+                                                    }
+                                                }, "editChore");
+                                            }
+                                        }
+                                        this.setState({edit: !this.state.edit})
                                     }}
                                 />
                             </CardSection>
@@ -927,7 +1018,11 @@ const styles = {
         textAlign: 'center',
         fontWeight: 'bold',
         fontSize: theme.bigButtonFontSize
-    }
+    },
+    containerStyle2 : {
+        backgroundColor: theme.backgroundColor,
+        padding: 20,
+    },
 };
 
 export default Chore;

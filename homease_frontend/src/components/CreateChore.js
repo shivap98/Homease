@@ -24,7 +24,7 @@ class CreateChore extends Component{
         description: '',
         multiLine: true,
         isChore: true,
-        date: new Date(),
+        timestamp: new Date(),
         modalVisible: false,
     };
 
@@ -143,7 +143,7 @@ class CreateChore extends Component{
         }
     }
 
-    async onCreateChoreClicked(){
+    async onCreateChorePressed(){
         console.log("Clicked create chore button");
         let users = this.state.users;
         let hasSelectedUsers = users.some(user => user.selected === true);
@@ -174,7 +174,7 @@ class CreateChore extends Component{
 				status: "Incomplete",
                 currentUser: this.state.selectedUsers[ 0 ],
                 reminderActive: false,
-                isChore: false,
+                isChore: true,
                 timestamp: ""
 			},
 		},
@@ -182,6 +182,66 @@ class CreateChore extends Component{
 
         console.log(resp)
         this.props.navigation.goBack()
+    }
+
+    async onCreateReminderPressed(){
+        console.log("Clicked create reminder button");
+        console.log("Date is ", this.state.timestamp.toString());
+        if(this.state.timestamp < new Date()){
+            Alert.alert(
+                'Oops!',
+                'Please select a timestamp in the future!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+        }else if(this.state.choreName.length === 0){
+            Alert.alert(
+                'Oops!',
+                'Reminder name cannot be empty!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {},
+                        style: 'cancel',
+                    },
+
+                ],
+                {cancelable: false},
+            );
+        }else {
+
+            let users = this.state.users;
+            let hasSelectedUsers = users.some(user => user.selected === true);
+
+            let timeStamp = new Date();
+
+            let resp = await getDB(
+                {
+                    data: {
+                        groupid: this.state.groupid,
+                        choreName: this.state.choreName,
+                        selectedUsers: this.state.selectedUsers,
+                        recursiveChore: this.state.recursiveChore,
+                        description: this.state.description,
+                        status: "Incomplete",
+                        currentUser: this.state.selectedUsers[0],
+                        reminderActive: false,
+                        isChore: false,
+                        timestamp: timeStamp.toString()
+                    },
+                },
+                'createChore');
+
+            console.log(resp);
+            this.props.navigation.goBack();
+        }
     }
 
     onDateButtonPressed(){
@@ -301,44 +361,15 @@ class CreateChore extends Component{
         });
         console.log("selectedUsers is ", selectedUsers);
         if(this.state.isChore){
-            this.setState({users: users, isChore: false, choreName: '', description: '', recursiveChore: false, selectedUsers: selectedUsers, date: new Date()})
+            this.setState({users: users, isChore: false, choreName: '', description: '', recursiveChore: false, selectedUsers: selectedUsers, timestamp: new Date()})
         }
     }
 
     async onCreatePressed() {
         if (this.state.isChore) {
-            await this.onCreateChoreClicked();
+            await this.onCreateChorePressed();
         }else{
-            console.log("Date is ", this.state.date.toString());
-            if(this.state.date < new Date()){
-                Alert.alert(
-                    'Oops!',
-                    'Please select a date in the future!',
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => {},
-                            style: 'cancel',
-                        },
-
-                    ],
-                    {cancelable: false},
-                );
-            }else if(this.state.choreName.length === 0){
-                Alert.alert(
-                    'Oops!',
-                    'Reminder name cannot be empty!',
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => {},
-                            style: 'cancel',
-                        },
-
-                    ],
-                    {cancelable: false},
-                );
-            }
+            await this.onCreateReminderPressed();
         }
     }
 
@@ -355,9 +386,9 @@ class CreateChore extends Component{
                             <Button>Select Date</Button>
                             {/*<Text style={styles.modalHeaderTextStyle}>Select Date</Text>*/}
                             <DatePicker
-                                date={this.state.date}
+                                date={this.state.timestamp}
                                 textColor={theme.buttonTextColor}
-                                onDateChange={date => {this.setState({date: date})}}
+                                onDateChange={date => {this.setState({timestamp: date})}}
                             />
                             <Button onPress={()=>{this.onDateButtonPressed()}}>
                                 Done
