@@ -50,8 +50,6 @@ class ExpensesTab extends Component{
 	
 	async componentDidMount(){
 	   
-		console.log("------------STARTING COMPONENT DID MOUNT")
-
 		var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid
@@ -74,16 +72,15 @@ class ExpensesTab extends Component{
 
     getUserFromID(id){
 		let users = this.state.users;
-		//console.log("---------------xxxxxxxxxxxx------")
         return users.filter(user => user.uid == id);
     }
 
     showItemDate(item){
-        console.log(item.timestamp.toString(0).substr(4, 20));
-		let descr = item.timestamp.toString(0).substr(4, 20);
-		//console.log("---------item: " + item)
-        descr = descr + "\n" + "Paid by: " + this.getUserFromID(item.uid)[0].name;
-        return descr;
+		if(item.timestamp){
+			let descr = item.timestamp.substr(4, 20);
+			descr = descr + "\n" + "Paid by: " + this.getUserFromID(item.uid)[0].name;
+			return descr;
+		}
     }
 
     showDivider(expenses, index){
@@ -161,7 +158,6 @@ class ExpensesTab extends Component{
                     color={theme.darkColor}
                     icon="plus"
                     onPress={() => {
-                        console.log("Pressed fab");
                         this.props.navigation.navigate('AddExpense', {users: this.state.users, groupid: this.state.groupid, uid: this.state.uid});
                     }}
                 />

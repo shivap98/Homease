@@ -127,6 +127,11 @@ class App extends Component<Props> {
 						name="Expense"
 						component={Expense}
 					/>
+					<Stack.Screen
+						name="ExpensesTab"
+						component={ExpensesTab}
+					/>
+
 				</Stack.Navigator>
 			</NavigationContainer>
 		);

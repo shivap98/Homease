@@ -12,10 +12,10 @@ class AddExpense extends Component{
         description: '',
         amount: '',
         users: [
-            {userID: '1', name: 'Aman Wali', selected: false},
-            {userID: '2', name: 'Kartik Mittal', selected: false},
-            {userID: '3', name: 'Sehaj Randhawa', selected: false},
-            {userID: '4', name: 'Shiv Paul', selected: false}
+            // {uid: '1', name: 'Aman Wali', selected: false},
+            // {uid: '2', name: 'Kartik Mittal', selected: false},
+            // {uid: '3', name: 'Sehaj Randhawa', selected: false},
+            // {uid: '4', name: 'Shiv Paul', selected: false}
         ],
         selectedUsers: [],
     };
@@ -35,9 +35,9 @@ class AddExpense extends Component{
         users[index].selected = !selectedUser.selected;
 		let selectedUsers = this.state.selectedUsers;
         if(users[index].selected === true){
-            selectedUsers.push(users[index].userID);
+            selectedUsers.push(users[index].uid);
         }else{
-            selectedUsers = selectedUsers.filter(user => user !== users[index].userID);
+            selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
         }
         this.setState({users: users, selectedUsers: selectedUsers});
     }
@@ -107,9 +107,12 @@ class AddExpense extends Component{
 		}
 
 		arr = []
-		for(i = 0; i<this.state.users.length; i++){
-			arr.push(this.state.users[i].userID)
+		for(i=0;i<this.state.users.length;i++){
+			if(this.state.users[i].selected){
+				arr.push(this.state.users[i].uid)
+			}
 		}
+
 		currDate = new Date()
 		let result = await getDB({ data: {
 			groupid: this.state.groupid,
@@ -123,8 +126,6 @@ class AddExpense extends Component{
 			}
 		}},
 		"addExpense");
-
-        console.log("Clicked Add expense");
     }
 
     render(){
