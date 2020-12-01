@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {ScrollView, View, Image, Text, Alert, LayoutAnimation, Platform, TouchableOpacity} from 'react-native';
-import {Button, List, Provider as PaperProvider, Switch, TextInput, Modal, Portal} from 'react-native-paper';
+import {Button, List, Provider as PaperProvider, Switch, TextInput, Modal, Portal, ActivityIndicator, Colors} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import theme from './common/theme';
 import getDB from './Cloud';
@@ -25,6 +25,7 @@ const options = {
 class Chore extends Component{
 
     state = {
+        loading: true,
         choreName: "",
         currentUser: "",
         description: "",
@@ -94,6 +95,8 @@ class Chore extends Component{
             },
             "getChoreByID");
 
+
+        console.log("CHORE FETCHED IS ", chore);
         chore = chore.result;
 
         let groupInfo = await getDB({ data: {
@@ -119,6 +122,7 @@ class Chore extends Component{
         });
 
         this.setState({
+            loading: false,
             choreName: chore.choreName,
             currentUser: chore.currentUser,
             description: chore.description,
@@ -681,8 +685,63 @@ class Chore extends Component{
 
     }
 
+    renderSendReminderButton(){
+        if(!(this.state.uid === this.state.currentUser)){
+            return(
+                <Button
+                    color={theme.buttonColor}
+                    style={styles.reminderButton}
+                    mode="contained"
+                    disabled={this.state.reminderActive}
+                    onPress={() => {
+                        Alert.alert(
+                            'This will send a reminder to the user. Are you sure?',
+                            '',
+                            [
+                                {
+                                    text: 'No',
+                                    onPress: () => {
+                                    },
+                                    style: 'cancel',
+                                },
+                                {
+                                    text: 'Yes',
+                                    onPress: async () => {
+                                        console.log("Clicked Yes")
+                                        console.log("Current user is ", this.state.uid);
+                                        var chore = this.packageChoreObj();
+                                        chore.reminderActive = true;
+                                        await getDB({
+                                            data: {
+                                                groupid: this.state.groupid,
+                                                choreid: this.state.choreid,
+                                                chore: chore
+                                            }
+                                        }, "editChore");
+                                        this.setState({reminderActive: true});
+                                    },
+                                }
+                            ],
+                            {cancelable: false},
+                        );
+                    }}
+                >
+                    <Text style={componentStyles.smallButtonTextStyle}>
+                        Send reminder to current user.
+                    </Text>
+                </Button>
+            )
+        }
+    }
+
     renderChoreOrReminder(){
-        if(this.state.isChore) {
+        if(this.state.loading){
+            return(
+                <View style={componentStyles.cardSectionWithBorderStyle}>
+                    <ActivityIndicator animating={true} color={Colors.blue800} />
+                </View>
+            )
+        } else if(this.state.isChore) {
             return (
                 <View>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
@@ -718,6 +777,7 @@ class Chore extends Component{
                             onChangeText={textString => this.setState({description: textString})}
                             editable={this.state.edit}
                         />
+                        {this.renderSendReminderButton()}
                         <TextInput
                             style={styles.textInputStyle}
                             label='Current User'
@@ -770,10 +830,9 @@ class Chore extends Component{
                     </Button>
                 </View>
             )
-        }else{
+        } else{
             return(
                 <View style={componentStyles.cardSectionWithBorderStyle}>
-                    {/*{this.displayChoreType()}*/}
                     <TextInput
                         style={styles.textInputStyle}
                         label='Reminder Name'
@@ -805,16 +864,6 @@ class Chore extends Component{
                         onChangeText={textString => this.setState({description: textString})}
                         editable={this.state.edit}
                     />
-                    {/*<TextInput*/}
-                        {/*style={styles.textInputStyle}*/}
-                        {/*label='Current User'*/}
-                        {/*mode='outlined'*/}
-                        {/*value={this.getCurrentUserName()}*/}
-                        {/*keyboardAppearance='dark'*/}
-                        {/*editable={false}*/}
-                        {/*onChangeText={textString => {*/}
-                        {/*}}*/}
-                    {/*/>*/}
                     {this.showGroupMembers()}
                     <Button onPress={()=>{this.onDateButtonPressed()}}>Click to select Date for reminder</Button>
                     {this.renderProgressButtons()}
@@ -863,7 +912,6 @@ class Chore extends Component{
                             contentContainerStyle={styles.containerStyle2}
                         >
                             <Button>Select Date</Button>
-                            {/*<Text style={styles.modalHeaderTextStyle}>Select Date</Text>*/}
                             <DatePicker
                                 date={new Date(this.state.timestamp)}
                                 textColor={theme.buttonTextColor}
@@ -890,9 +938,6 @@ class Chore extends Component{
                                 <Switch
                                     value={this.state.edit}
                                     onValueChange={async = () => {
-                                        //TEMP
-                                        // this.setState({edit: !this.state.edit});
-                                        //Delete above line later
                                         if(this.state.edit === true && this.state.isChore) {
                                             getDB({
                                                 data: {
@@ -1023,6 +1068,12 @@ const styles = {
         backgroundColor: theme.backgroundColor,
         padding: 20,
     },
+    reminderButton:{
+        height: 47,
+        justifyContent: 'center',
+        flex: 1,
+        marginTop: 15
+    }
 };
 
 export default Chore;

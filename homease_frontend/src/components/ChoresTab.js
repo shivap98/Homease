@@ -40,6 +40,9 @@ class ChoresTab extends Component {
         modalVisible: false,
         currentSwipedKey: '',
         photoURI: '',
+        reminderModalVisible: false,
+        reminderChoreName: '',
+        reminderChoreKey: '',
     }
 
     groupid = ''
@@ -54,6 +57,8 @@ class ChoresTab extends Component {
 		var allChoresList = [];
 		var myChoresList = [];
         var remindersList = [];
+        var reminderChoreName = '';
+        var reminderChoreKey = '';
 		for(key in chores.result){
 			var obj = chores.result[key];
 			var name = '';
@@ -106,16 +111,23 @@ class ChoresTab extends Component {
             res = await getDB({data: {uid: currentUser} }, "getUser")
             var currentUserName = res.result.firstName + " " + res.result.lastName
 
-            console.log("isChore is ", isChore);
             if(!isChore){
                 remindersList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
             } else if (currentUser === uid && status !== 'Complete') {
+                if(reminderActive){
+                    reminderChoreName = name;
+                    reminderChoreKey = key;
+                }
                 myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
             } else {
                 allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
             }
 		}
-		this.setState({allChoresList, myChoresList, remindersList})
+		if(reminderChoreName.length === 0) {
+            this.setState({allChoresList, myChoresList, remindersList, reminderModalVisible: false, reminderChoreName, reminderChoreKey});
+        }else{
+		    this.setState({allChoresList: allChoresList, myChoresList: myChoresList, remindersList: remindersList, reminderModalVisible: true, reminderChoreName: reminderChoreName, reminderChoreKey: reminderChoreKey});
+        }
 	}
 
 	async componentDidMount(){
@@ -146,31 +158,37 @@ class ChoresTab extends Component {
 
     onPressChore(data) {
         console.log("View chore");
+        console.log("Chore being pressed is ", data);
         this.props.navigation.navigate('Chore', {key: data.item.key, groupid: this.groupid});
     }
 
-    renderMyChores = data => (
-        <TouchableHighlight
-            onPress={() => this.onPressChore(data)}
-            style={styles.rowFront}
-            underlayColor={theme.lightColor}
-        >
-            <View>
-                <Text
-                    style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}
-                >
-                    {data.item.name}
-                </Text>
-                <Text
-                    style={{ color: 'white', fontSize: 18 }}
-                >
-                    Status: {data.item.status}
-                </Text>
-            </View>
-        </TouchableHighlight>
-    );
+    renderMyChores = data => {
+        console.log("Data to be rendered for mychores is ", data);
+        return (
+            <TouchableHighlight
+                onPress={() => this.onPressChore(data)}
+                style={styles.rowFront}
+                underlayColor={theme.lightColor}
+            >
+                <View>
+                    <Text
+                        style={{fontSize: 20, color: 'white', fontWeight: 'bold'}}
+                    >
+                        {data.item.name}
+                    </Text>
+                    <Text
+                        style={{color: 'white', fontSize: 18}}
+                    >
+                        Status: {data.item.status}
+                    </Text>
+                </View>
+            </TouchableHighlight>
+        )
+    }
 
-    renderAllChores = data => (
+    renderAllChores = data => {
+        console.log("Data to be rendered for all chores is ", data);
+        return(
         <TouchableHighlight
             onPress={() => this.onPressChore(data)}
             style={styles.rowFront}
@@ -178,23 +196,24 @@ class ChoresTab extends Component {
         >
             <View>
                 <Text
-                    style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}
+                    style={{fontSize: 20, color: 'white', fontWeight: 'bold'}}
                 >
                     {data.item.name}
                 </Text>
                 <Text
-                    style={{ color: 'white', fontSize: 18 }}
+                    style={{color: 'white', fontSize: 18}}
                 >
                     Status: {data.item.status}
                 </Text>
                 <Text
-                    style={{ color: 'white', fontSize: 18 }}
+                    style={{color: 'white', fontSize: 18}}
                 >
                     Current User: {data.item.currentUserName}
                 </Text>
             </View>
         </TouchableHighlight>
-    );
+        );
+    }
 
     async onDoneButtonClicked() {
 
@@ -397,6 +416,45 @@ class ChoresTab extends Component {
         this.setState({modalVisible: false, photoURL: ''});
     }
 
+    async onReminderModalClose() {
+        console.log("Reminder Modal Closed");
+        let chore = {}
+        let choreKey = this.state.reminderChoreKey;
+        let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
+        console.log("My chores is ", JSON.stringify(this.state.myChoresList));
+        console.log("Reminder chore name is ", this.state.reminderChoreName);
+        console.log("Reminder chore key is ", this.state.reminderChoreKey);
+        console.log("Chores is: ", JSON.stringify(choreObj));
+
+        chore = {
+            choreName: choreObj.name,
+            currentUser: choreObj.currentUser,
+            description: choreObj.description,
+            lastDoneBy: choreObj.lastDoneBy,
+            lastDoneDate: choreObj.lastDoneDate,
+            lastDonePhoto: choreObj.lastDonePhoto,
+            recursiveChore: choreObj.recursiveChore,
+            selectedUsers: choreObj.selectedUsers,
+            status: choreObj.status,
+            reminderActive: false,
+            isChore: choreObj.isChore,
+            timestamp: choreObj.timestamp
+        };
+
+        console.log("Chore is ", JSON.stringify(chore));
+
+        res = await getDB({
+            data: {
+                chore: chore,
+                choreid: choreObj.key,
+                groupid: this.groupid
+            }
+        }, "editChore");
+
+        console.log("Result is ", JSON.stringify(res));
+        this.setState({reminderModalVisible: false});
+    }
+
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
@@ -428,11 +486,25 @@ class ChoresTab extends Component {
                             </Button>
                         </Modal>
                     </Portal>
-
+                    <Portal>
+                        <Modal
+                            visible={this.state.reminderModalVisible}
+                            onDismiss = {async () => {
+                                await this.onReminderModalClose()
+                            }}
+                            contentContainerStyle={styles.containerStyle}
+                        >
+                            <Text style={styles.modalHeaderTextStyle}>Reminder to complete chore: {this.state.reminderChoreName}</Text>
+                            <Button onPress={async () => {
+                                await this.onReminderModalClose()
+                            }}>
+                                Dismiss reminder
+                            </Button>
+                        </Modal>
+                    </Portal>
                 <ScrollView>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
                         <Text style={styles.cardHeaderTextStyle}>Reminders for group</Text>
-                        {/*<Button onPress={()=>{this.props.navigation.navigate('Chore', {key: 'temp', groupid: this.groupid})}}>Click for reminder tab</Button>*/}
                         <SwipeListView
                             data={this.state.remindersList}
                             renderItem={this.renderMyChores}
