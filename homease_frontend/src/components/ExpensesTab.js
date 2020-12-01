@@ -12,17 +12,17 @@ import {CardSection} from './common';
 class ExpensesTab extends Component{
 
     state = {
-        mockExpenses: [
-            {id: '1', title: 'First expense', description: 'Random Description', uid: '1', amount: 10, timestamp: 'Thu Nov 26 2020 02:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3']},
-            {id: '2', title: 'Second expense', description: 'Random Description', uid: '2', amount: 30, timestamp: 'Thu Nov 26 2020 01:51:31 GMT-0500 (EST)', splitBetweenUsers:['2', '3', '1']},
-            {id: '3', title: 'Third expense', description: 'Random Description', uid: '1', amount: 20, timestamp: 'Thu Nov 26 2020 03:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3', '4']}
-        ],
-        users: [
-            {uid: '1', name: 'Aman Wali'},
-            {uid: '2', name: 'Kartik Mittal'},
-            {uid: '3', name: 'Sehaj Randhawa'},
-            {uid: '4', name: 'Shiv Paul'}
-        ],
+        // mockExpenses: [
+        //     { title: 'First expense', description: 'Random Description', uid: '1', amount: 10, timestamp: 'Thu Nov 26 2020 02:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3']},
+        //     { title: 'Second expense', description: 'Random Description', uid: '2', amount: 30, timestamp: 'Thu Nov 26 2020 01:51:31 GMT-0500 (EST)', splitBetweenUsers:['2', '3', '1']},
+        //     { title: 'Third expense', description: 'Random Description', uid: '1', amount: 20, timestamp: 'Thu Nov 26 2020 03:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3', '4']}
+        // ],
+        // users: [
+        //     {uid: '1', name: 'Aman Wali'},
+        //     {uid: '2', name: 'Kartik Mittal'},
+        //     {uid: '3', name: 'Sehaj Randhawa'},
+        //     {uid: '4', name: 'Shiv Paul'}
+        // ],
 	};
 
 	async getExpenses(res){
@@ -44,8 +44,8 @@ class ExpensesTab extends Component{
 			var user = await getDB({data: {uid: mems[key]} }, "getUser")
 			users.push({name: user.result.firstName + " " + user.result.lastName, uid: mems[key]});
 		}
-		
-		this.setState({mockExpenses: values, users})
+
+		this.setState({expenses: values, users})
 	}
 	
 	async componentDidMount(){
@@ -110,9 +110,9 @@ class ExpensesTab extends Component{
 
     renderListOfExpenses(){
         console.log("List of expenses clicked");
-        let expenses = this.state.mockExpenses;
+		let expenses = this.state.expenses;
+		if(expenses){
         expenses = expenses.sort(this.compareDate);
-        if(expenses){
             return expenses.map((item, index)=>{
                 return(
                     <View>
