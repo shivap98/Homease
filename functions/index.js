@@ -535,9 +535,9 @@ exports.addExpense = functions.https.onCall((data, context) => {
 
 	return groupref.once("value").then(function (snapshot) {
 
-		if(snapshot.val() == null) {
-			return "Group not found"
-		}
+		// if(snapshot.val() == null) {
+		// 	return "Group not found"
+		// }
 
 		var expensesRef = firebase.database().ref("groups/" + groupid + "/expenses/");
 
@@ -593,6 +593,98 @@ exports.addExpense = functions.https.onCall((data, context) => {
 		})
 
 	}).catch((error) => {
+		return "fail3"
+	})
+});
+
+exports.deleteExpense = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null
+		|| data.expenseid == "" || data.expenseid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value").then(function (snapshot) {
+
+		if(snapshot.val() == null) {
+			return "Group not found"
+		}
+
+		var expenseRef = firebase.database().ref("groups/" + groupid + "/expenses/" + data.expenseid);
+
+		return expenseRef.once("value").then(function (snapshot) {
+
+			if (snapshot.val() == null) {
+				return "Expense not found"
+			}
+
+			var balancesRef = firebase.database().ref("groups/" + groupid + "/balances/");
+
+			expense = snapshot.val()
+
+			splitCost = expense.amount / expense.split.length
+			splitCost = parseFloat(splitCost.toFixed(2))
+
+			return balancesRef.once("value").then(function (balances) {
+
+				balances = balances.val()
+
+				if (balances != null && balances.balances != null) {
+
+					balances = balances.balances
+				}
+
+				expense.split.forEach((user) => {
+
+					if (user != expense.uid) {
+
+						user_owes_uid = user + "-" + expense.uid
+						uid_owes_user = expense.uid + "-" + user
+
+						if (balances != null) {
+							balancesRef.update({
+
+								[ user_owes_uid ]: (balances[ user_owes_uid ] ?
+									balances[ user_owes_uid ] : 0.0) - splitCost,
+
+								[ uid_owes_user ]: (balances[ uid_owes_user ] ?
+									balances[ uid_owes_user ] : 0.0) + splitCost
+							})
+						}
+
+						else {
+							balancesRef.update({
+								[ user_owes_uid ]: 0.0 - splitCost,
+
+								[ uid_owes_user ]: 0.0 + splitCost
+							})
+						}
+					}
+				});
+
+				return expenseRef.remove().then(() => {
+
+					return "success"
+
+				}).catch((error) => {
+
+					console.log(error)
+					return "fail1"
+				})
+			})
+
+		}).catch((error) => {
+
+			console.log(error)
+			return "fail2"
+		})
+
+	}).catch((error) => {
+
+		console.log(error)
 		return "fail3"
 	})
 });
