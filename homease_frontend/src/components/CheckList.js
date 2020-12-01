@@ -62,7 +62,6 @@ class CheckList extends Component {
 
 
 	 async componentDidMount(){
-        //TODO: attach hook to DB to look for changes
         //TODO: inside the get DB call Keyboard.dismiss() so that if user currently editing, changes are discarded
 
 		var uid = null

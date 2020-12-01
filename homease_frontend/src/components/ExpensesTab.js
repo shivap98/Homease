@@ -143,7 +143,7 @@ class ExpensesTab extends Component{
                                 color={theme.buttonColor}
                                 style={styles.buttonContainedStyle}
                                 mode="contained"
-                                onPress={() => {this.props.navigation.navigate('Balances');}}
+                                onPress={() => {this.props.navigation.navigate('Balances', {users: this.state.users, groupid: this.state.groupid, uid: this.state.uid});}}
                             >
                                 View Balances
                             </Button>
