@@ -523,4 +523,236 @@ exports.getSharedList = functions.https.onCall((data, context) => {
 		})
 });
 
+exports.addExpense = functions.https.onCall((data, context) => {
 
+	if (data.groupid == "" || data.groupid == null 
+		|| data.expense == "" || data.expense == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value").then(function (snapshot) {
+
+		// if(snapshot.val() == null) {
+		// 	return "Group not found"
+		// }
+
+		var expensesRef = firebase.database().ref("groups/" + groupid + "/expenses/");
+
+		return expensesRef.push(data.expense).then(() => {
+			
+			var balancesRef = firebase.database().ref("groups/" + groupid + "/balances/");
+
+			splitCost = data.expense.amount/data.expense.split.length
+			splitCost = parseFloat(splitCost.toFixed(2))
+
+			return balancesRef.once("value").then(function (balances) {
+			
+				balances = balances.val()
+				
+				if(balances != null && balances.balances != null) {
+
+					balances = balances.balances
+				}
+
+				data.expense.split.forEach((user) => {
+
+					if (user != data.expense.uid) {
+
+						user_owes_uid = user + "-" + data.expense.uid
+						uid_owes_user = data.expense.uid + "-" + user
+
+						if (balances != null) {
+							balancesRef.update({
+								
+								[ user_owes_uid ]: (balances[ user_owes_uid ] ? 
+									balances[ user_owes_uid ] : 0.0) + splitCost,
+								
+								[ uid_owes_user ]: (balances[ uid_owes_user ] ? 
+									balances[ uid_owes_user ] : 0.0) - splitCost
+							})
+						}
+
+						else {
+							balancesRef.update({
+								[ user_owes_uid ]: 0.0 + splitCost,
+
+								[ uid_owes_user ]: 0.0 - splitCost
+							})
+						}
+					}
+				});
+
+				return "success"
+			})
+
+		}).catch((error) => {
+			return "fail2"
+		})
+
+	}).catch((error) => {
+		return "fail3"
+	})
+});
+
+exports.deleteExpense = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null
+		|| data.expenseid == "" || data.expenseid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value").then(function (snapshot) {
+
+		if(snapshot.val() == null) {
+			return "Group not found"
+		}
+
+		var expenseRef = firebase.database().ref("groups/" + groupid + "/expenses/" + data.expenseid);
+
+		return expenseRef.once("value").then(function (snapshot) {
+
+			if (snapshot.val() == null) {
+				return "Expense not found"
+			}
+
+			var balancesRef = firebase.database().ref("groups/" + groupid + "/balances/");
+
+			expense = snapshot.val()
+
+			splitCost = expense.amount / expense.split.length
+			splitCost = parseFloat(splitCost.toFixed(2))
+
+			return balancesRef.once("value").then(function (balances) {
+
+				balances = balances.val()
+
+				if (balances != null && balances.balances != null) {
+
+					balances = balances.balances
+				}
+
+				expense.split.forEach((user) => {
+
+					if (user != expense.uid) {
+
+						user_owes_uid = user + "-" + expense.uid
+						uid_owes_user = expense.uid + "-" + user
+
+						if (balances != null) {
+							balancesRef.update({
+
+								[ user_owes_uid ]: (balances[ user_owes_uid ] ?
+									balances[ user_owes_uid ] : 0.0) - splitCost,
+
+								[ uid_owes_user ]: (balances[ uid_owes_user ] ?
+									balances[ uid_owes_user ] : 0.0) + splitCost
+							})
+						}
+
+						else {
+							balancesRef.update({
+								[ user_owes_uid ]: 0.0 - splitCost,
+
+								[ uid_owes_user ]: 0.0 + splitCost
+							})
+						}
+					}
+				});
+
+				return expenseRef.remove().then(() => {
+
+					return "success"
+
+				}).catch((error) => {
+
+					console.log(error)
+					return "fail1"
+				})
+			})
+
+		}).catch((error) => {
+
+			console.log(error)
+			return "fail2"
+		})
+
+	}).catch((error) => {
+
+		console.log(error)
+		return "fail3"
+	})
+});
+
+exports.getExpensesByGroupID = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			if (snapshot.val() == null) {
+				return "Group not found"
+			}
+
+			var expensesRef = firebase.database().ref("groups/" + groupid + "/expenses/");
+
+			return expensesRef.once("value")
+				.then(function (snapshot) {
+
+					return snapshot.val()
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
+
+exports.getBalancesByGroupID = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			if (snapshot.val() == null) {
+				return "Group not found"
+			}
+
+			var balancesRef = firebase.database().ref("groups/" + groupid + "/balances/");
+
+			return balancesRef.once("value")
+				.then(function (snapshot) {
+
+					return snapshot.val()
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
