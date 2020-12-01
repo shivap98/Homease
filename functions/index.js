@@ -525,8 +525,8 @@ exports.getSharedList = functions.https.onCall((data, context) => {
 
 exports.addExpense = functions.https.onCall((data, context) => {
 
-	if (data.groupid == "" || data.groupid == null || data.uid == "" 
-		|| data.uid == null || data.expense == "" || data.expense == null) {
+	if (data.groupid == "" || data.groupid == null 
+		|| data.expense == "" || data.expense == null) {
 		return "fail"
 	}
 
@@ -559,10 +559,10 @@ exports.addExpense = functions.https.onCall((data, context) => {
 
 				data.expense.split.forEach((user) => {
 
-					if (user != data.uid) {
+					if (user != data.expense.uid) {
 
-						user_owes_uid = user + "-" + data.uid
-						uid_owes_user = data.uid + "-" + user
+						user_owes_uid = user + "-" + data.expense.uid
+						uid_owes_user = data.expense.uid + "-" + user
 
 						if (balances != null) {
 							balancesRef.update({
