@@ -525,30 +525,74 @@ exports.getSharedList = functions.https.onCall((data, context) => {
 
 exports.addExpense = functions.https.onCall((data, context) => {
 
-	if (data.groupid == "" || data.groupid == null) {
+	if (data.groupid == "" || data.groupid == null || data.uid == "" 
+		|| data.uid == null || data.expense == "" || data.expense == null) {
 		return "fail"
 	}
 
 	var groupid = data.groupid.replace("#", "*");
 	var groupref = firebase.database().ref("groups/" + groupid + "/");
 
-	return groupref.once("value")
-		.then(function (snapshot) {
+	return groupref.once("value").then(function (snapshot) {
 
-			if(snapshot.val() == null) {
-				return "Group not found"
-			}
+		if(snapshot.val() == null) {
+			return "Group not found"
+		}
 
-			var expensesRef = firebase.database().ref("groups/" + groupid + "/expenses/");
+		var expensesRef = firebase.database().ref("groups/" + groupid + "/expenses/");
 
-			return expensesRef.push(data.expense).then(() => {
+		return expensesRef.push(data.expense).then(() => {
+			
+			var balancesRef = firebase.database().ref("groups/" + groupid + "/balances/");
+
+			splitCost = data.expense.amount/data.expense.split.length
+			splitCost = parseFloat(splitCost.toFixed(2))
+
+			return balancesRef.once("value").then(function (balances) {
+			
+				balances = balances.val()
+				
+				if(balances != null && balances.balances != null) {
+
+					balances = balances.balances
+				}
+
+				data.expense.split.forEach((user) => {
+
+					if (user != data.uid) {
+
+						user_owes_uid = user + "-" + data.uid
+						uid_owes_user = data.uid + "-" + user
+
+						if (balances != null) {
+							balancesRef.update({
+								
+								[ user_owes_uid ]: (balances[ user_owes_uid ] ? 
+									balances[ user_owes_uid ] : 0.0) + splitCost,
+								
+								[ uid_owes_user ]: (balances[ uid_owes_user ] ? 
+									balances[ uid_owes_user ] : 0.0) - splitCost
+							})
+						}
+
+						else {
+							balancesRef.update({
+								[ user_owes_uid ]: 0.0 + splitCost,
+
+								[ uid_owes_user ]: 0.0 - splitCost
+							})
+						}
+					}
+				});
+
 				return "success"
-
-			}).catch((error) => {
-				return "fail2"
 			})
 
 		}).catch((error) => {
-			return "fail3"
+			return "fail2"
 		})
+
+	}).catch((error) => {
+		return "fail3"
+	})
 });
