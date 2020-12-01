@@ -13,15 +13,15 @@ class ExpensesTab extends Component{
 
     state = {
         mockExpenses: [
-            {id: '1', title: 'First expense', description: 'Random Description', paidBy: '1', amount: 10, dateTime: 'Thu Nov 26 2020 02:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3']},
-            {id: '2', title: 'Second expense', description: 'Random Description', paidBy: '2', amount: 30, dateTime: 'Thu Nov 26 2020 01:51:31 GMT-0500 (EST)', splitBetweenUsers:['2', '3', '1']},
-            {id: '3', title: 'Third expense', description: 'Random Description', paidBy: '1', amount: 20, dateTime: 'Thu Nov 26 2020 03:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3', '4']}
+            {id: '1', title: 'First expense', description: 'Random Description', uid: '1', amount: 10, timestamp: 'Thu Nov 26 2020 02:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3']},
+            {id: '2', title: 'Second expense', description: 'Random Description', uid: '2', amount: 30, timestamp: 'Thu Nov 26 2020 01:51:31 GMT-0500 (EST)', splitBetweenUsers:['2', '3', '1']},
+            {id: '3', title: 'Third expense', description: 'Random Description', uid: '1', amount: 20, timestamp: 'Thu Nov 26 2020 03:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3', '4']}
         ],
         users: [
-            {userID: '1', name: 'Aman Wali'},
-            {userID: '2', name: 'Kartik Mittal'},
-            {userID: '3', name: 'Sehaj Randhawa'},
-            {userID: '4', name: 'Shiv Paul'}
+            {uid: '1', name: 'Aman Wali'},
+            {uid: '2', name: 'Kartik Mittal'},
+            {uid: '3', name: 'Sehaj Randhawa'},
+            {uid: '4', name: 'Shiv Paul'}
         ],
 	};
 
@@ -31,19 +31,26 @@ class ExpensesTab extends Component{
 		}},
 		"getExpensesByGroupID");
 
-		console.log(result.result)
+		list = result.result
+		values = []
+		for (var key in list) {
+			values.push(list[key]);
+		}
 
-		// list = result.result
-		// values = []
-		// for (var key in list) {
-		// 	values.push(list[key]);
-		// }
-		// console.log(values)
-		// this.setState({list: values})
+		grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+		mems = grp.result.users
+		users = []
+		for (var key in mems) {
+			var user = await getDB({data: {uid: mems[key]} }, "getUser")
+			users.push({name: user.result.firstName + " " + user.result.lastName, uid: mems[key]});
+		}
+		
+		this.setState({mockExpenses: values, users})
 	}
 	
 	async componentDidMount(){
-       
+	   
+		console.log("------------STARTING COMPONENT DID MOUNT")
 
 		var uid = null
         if (auth().currentUser) {
@@ -57,9 +64,7 @@ class ExpensesTab extends Component{
 		res = await getDB({data: {uid: uid} }, "getUser")
 
 		if(res.result.groupid){
-            this.groupid = res.result.groupid
-			this.setState({groupid: this.groupid})
-
+			this.setState({groupid: res.result.groupid})
 			firebase.database().ref('/groups/'+res.result.groupid + '/expenses/').on('value', (snapshot) => {
 				this.getExpenses(res)
 			})
@@ -68,14 +73,16 @@ class ExpensesTab extends Component{
     }
 
     getUserFromID(id){
-        let users = this.state.users;
-        return users.filter(user => user.userID === id);
+		let users = this.state.users;
+		//console.log("---------------xxxxxxxxxxxx------")
+        return users.filter(user => user.uid == id);
     }
 
     showItemDate(item){
-        console.log(item.dateTime.toString().substr(4, 20));
-        let descr = item.dateTime.toString().substr(4, 20);
-        descr = descr + "\n" + "Paid by: " + this.getUserFromID(item.paidBy)[0].name;
+        console.log(item.timestamp.toString(0).substr(4, 20));
+		let descr = item.timestamp.toString(0).substr(4, 20);
+		//console.log("---------item: " + item)
+        descr = descr + "\n" + "Paid by: " + this.getUserFromID(item.uid)[0].name;
         return descr;
     }
 
@@ -88,8 +95,8 @@ class ExpensesTab extends Component{
     }
 
     compareDate(a, b){
-        const d1 = new Date(a.dateTime);
-        const d2 = new Date(b.dateTime);
+        const d1 = new Date(a.timestamp);
+        const d2 = new Date(b.timestamp);
 
         let comparison = 0;
 

@@ -144,9 +144,13 @@ class ChoresTab extends Component {
 
 		if(res.result.groupid){
             this.groupid = res.result.groupid
-            this.setState({groupid: this.groupid})
+			this.setState({groupid: this.groupid})
+			
+			firebase.database().ref('/groups/'+res.result.groupid + '/users/').on('value', (snapshot) => {
+				this.getDbInfo(uid, this.state.groupid)
+			})
 
-			firebase.database().ref('/').on('value', (snapshot) => {
+			firebase.database().ref('/groups/'+res.result.groupid + '/chores/').on('value', (snapshot) => {
 				this.getDbInfo(uid, this.state.groupid)
 			})
 		}

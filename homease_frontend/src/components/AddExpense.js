@@ -110,7 +110,7 @@ class AddExpense extends Component{
 		for(i = 0; i<this.state.users.length; i++){
 			arr.push(this.state.users[i].userID)
 		}
-		
+		currDate = new Date()
 		let result = await getDB({ data: {
 			groupid: this.state.groupid,
 			expense: {
@@ -118,7 +118,7 @@ class AddExpense extends Component{
 				title: this.state.title,
 				description: this.state.description,
 				amount: this.state.amount,
-				timestamp: Date.now(),
+				timestamp: currDate.toString(),
 				split: arr
 			}
 		}},
