@@ -4,6 +4,9 @@ import theme from './common/theme';
 import {Button, FAB, List, Provider as PaperProvider, Divider} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import componentStyles from './common/componentStyles';
+import auth from '@react-native-firebase/auth';
+import firebase from 'firebase';
+import getDB from './Cloud';
 import {CardSection} from './common';
 
 class ExpensesTab extends Component{
@@ -20,7 +23,49 @@ class ExpensesTab extends Component{
             {userID: '3', name: 'Sehaj Randhawa'},
             {userID: '4', name: 'Shiv Paul'}
         ],
-    };
+	};
+
+	async getExpenses(res){
+		let result = await getDB({ data: {
+			groupid: res.result.groupid,
+		}},
+		"getExpensesByGroupID");
+
+		console.log(result.result)
+
+		// list = result.result
+		// values = []
+		// for (var key in list) {
+		// 	values.push(list[key]);
+		// }
+		// console.log(values)
+		// this.setState({list: values})
+	}
+	
+	async componentDidMount(){
+       
+
+		var uid = null
+        if (auth().currentUser) {
+            uid = auth().currentUser.uid
+
+            this.setState({uid: auth().currentUser.uid})
+        } else {
+            uid = firebase.auth().currentUser.uid
+            this.setState({uid: firebase.auth().currentUser.uid})
+        }
+		res = await getDB({data: {uid: uid} }, "getUser")
+
+		if(res.result.groupid){
+            this.groupid = res.result.groupid
+			this.setState({groupid: this.groupid})
+
+			firebase.database().ref('/groups/'+res.result.groupid + '/expenses/').on('value', (snapshot) => {
+				this.getExpenses(res)
+			})
+		}
+        
+    }
 
     getUserFromID(id){
         let users = this.state.users;
@@ -110,7 +155,7 @@ class ExpensesTab extends Component{
                     icon="plus"
                     onPress={() => {
                         console.log("Pressed fab");
-                        this.props.navigation.navigate('AddExpense');
+                        this.props.navigation.navigate('AddExpense', {users: this.state.users, groupid: this.state.groupid, uid: this.state.uid});
                     }}
                 />
             </View>

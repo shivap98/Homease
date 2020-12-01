@@ -21,8 +21,10 @@ class AddExpense extends Component{
     };
 
     componentDidMount(){
-        console.log("Test");
-        this.props.navigation.setOptions({title: 'Add an Expense'})
+		this.props.navigation.setOptions({title: 'Add an Expense'})
+		this.setState({users: this.props.route.params.users,
+						 groupid: this.props.route.params.groupid,
+					 	uid: this.props.route.params.uid})
     }
 
     onSelectPressed(selectedUser, index){
@@ -31,7 +33,7 @@ class AddExpense extends Component{
         let users = this.state.users;
 
         users[index].selected = !selectedUser.selected;
-        let selectedUsers = this.state.selectedUsers;
+		let selectedUsers = this.state.selectedUsers;
         if(users[index].selected === true){
             selectedUsers.push(users[index].userID);
         }else{
@@ -56,7 +58,7 @@ class AddExpense extends Component{
         }
     }
 
-    onAddExpenseClicked(){
+    async onAddExpenseClicked(){
         let users = this.state.users;
         let hasSelectedUsers = users.some(user => user.selected === true);
         if(this.state.title.length === 0){
@@ -102,7 +104,26 @@ class AddExpense extends Component{
                 ],
                 {cancelable: false},
             );
-        }
+		}
+
+		arr = []
+		for(i = 0; i<this.state.users.length; i++){
+			arr.push(this.state.users[i].userID)
+		}
+		
+		let result = await getDB({ data: {
+			groupid: this.state.groupid,
+			expense: {
+				uid: this.state.uid,
+				title: this.state.title,
+				description: this.state.description,
+				amount: this.state.amount,
+				timestamp: Date.now(),
+				split: arr
+			}
+		}},
+		"addExpense");
+
         console.log("Clicked Add expense");
     }
 

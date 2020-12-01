@@ -684,7 +684,7 @@ exports.deleteExpense = functions.https.onCall((data, context) => {
 
 	}).catch((error) => {
 
-		console.log(error)
+		console.lothtndfvdvfvdvvdvvg(error)
 		return "fail3"
 	})
 });
