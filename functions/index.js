@@ -722,3 +722,37 @@ exports.getExpensesByGroupID = functions.https.onCall((data, context) => {
 			return "fail3"
 		})
 });
+
+exports.getBalancesByGroupID = functions.https.onCall((data, context) => {
+
+	if (data.groupid == "" || data.groupid == null) {
+		return "fail"
+	}
+
+	var groupid = data.groupid.replace("#", "*");
+	var groupref = firebase.database().ref("groups/" + groupid + "/");
+
+	return groupref.once("value")
+		.then(function (snapshot) {
+
+			if (snapshot.val() == null) {
+				return "Group not found"
+			}
+
+			var balancesRef = firebase.database().ref("groups/" + groupid + "/balances/");
+
+			return balancesRef.once("value")
+				.then(function (snapshot) {
+
+					return snapshot.val()
+
+				}).catch((error) => {
+
+					return "fail2"
+				})
+
+		}).catch((error) => {
+
+			return "fail3"
+		})
+});
