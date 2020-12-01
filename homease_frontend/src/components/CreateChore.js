@@ -47,7 +47,7 @@ class CreateChore extends Component{
 	}
 
     async componentDidMount() {
-        this.props.navigation.setOptions({title: 'Create Chore'})
+        this.props.navigation.setOptions({title: 'Create'})
         var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid

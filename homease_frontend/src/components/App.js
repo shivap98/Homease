@@ -62,7 +62,7 @@ class App extends Component<Props> {
 				}}
 			>
 				<Tab.Screen name="Chores" component={ChoresTab} />
-				<Tab.Screen name="Lists" component={CheckList} />
+				<Tab.Screen name="List" component={CheckList} />
 				<Tab.Screen name="Expenses" component={ExpensesTab} />
 				<Tab.Screen name="Account" component={Account} />
 			</Tab.Navigator>
