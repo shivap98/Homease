@@ -158,7 +158,9 @@ class ExpensesTab extends Component{
                     color={theme.darkColor}
                     icon="plus"
                     onPress={() => {
-                        this.props.navigation.navigate('AddExpense', {users: this.state.users, groupid: this.state.groupid, uid: this.state.uid});
+						if(this.state.users){
+							this.props.navigation.navigate('AddExpense', {users: this.state.users, groupid: this.state.groupid, uid: this.state.uid});
+						}
                     }}
                 />
             </View>

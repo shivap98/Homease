@@ -18,13 +18,17 @@ class AddExpense extends Component{
             // {uid: '4', name: 'Shiv Paul', selected: false}
         ],
         selectedUsers: [],
-    };
+	};
+	
+	onlyUnique(value, index, self) {
+		return self.indexOf(value) === index;
+	}
+	  
 
-    componentDidMount(){
+    async componentDidMount(){
 		this.props.navigation.setOptions({title: 'Add an Expense'})
-		this.setState({users: this.props.route.params.users,
-						 groupid: this.props.route.params.groupid,
-					 	uid: this.props.route.params.uid})
+		this.setState({groupid: this.props.route.params.groupid,
+			uid: this.props.route.params.uid, users: this.props.route.params.users})
     }
 
     onSelectPressed(selectedUser, index){
