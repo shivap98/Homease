@@ -81,54 +81,62 @@ class Expense extends Component{
         }
     }
 
-    onSavePressed(){
-        let users = this.state.users;
-        let hasSelectedUsers = users.some(user => user.selected === true);
-        if(this.state.title.length === 0){
-            Alert.alert(
-                'Oops!',
-                'Title cannot be empty!',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {},
-                        style: 'cancel',
-                    },
+    onEditPressed(){
+        if (this.state.edit) {
+            let users = this.state.users;
+            let hasSelectedUsers = users.some(user => user.selected === true);
+            if(this.state.title.length === 0){
+                Alert.alert(
+                    'Oops!',
+                    'Title cannot be empty!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
 
-                ],
-                {cancelable: false},
-            );
+                    ],
+                    {cancelable: false},
+                );
+            }
+            else if(!(parseFloat(this.state.amount) > 0.0)){
+                Alert.alert(
+                    'Oops!',
+                    'Please enter amount greater than 0!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
+
+                    ],
+                    {cancelable: false},
+                );
+            }else if(hasSelectedUsers === false){
+                Alert.alert(
+                    'Oops!',
+                    'Please select at least one user to split the expense with!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
+
+                    ],
+                    {cancelable: false},
+                );
+            } else {
+                //TODO: add the save code here
+
+
+                this.setState({edit: !this.state.edit})
+            }
+        } else {
+            this.setState({edit: !this.state.edit})
         }
-        else if(!(parseFloat(this.state.amount) > 0.0)){
-            Alert.alert(
-                'Oops!',
-                'Please enter amount greater than 0!',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {},
-                        style: 'cancel',
-                    },
-
-                ],
-                {cancelable: false},
-            );
-        }else if(hasSelectedUsers === false){
-            Alert.alert(
-                'Oops!',
-                'Please select at least one user to split the expense with!',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {},
-                        style: 'cancel',
-                    },
-
-                ],
-                {cancelable: false},
-            );
-        }
-        console.log("Clicked Save expense");
     }
 
     renderListOfMembers (){
@@ -168,7 +176,7 @@ class Expense extends Component{
                                     value={this.state.edit}
                                     onValueChange={() => {
                                         console.log("Edit clicked");
-                                        this.setState({edit: !this.state.edit})
+                                        this.onEditPressed()
                                     }}
                                 />
                             </CardSection>
@@ -179,6 +187,13 @@ class Expense extends Component{
                                     label='Expense Title'
                                     mode='outlined'
                                     value={this.state.title}
+                                    theme={{
+                                        colors: {
+                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                            text: this.state.edit ? 'white' : theme.lightColor,
+                                            primary: this.state.edit ? 'white' : theme.lightColor,
+                                        }
+                                    }}
                                     onChangeText={textString => this.setState({title: textString})}
                                 />
                                 <TextInput
@@ -189,6 +204,13 @@ class Expense extends Component{
                                     keyboardType='numeric'
                                     editable={this.state.edit}
                                     maxLength={8}
+                                    theme={{
+                                        colors: {
+                                            placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                            text: this.state.edit ? 'white' : theme.lightColor,
+                                            primary: this.state.edit ? 'white' : theme.lightColor,
+                                        }
+                                    }}
                                     onChangeText={textString => this.setState({amount: textString.replace(/[^0-9.]/g, '')})}
                                 />
                             </View>
@@ -199,6 +221,13 @@ class Expense extends Component{
                                 editable={this.state.edit}
                                 multiline= {true}
                                 value={this.state.description}
+                                theme={{
+                                    colors: {
+                                        placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                        text: this.state.edit ? 'white' : theme.lightColor,
+                                        primary: this.state.edit ? 'white' : theme.lightColor,
+                                    }
+                                }}
                                 onChangeText={textString => this.setState({description: textString})}
                             />
                             <View style={{margin: 10}}/>
@@ -207,14 +236,6 @@ class Expense extends Component{
                                 <Divider style={{backgroundColor: 'white'}}/>
                                 {this.renderListOfMembers()}
                             </View>
-                            <Button
-                                color={theme.buttonColor}
-                                style={styles.buttonContainedStyle}
-                                mode="contained"
-                                onPress={() => {this.onSavePressed()}}
-                            >
-                                Save expense
-                            </Button>
                         </View>
                     </ScrollView>
                 </PaperProvider>

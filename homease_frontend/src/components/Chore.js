@@ -945,7 +945,8 @@ class Chore extends Component{
                                                     choreid: this.state.choreid,
                                                     chore: this.packageChoreObj()
                                                 }
-                                            }, "editChore");
+                                            }, "editChore")
+                                            this.setState({edit: !this.state.edit})
                                         }else if(this.state.edit === true && !this.state.isChore){
                                             if(this.state.timestamp < new Date()){
                                                 Alert.alert(
@@ -984,9 +985,11 @@ class Chore extends Component{
                                                         chore: this.packageChoreObj()
                                                     }
                                                 }, "editChore");
+                                                this.setState({edit: !this.state.edit})
                                             }
+                                        } else {
+                                            this.setState({edit: !this.state.edit})
                                         }
-                                        this.setState({edit: !this.state.edit})
                                     }}
                                 />
                             </CardSection>

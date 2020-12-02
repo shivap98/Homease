@@ -65,7 +65,7 @@ class AddExpense extends Component{
     async onAddExpenseClicked(){
         let users = this.state.users;
         let hasSelectedUsers = users.some(user => user.selected === true);
-        if(this.state.title.length === 0){
+        if (this.state.title.length === 0) {
             Alert.alert(
                 'Oops!',
                 'Please enter a title!',
@@ -80,7 +80,7 @@ class AddExpense extends Component{
                 {cancelable: false},
             );
         }
-        else if(!(parseFloat(this.state.amount) > 0.0)){
+        else if (!(parseFloat(this.state.amount) > 0.0)) {
             Alert.alert(
                 'Oops!',
                 'Please enter amount greater than 0!',
@@ -94,7 +94,7 @@ class AddExpense extends Component{
                 ],
                 {cancelable: false},
             );
-        }else if(hasSelectedUsers === false){
+        } else if(hasSelectedUsers === false) {
             Alert.alert(
                 'Oops!',
                 'Please select at least one user to split the expense with!',
@@ -129,7 +129,10 @@ class AddExpense extends Component{
 				split: arr
 			}
 		}},
-		"addExpense");
+        "addExpense");
+        
+        console.log(result)
+        this.props.navigation.goBack()
     }
 
     render(){

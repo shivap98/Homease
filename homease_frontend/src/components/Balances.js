@@ -91,7 +91,15 @@ class Balances extends Component{
 
         //TODO: venmo deep link for uid2
 
-        let link = 'venmo://paycharge?txn=pay&recipients=a&amount=10&note=Homease';
+        let venmoUsername = ''
+        for(i=0;i<this.state.users.length;i++){
+            if(this.state.users[i].uid == uid2){
+				venmoUsername = this.state.users[i].venmoUsername
+			}
+		}
+
+        let link = 'venmo://paycharge?txn=pay&recipients=' + venmoUsername + '&amount=' + amount + '&note=Homease';
+        console.log(link)
         Linking.openURL(link);
     }
 
@@ -116,20 +124,19 @@ class Balances extends Component{
 
         if (balance.amount > 0) {
             return(
-                <View style={{margin: 10, justifyContent: 'flex-start', flexDirection: 'row'}}>
+                <View style={{margin: 10, justifyContent: 'flex-start', flexDirection: 'column'}}>
                     <Text 
                         style={{
-                            fontSize: 20,
+                            fontSize: 15,
                             fontWeight: 'bold',
                             color: theme.buttonTextColor, 
-                            alignSelf: "center"
                         }}
                     >
                             {name1} owes {name2}  ${balance.amount}
                     </Text>
                     <Button
                         color={theme.buttonColor}
-                        style={{marginLeft: 'auto'}}
+                        style={{marginLeft: 'auto', marginTop: 20}}
                         mode="contained"
                         onPress={() => {this.onSettleButtonPressed(uid1, uid2, balance.amount)}}
                     >

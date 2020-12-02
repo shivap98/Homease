@@ -41,8 +41,8 @@ class ExpensesTab extends Component{
 		mems = grp.result.users
 		users = []
 		for (var key in mems) {
-			var user = await getDB({data: {uid: mems[key]} }, "getUser")
-			users.push({name: user.result.firstName + " " + user.result.lastName, uid: mems[key]});
+            var user = await getDB({data: {uid: mems[key]} }, "getUser")
+			users.push({name: user.result.firstName + " " + user.result.lastName, uid: mems[key], key: mems[key], venmoUsername: user.result.venmoUsername});
 		}
 
 		this.setState({expenses: values, users})
