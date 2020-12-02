@@ -131,7 +131,6 @@ class AddExpense extends Component{
 		}},
         "addExpense");
         
-        console.log(result)
         this.props.navigation.goBack()
     }
 

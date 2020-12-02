@@ -45,34 +45,25 @@ class ExpensesTab extends Component{
             var user = await getDB({data: {uid: mems[key]} }, "getUser")
 			users.push({name: user.result.firstName + " " + user.result.lastName, uid: mems[key], key: mems[key], venmoUsername: user.result.venmoUsername});
 		}
-        console.log("vals", list)
 		this.setState({expenses: values, users})
 	}
 	
 	async componentDidMount(){
-	   
 		var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid
-
             this.setState({uid: auth().currentUser.uid})
         } else {
             uid = firebase.auth().currentUser.uid
             this.setState({uid: firebase.auth().currentUser.uid})
         }
 		res = await getDB({data: {uid: uid} }, "getUser")
-
-        console.log("1", this.state.expenses)
 		if(res.result.groupid){
 			this.setState({groupid: res.result.groupid})
 			firebase.database().ref('/groups/'+res.result.groupid + '/expenses/').on('value', (snapshot) => {
-                console.log("called")
 				this.getExpenses(res)
 			})
         }
-        
-        console.log("2", this.state.expenses)
-        
     }
 
     getUserFromID(id){
@@ -123,7 +114,8 @@ class ExpensesTab extends Component{
                             title={item.title}
                             key={index}
                             description={this.showItemDate(item)}
-                            onPress={() => {this.props.navigation.navigate('Expense', {key: item.id})}}
+							onPress={() => {this.props.navigation.navigate('Expense', 
+								{key: item.uid, item: item, users: this.state.users, groupid: this.state.groupid})}}
                             right={props =>
                                 <CardSection>
                                         <Text style={styles.amountTextStyle}>

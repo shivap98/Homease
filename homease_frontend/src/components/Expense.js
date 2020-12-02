@@ -10,41 +10,42 @@ class Expense extends Component{
 
     state={
         mockExpenses: [
-            {id: '1', title: 'First expense', description: 'Random Description', uid: '1', amount: 10, dateTime: 'Thu Nov 26 2020 02:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3']},
-            {id: '2', title: 'Second expense', description: 'Random Description', uid: '2', amount: 30, dateTime: 'Thu Nov 26 2020 01:51:31 GMT-0500 (EST)', splitBetweenUsers:['2', '3', '1']},
-            {id: '3', title: 'Third expense', description: 'Random Description', uid: '1', amount: 20, dateTime: 'Thu Nov 26 2020 03:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3', '4']}
+            // {id: '1', title: 'First expense', description: 'Random Description', uid: '1', amount: 10, dateTime: 'Thu Nov 26 2020 02:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3']},
+            // {id: '2', title: 'Second expense', description: 'Random Description', uid: '2', amount: 30, dateTime: 'Thu Nov 26 2020 01:51:31 GMT-0500 (EST)', splitBetweenUsers:['2', '3', '1']},
+            // {id: '3', title: 'Third expense', description: 'Random Description', uid: '1', amount: 20, dateTime: 'Thu Nov 26 2020 03:51:31 GMT-0500 (EST)', splitBetweenUsers:['1', '3', '4']}
         ],
         expense: {},
         title: '',
         description: '',
         amount: '',
         users: [
-            {uid: '1', name: 'Aman Wali', selected: false},
-            {uid: '2', name: 'Kartik Mittal', selected: false},
-            {uid: '3', name: 'Sehaj Randhawa', selected: false},
-            {uid: '4', name: 'Shiv Paul', selected: false}
+            // {uid: '1', name: 'Aman Wali', selected: false},
+            // {uid: '2', name: 'Kartik Mittal', selected: false},
+            // {uid: '3', name: 'Sehaj Randhawa', selected: false},
+            // {uid: '4', name: 'Shiv Paul', selected: false}
         ],
         selectedUsers: [],
         edit: false
     };
 
     componentDidMount(){
-        let expenseId = this.props.route.params.key;
-        console.log("Expense clicked is ", expenseId);
+		this.setState({groupid: this.props.route.params.groupid,
+			uid: this.props.route.params.key, users: this.props.route.params.users})
 
-		let expense = this.state.mockExpenses.filter(expense => expense.id === expenseId)[0];
+		let expense = this.props.route.params.item
+		console.log(expense)
 		if(expense){
 			let title = expense.title;
 			let description = expense.description;
 			let amount = expense.amount;
-			let selectedUsers = expense.splitBetweenUsers;
-			let users = this.state.users;
+			let selectedUsers = expense.split;
+			let users = this.props.route.params.users;
 			users = users.map(user => {
 				user.selected = selectedUsers.includes(user.uid);
 				return user;
 			});
-			console.log(users);
-			console.log("Split between ", selectedUsers);
+			console.log("selectedUsers: " + selectedUsers)
+			console.log("Users: " + users)
 			this.setState({expense: expense, title: title, description: description, amount: amount, selectedUsers: selectedUsers, users: users});
 		}
     }
