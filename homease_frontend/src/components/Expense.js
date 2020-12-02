@@ -157,7 +157,8 @@ class Expense extends Component{
 				}},
 				"addExpense");
 
-                this.setState({edit: !this.state.edit})
+				this.setState({edit: !this.state.edit})
+				this.props.navigation.goBack()
             }
        } else {
             this.setState({edit: !this.state.edit})
