@@ -109,7 +109,7 @@ class ExpensesTab extends Component{
         console.log("List of expenses clicked");
 		let expenses = this.state.expenses;
 		if(expenses){
-        expenses = expenses.sort(this.compareDate);
+        expenses = expenses.sort(this.compareDate).reverse();
             return expenses.map((item, index)=>{
                 return(
                     <View>
