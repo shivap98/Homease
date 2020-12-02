@@ -5,6 +5,9 @@ import paperTheme from './common/paperTheme';
 import componentStyles from './common/componentStyles';
 import {Button, Divider, List, Provider as PaperProvider, Switch, TextInput} from 'react-native-paper';
 import {CardSection} from './common';
+import auth from '@react-native-firebase/auth';
+import firebase from 'firebase';
+import getDB from './Cloud';
 
 class Expense extends Component{
 
@@ -39,14 +42,17 @@ class Expense extends Component{
 			let description = expense.description;
 			let amount = expense.amount;
 			let selectedUsers = expense.split;
+			let uid = expense.uid
+			let expenseid = expense.expenseid
 			let users = this.props.route.params.users;
+			
 			users = users.map(user => {
 				user.selected = selectedUsers.includes(user.uid);
 				return user;
 			});
 			console.log("selectedUsers: " + selectedUsers)
 			console.log("Users: " + users)
-			this.setState({expense: expense, title: title, description: description, amount: amount, selectedUsers: selectedUsers, users: users});
+			this.setState({expense, title, description, amount, selectedUsers, users, expenseid, uid});
 		}
     }
 
@@ -77,12 +83,12 @@ class Expense extends Component{
                 selectedUsers.push(users[index].uid);
             } else {
                 selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
-            }
-            this.setState({users: users, selectedUsers: selectedUsers});
+			}
+            this.setState({users, selectedUsers});
         }
     }
 
-    onEditPressed(){
+    async onEditPressed(){
         if (this.state.edit) {
             let users = this.state.users;
             let hasSelectedUsers = users.some(user => user.selected === true);
@@ -131,13 +137,31 @@ class Expense extends Component{
                 );
             } else {
                 //TODO: add the save code here
+				var result = await getDB({ data: {
+					groupid: this.state.groupid,
+					expenseid: this.state.expenseid
+				}},
+				"deleteExpense");
 
+				currDate = new Date()
+				var result = await getDB({ data: {
+					groupid: this.state.groupid,
+					expense: {
+						uid: this.state.uid,
+						title: this.state.title,
+						description: this.state.description,
+						amount: this.state.amount,
+						timestamp: currDate.toString(),
+						split: this.state.selectedUsers
+					}
+				}},
+				"addExpense");
 
                 this.setState({edit: !this.state.edit})
             }
-        } else {
+       } else {
             this.setState({edit: !this.state.edit})
-        }
+       }
     }
 
     renderListOfMembers (){
@@ -176,7 +200,6 @@ class Expense extends Component{
                                 <Switch
                                     value={this.state.edit}
                                     onValueChange={() => {
-                                        console.log("Edit clicked");
                                         this.onEditPressed()
                                     }}
                                 />

@@ -35,7 +35,7 @@ class ExpensesTab extends Component{
 		var list = result.result
 		var values = []
 		for (var key in list) {
-			values.push(list[key]);
+			values.push({...list[key], expenseid: key});
 		}
 
 		var grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
