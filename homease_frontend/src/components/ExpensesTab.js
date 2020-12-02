@@ -32,20 +32,20 @@ class ExpensesTab extends Component{
 		}},
 		"getExpensesByGroupID");
 
-		list = result.result
-		values = []
+		var list = result.result
+		var values = []
 		for (var key in list) {
 			values.push(list[key]);
 		}
 
-		grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
-		mems = grp.result.users
-		users = []
+		var grp = await getDB({data: {groupid: res.result.groupid} }, "getGroupFromGroupID")
+		var mems = grp.result.users
+		var users = []
 		for (var key in mems) {
             var user = await getDB({data: {uid: mems[key]} }, "getUser")
 			users.push({name: user.result.firstName + " " + user.result.lastName, uid: mems[key], key: mems[key], venmoUsername: user.result.venmoUsername});
 		}
-
+        console.log("vals", list)
 		this.setState({expenses: values, users})
 	}
 	
@@ -62,12 +62,16 @@ class ExpensesTab extends Component{
         }
 		res = await getDB({data: {uid: uid} }, "getUser")
 
+        console.log("1", this.state.expenses)
 		if(res.result.groupid){
 			this.setState({groupid: res.result.groupid})
 			firebase.database().ref('/groups/'+res.result.groupid + '/expenses/').on('value', (snapshot) => {
+                console.log("called")
 				this.getExpenses(res)
 			})
-		}
+        }
+        
+        console.log("2", this.state.expenses)
         
     }
 
@@ -108,6 +112,7 @@ class ExpensesTab extends Component{
 
     renderListOfExpenses(){
         console.log("List of expenses clicked");
+        console.log(this.state.expenses)
 		let expenses = this.state.expenses;
 		if(expenses){
         expenses = expenses.sort(this.compareDate).reverse();
