@@ -167,7 +167,6 @@ class ChoresTab extends Component {
     }
 
     renderMyChores = data => {
-        console.log("Data to be rendered for mychores is ", data);
         return (
             <TouchableHighlight
                 onPress={() => this.onPressChore(data)}
@@ -191,7 +190,6 @@ class ChoresTab extends Component {
     }
 
     renderAllChores = data => {
-        console.log("Data to be rendered for all chores is ", data);
         return(
         <TouchableHighlight
             onPress={() => this.onPressChore(data)}

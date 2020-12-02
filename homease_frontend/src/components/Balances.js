@@ -9,32 +9,32 @@ import firebase from 'firebase';
 import getDB from './Cloud';
 
 const mockBalances = [
-    // {
-    //     id: "a-b",
-    //     amount: 10
-    // }, 
-    // {
-    //     id: "b-a",
-    //     amount: -10
-    // }, 
+    {
+        id: "a-b",
+        amount: 10
+    }, 
+    {
+        id: "b-a",
+        amount: -10
+    }, 
 ]
 
 const mockUsers = [
-	// {
-	// 	name: "Sehaj",
-	// 	id: "xxxxx"
-	// },
-	// {
-	// 	name: "Kartik",
-	// 	id: "xxxxx"
-	// }
+	{
+		name: "Sehaj",
+		id: "xxxxx"
+	},
+	{
+		name: "Kartik",
+		id: "xxxxx"
+	}
 ]
 
 class Balances extends Component{
 
     state = {
-        balances: mockBalances, 
-        users: mockUsers
+        balances: [], 
+        users: []
 	}
 	
 	async getBalances(res){
@@ -51,7 +51,7 @@ class Balances extends Component{
 				amount: list[key]
 			});
 		}
-
+        console.log("balances", values)
 		this.setState({balances: values})
 	}
 
@@ -79,16 +79,14 @@ class Balances extends Component{
 				this.getBalances(res)
 			})
 
-			firebase.database().ref('/groups/'+res.result.groupid + '/expenses/').on('value', (snapshot) => {
-				this.getBalances(res)
-			})
+			// firebase.database().ref('/groups/'+res.result.groupid + '/expenses/').on('value', (snapshot) => {
+			// 	this.getBalances(res)
+			// })
 		}
         
     }
 
-    onSettleButtonPressed(uid1, uid2, amount) {
-        console.log("settle pressed", uid1, uid2, amount)
-
+    async onSettleButtonPressed(uid1, uid2, amount) {
         //TODO: venmo deep link for uid2
 
         let venmoUsername = ''
@@ -101,6 +99,23 @@ class Balances extends Component{
         let link = 'venmo://paycharge?txn=pay&recipients=' + venmoUsername + '&amount=' + amount + '&note=Homease';
         console.log(link)
         Linking.openURL(link);
+
+        currDate = new Date()
+        arr = [uid2]
+        let result = await getDB({ data: {
+			groupid: this.state.groupid,
+			expense: {
+				uid: uid1,
+				title: 'Settlement',
+				description: 'Expense for settling balances',
+				amount: amount,
+				timestamp: currDate.toString(),
+				split: arr
+			}
+		}},
+        "addExpense");
+        console.log(result)
+        this.props.navigation.goBack()
     }
 
     renderItem(balance) {
@@ -111,7 +126,6 @@ class Balances extends Component{
         var uid1 = ids[0]
         var uid2 = ids[1]
 
-    
         //TODO: get all the users before hand and use uid to get name
 
 		for(i=0;i<this.state.users.length;i++){
@@ -121,6 +135,8 @@ class Balances extends Component{
 				name2 = this.state.users[i].name
 			}
 		}
+        console.log(balance)
+        balance.amount = (Math.round(balance.amount * 100) / 100).toFixed(2);
 
         if (balance.amount > 0) {
             return(
@@ -156,9 +172,11 @@ class Balances extends Component{
                     <ScrollView style={{padding: 20}}>
                         <FlatList
                             data={this.state.balances}
-                            renderItem={({ item }) => {return this.renderItem(item)}}
+                            renderItem={({ item }) => {
+                                return this.renderItem(item)
+                            }}
                             extraData={this.state}
-                            keyExtractor={item => item.id.toString()}
+                            keyExtractor={item => item.id}
                         />
                     </ScrollView>
                 </PaperProvider>
