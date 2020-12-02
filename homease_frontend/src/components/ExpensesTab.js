@@ -23,6 +23,7 @@ class ExpensesTab extends Component{
         //     {uid: '3', name: 'Sehaj Randhawa'},
         //     {uid: '4', name: 'Shiv Paul'}
         // ],
+        expenses: [],
 	};
 
 	async getExpenses(res){
@@ -112,7 +113,7 @@ class ExpensesTab extends Component{
         expenses = expenses.sort(this.compareDate).reverse();
             return expenses.map((item, index)=>{
                 return(
-                    <View>
+                    <View key={item.id}>
                         <List.Item
                             title={item.title}
                             key={index}
