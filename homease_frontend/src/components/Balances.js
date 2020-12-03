@@ -77,9 +77,6 @@ class Balances extends Component{
 			firebase.database().ref('/groups/'+res.result.groupid + '/balances/').on('value', (snapshot) => {
 			    this.getBalances(res)
 			})
-			// firebase.database().ref('/groups/'+res.result.groupid + '/expenses/').on('value', (snapshot) => {
-			// 	this.getBalances(res)
-			// })
         }
         
         
@@ -117,51 +114,6 @@ class Balances extends Component{
         this.props.navigation.goBack()
     }
 
-    // renderItem(balance) {
-    //     //TODO: maybe only render item if uid1-uid2, uid1 matches current user
-
-    //     var ids = balance.id.split("-")
-
-    //     var uid1 = ids[0]
-    //     var uid2 = ids[1]
-
-    //     //TODO: get all the users before hand and use uid to get name
-
-	// 	for(i=0;i<this.state.users.length;i++){
-	// 		if(this.state.users[i].uid == uid1){
-	// 			name1 = this.state.users[i].name
-	// 		}else if(this.state.users[i].uid == uid2){
-	// 			name2 = this.state.users[i].name
-	// 		}
-	// 	}
-    //     balance.amount = (Math.round(balance.amount * 100) / 100).toFixed(2);
-
-    //     if (balance.amount > 0) {
-    //         return(
-    //             <View style={{margin: 10, justifyContent: 'flex-start', flexDirection: 'column'}}>
-    //                 <Text 
-    //                     style={{
-    //                         fontSize: 15,
-    //                         fontWeight: 'bold',
-    //                         color: theme.buttonTextColor, 
-    //                     }}
-    //                 >
-    //                         {name1} owes {name2}  ${balance.amount}
-    //                 </Text>
-    //                 <Button
-    //                     color={theme.buttonColor}
-    //                     style={{marginLeft: 'auto', marginTop: 20}}
-    //                     mode="contained"
-    //                     onPress={() => {this.onSettleButtonPressed(uid1, uid2, balance.amount)}}
-    //                 >
-    //                     <Text style={componentStyles.smallButtonTextStyle}>
-    //                         Settle
-    //                     </Text>
-    //                 </Button>
-    //             </View>
-    //         )
-    //     }
-    // }
 
     renderItems() {
         let balances = this.state.balances;
@@ -221,14 +173,6 @@ class Balances extends Component{
                 <PaperProvider theme={paperTheme}>
                     <ScrollView style={{padding: 20}}>
                         {this.renderItems()}
-                        {/* <FlatList
-                            data={this.state.balances}
-                            renderItem={({ item }) => {
-                                return this.renderItem(item)
-                            }}
-                            extraData={this.state}
-                            keyExtractor={item => item.id}
-                        /> */}
                     </ScrollView>
                 </PaperProvider>
             </View>

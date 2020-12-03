@@ -109,7 +109,7 @@ class ExpensesTab extends Component{
         expenses = expenses.sort(this.compareDate).reverse();
             return expenses.map((item, index)=>{
                 return(
-                    <View key={item.id}>
+                    <View key={item.expenseid}>
                         <List.Item
                             title={item.title}
                             key={index}

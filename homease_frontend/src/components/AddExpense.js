@@ -11,12 +11,7 @@ class AddExpense extends Component{
         title: '',
         description: '',
         amount: '',
-        users: [
-            // {uid: '1', name: 'Aman Wali', selected: false},
-            // {uid: '2', name: 'Kartik Mittal', selected: false},
-            // {uid: '3', name: 'Sehaj Randhawa', selected: false},
-            // {uid: '4', name: 'Shiv Paul', selected: false}
-        ],
+        users: [],
         selectedUsers: [],
 	};
 	
