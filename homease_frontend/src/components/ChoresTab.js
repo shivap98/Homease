@@ -52,8 +52,6 @@ class ChoresTab extends Component {
         var reminderChoreName = '';
         var reminderChoreKey = '';
 		for(key in chores.result){
-            console.log("KEYJHKNLK")
-            console.log(key)
 			var obj = chores.result[key];
 			var name = '';
 			var status = 'Incomplete';
@@ -158,15 +156,14 @@ class ChoresTab extends Component {
     };
 
     onPressChore(data) {
-        console.log("View chore");
-        console.log("Chore being pressed is ", data);
+        console.log("onPressChore", data);
         this.props.navigation.navigate('Chore', {key: data.item.key, groupid: this.groupid});
     }
 
     renderMyChores = data => {
         return (
             <TouchableHighlight
-                onPress={() => this.onPressChore(data)}
+                onPress={() => {this.onPressChore(data)}}
                 style={styles.rowFront}
                 underlayColor={theme.lightColor}
             >
@@ -189,7 +186,7 @@ class ChoresTab extends Component {
     renderAllChores = data => {
         return(
         <TouchableHighlight
-            onPress={() => this.onPressChore(data)}
+            onPress={() => {this.onPressChore(data)}}
             style={styles.rowFront}
             underlayColor={theme.lightColor}
         >
@@ -337,16 +334,12 @@ class ChoresTab extends Component {
     }
 
     async onInProgressButtonClicked(key) {
-        console.log("In Progress button pressed and key is : ", JSON.stringify(key));
 
         let chore = {}
         let choreKey = key;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
-        console.log("Chores is: ", JSON.stringify(choreObj));
 
         choreObj.status = "In Progress";
-
-        console.log("Chore is now : ", JSON.stringify(choreObj));
 
         chore = {
             choreName: choreObj.name,
@@ -363,8 +356,6 @@ class ChoresTab extends Component {
             timestamp: choreObj.timestamp
         };
 
-        console.log("Chore is ", JSON.stringify(chore));
-
         res = await getDB({
             data: {
                 chore: chore,
@@ -372,8 +363,6 @@ class ChoresTab extends Component {
                 groupid: this.groupid
             }
         }, "editChore");
-
-        console.log("Result is ", JSON.stringify(res));
     }
 
     renderSwipeOptions = (data, rowMap) => (
@@ -458,7 +447,6 @@ class ChoresTab extends Component {
                 </View>
             )
         } else {
-
             return (
                 <View>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
@@ -502,7 +490,6 @@ class ChoresTab extends Component {
     }
 
     render() {
-        console.log("RENDEr", this.state.allChoresList)
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <PaperProvider theme={paperTheme}>
@@ -550,7 +537,7 @@ class ChoresTab extends Component {
                         </Modal>
                     </Portal>
                 <ScrollView>
-                    {this.renderCards()}
+                        {this.renderCards()}
                 </ScrollView>
                 </PaperProvider>
                 <FAB

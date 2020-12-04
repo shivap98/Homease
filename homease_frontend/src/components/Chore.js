@@ -96,7 +96,6 @@ class Chore extends Component{
             "getChoreByID");
 
 
-        console.log("CHORE FETCHED IS ", chore);
         chore = chore.result;
 
         let groupInfo = await getDB({ data: {
@@ -110,7 +109,6 @@ class Chore extends Component{
             var user = await getDB({ data: { uid: mems[ key ] } }, "getUser");
             users.push({ name: user.result.firstName + " " + user.result.lastName, uid: mems[ key ], outOfHouse: user.result.outOfHouse });
         }
-        console.log("users are ", users);
 
         users = users.map(user => {
             if(chore.selectedUsers.includes(user.uid)){
@@ -143,7 +141,6 @@ class Chore extends Component{
     }
 
     onSelectPressed(selectedUser, index){
-        console.log("Select pressed");
         if(this.state.isChore) {
             if (this.state.edit === true) {
                 let users = this.state.users;
@@ -175,7 +172,6 @@ class Chore extends Component{
                     }
                 } else {
                     if (selectedUser.selected === false) {
-                        console.log("Clicked new user");
                         users = users.map(user => {
                             user.selected = false;
                             return user;
@@ -184,8 +180,6 @@ class Chore extends Component{
                         let selectedUsers = [];
                         selectedUsers.push(users[index].uid);
                         this.setState({users: users, selectedUsers: selectedUsers, currentUser: selectedUsers[0]});
-                    } else {
-                        console.log("Clicked selected user again");
                     }
                 }
             } else {
@@ -448,7 +442,6 @@ class Chore extends Component{
     }
 
     async onRollBackClicked(){
-        console.log("ROLLBACK CLICKED");
         let chore = this.packageChoreObj()
         chore.currentUser = this.state.lastDoneBy
         chore.status = 'Incomplete'
@@ -457,13 +450,11 @@ class Chore extends Component{
             choreid: this.state.choreid,
             groupid: this.state.groupid
         }}, "editChore");
-        console.log(res)
 
         this.props.navigation.goBack()
     }
 
     onCompleteClicked() {
-        console.log("Complete button pressed");
         this.setState({modalVisible: true});
     }
 
@@ -490,7 +481,6 @@ class Chore extends Component{
     }
 
     async onInProgressButtonClicked() {
-        console.log("In Progress button pressed")
 
         this.setState({
             status: "In Progress"
@@ -507,14 +497,11 @@ class Chore extends Component{
             }
         }, "editChore");
 
-        console.log(res)
-
         if (res.result === "success") {
             this.props.navigation.goBack()
         }
     }
     async onDeleteButtonClicked() {
-        console.log("Delete button pressed")
         let ans = await getDB({
             data: {
                 groupid: this.state.groupid,
