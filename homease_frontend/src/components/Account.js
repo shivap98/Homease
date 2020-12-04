@@ -39,9 +39,9 @@ class Account extends Component {
 
 	async getDbUserInfo(groupid){
         this.setState({ members: [] })
-		grp = await getDB({data: {groupid: groupid} }, "getGroupFromGroupID")
-		mems = grp.result.users
-		values = []
+		var grp = await getDB({data: {groupid: groupid} }, "getGroupFromGroupID")
+		var mems = grp.result.users
+		var values = []
 		for (var key in mems) {
 			var user = await getDB({data: {uid: mems[key]} }, "getUser")
 			values.push({name: user.result.firstName + " " + user.result.lastName, admin: user.result.admin, uid: mems[key]});

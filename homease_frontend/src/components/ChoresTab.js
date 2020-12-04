@@ -23,15 +23,6 @@ const options = {
 
 class ChoresTab extends Component {
 
-    mockData = [
-        {key: '1', name: 'Dishes', status: 'incomplete'},
-        {key: '2', name: 'Cleaning', status: 'in progress'},
-        {key: '3', name: 'Cleaning', status: 'in progress'},
-        {key: '4', name: 'Cleaning', status: 'in progress'},
-        {key: '5', name: 'Cleaning', status: 'in progress'},
-        {key: '6', name: 'Cleaning', status: 'in progress'},
-    ]
-
     state = {
         loading: true,
         myChoresList: [],
@@ -61,6 +52,8 @@ class ChoresTab extends Component {
         var reminderChoreName = '';
         var reminderChoreKey = '';
 		for(key in chores.result){
+            console.log("KEYJHKNLK")
+            console.log(key)
 			var obj = chores.result[key];
 			var name = '';
 			var status = 'Incomplete';
@@ -123,7 +116,8 @@ class ChoresTab extends Component {
             } else {
                 allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
             }
-		}
+        }
+
 		if(reminderChoreName.length === 0) {
             this.setState({allChoresList, myChoresList, remindersList, reminderModalVisible: false, reminderChoreName, reminderChoreKey});
         }else{
@@ -222,8 +216,6 @@ class ChoresTab extends Component {
 
     async onDoneButtonClicked() {
 
-        console.log("CLICKED DONE.")
-
         let chore = {}
         let choreKey = this.state.currentSwipedKey;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
@@ -316,13 +308,11 @@ class ChoresTab extends Component {
                 choreid: choreObj.key,
                 groupid: this.groupid
             }}, "editChore");
-        console.log(res)
 
         this.setState({modalVisible: false, photoURL: '', photoURI: ''});
     }
 
     onCompleteClicked(data) {
-        console.log("Complete button pressed");
         this._swipeListView.safeCloseOpenRow();
         this.setState({modalVisible: true, currentSwipedKey: data.item.key});
     }
@@ -464,11 +454,11 @@ class ChoresTab extends Component {
         if (this.state.loading) {
             return (
                 <View style={componentStyles.cardSectionWithBorderStyle}>
-                    <Text>IKHJLNBKHJONK</Text>
                     <ActivityIndicator animating={true} color={Colors.blue800} />
                 </View>
             )
         } else {
+
             return (
                 <View>
                     <View style={componentStyles.cardSectionWithBorderStyle}>
@@ -512,7 +502,7 @@ class ChoresTab extends Component {
     }
 
     render() {
-        console.log(this.state.loading)
+        console.log("RENDEr", this.state.allChoresList)
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <PaperProvider theme={paperTheme}>

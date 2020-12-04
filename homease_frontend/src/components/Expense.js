@@ -151,7 +151,7 @@ class Expense extends Component{
 						title: this.state.title,
 						description: this.state.description,
 						amount: this.state.amount,
-						timestamp: currDate.toString(),
+						timestamp: this.state.expense.timestamp,
 						split: this.state.selectedUsers
 					}
 				}},
