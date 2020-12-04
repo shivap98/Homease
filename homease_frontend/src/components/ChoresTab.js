@@ -3,7 +3,7 @@ import {Text, View, TouchableOpacity, TouchableHighlight, ScrollView, Image} fro
 import theme from './common/theme';
 import componentStyles from './common/componentStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import {Button, FAB, Modal, Portal, Provider as PaperProvider} from 'react-native-paper';
+import { Button, FAB, Modal, Portal, Provider as PaperProvider, ActivityIndicator, Colors} from 'react-native-paper';
 import getDB from './Cloud';
 import auth from '@react-native-firebase/auth';
 import firebase from 'firebase';
@@ -33,6 +33,7 @@ class ChoresTab extends Component {
     ]
 
     state = {
+        loading: true,
         myChoresList: [],
         allChoresList: [],
         remindersList: [],
@@ -153,7 +154,9 @@ class ChoresTab extends Component {
 			firebase.database().ref('/groups/'+res.result.groupid + '/chores/').on('value', (snapshot) => {
 				this.getDbInfo(uid, this.state.groupid)
 			})
-		}
+        }
+        
+        this.setState({ loading: false })
 	}
 
      onRowDidOpen = rowKey => {
@@ -457,7 +460,59 @@ class ChoresTab extends Component {
         this.setState({reminderModalVisible: false});
     }
 
+    renderCards() {
+        if (this.state.loading) {
+            return (
+                <View style={componentStyles.cardSectionWithBorderStyle}>
+                    <Text>IKHJLNBKHJONK</Text>
+                    <ActivityIndicator animating={true} color={Colors.blue800} />
+                </View>
+            )
+        } else {
+            return (
+                <View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>Reminders for group</Text>
+                        <SwipeListView
+                            data={this.state.remindersList}
+                            renderItem={this.renderMyChores}
+                            disableRightSwipe={true}
+                            disableLeftSwipe={true}
+                            onRowDidOpen={this.onRowDidOpen}
+                        />
+                    </View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
+                        <SwipeListView
+                            data={this.state.myChoresList}
+                            renderItem={this.renderMyChores}
+                            renderHiddenItem={this.renderSwipeOptions}
+                            rightOpenValue={-150}
+                            disableRightSwipe={true}
+                            previewRowKey={'0'}
+                            previewOpenValue={-40}
+                            previewOpenDelay={5000}
+                            onRowDidOpen={this.onRowDidOpen}
+                            ref={ref => this._swipeListView = ref}
+                        />
+                    </View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
+                        <SwipeListView
+                            data={this.state.allChoresList}
+                            renderItem={this.renderAllChores}
+                            disableRightSwipe={true}
+                            disableLeftSwipe={true}
+                            onRowDidOpen={this.onRowDidOpen}
+                        />
+                    </View>
+                </View>
+            )
+        }
+    }
+
     render() {
+        console.log(this.state.loading)
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <PaperProvider theme={paperTheme}>
@@ -505,41 +560,7 @@ class ChoresTab extends Component {
                         </Modal>
                     </Portal>
                 <ScrollView>
-                    <View style={componentStyles.cardSectionWithBorderStyle}>
-                        <Text style={styles.cardHeaderTextStyle}>Reminders for group</Text>
-                        <SwipeListView
-                            data={this.state.remindersList}
-                            renderItem={this.renderMyChores}
-                            disableRightSwipe={true}
-                            disableLeftSwipe={true}
-                            onRowDidOpen={this.onRowDidOpen}
-                        />
-                    </View>
-                    <View style={componentStyles.cardSectionWithBorderStyle}>
-                        <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
-                        <SwipeListView
-                            data={this.state.myChoresList}
-                            renderItem={this.renderMyChores}
-                            renderHiddenItem={this.renderSwipeOptions}
-                            rightOpenValue={-150}
-                            disableRightSwipe={true}
-                            previewRowKey={'0'}
-                            previewOpenValue={-40}
-                            previewOpenDelay={5000}
-                            onRowDidOpen={this.onRowDidOpen}
-                            ref={ref => this._swipeListView = ref}
-                        />
-                    </View>
-                    <View style={componentStyles.cardSectionWithBorderStyle}>
-                        <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
-                        <SwipeListView
-                            data={this.state.allChoresList}
-                            renderItem={this.renderAllChores}
-                            disableRightSwipe={true}
-                            disableLeftSwipe={true}
-                            onRowDidOpen={this.onRowDidOpen}
-                        />
-                    </View>
+                    {this.renderCards()}
                 </ScrollView>
                 </PaperProvider>
                 <FAB
