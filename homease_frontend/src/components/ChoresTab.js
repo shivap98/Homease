@@ -31,6 +31,7 @@ class ChoresTab extends Component {
         photoURL: '',
         modalVisible: false,
         currentSwipedKey: '',
+        creepList: [],
         photoURI: '',
         reminderModalVisible: false,
         reminderChoreName: '',
@@ -49,6 +50,7 @@ class ChoresTab extends Component {
 		var allChoresList = [];
 		var myChoresList = [];
         var remindersList = [];
+        var creepList = [];
         var reminderChoreName = '';
         var reminderChoreKey = '';
 		for(key in chores.result){
@@ -139,11 +141,7 @@ class ChoresTab extends Component {
             this.groupid = res.result.groupid
 			this.setState({groupid: this.groupid})
 			
-			firebase.database().ref('/groups/'+res.result.groupid + '/users/').on('value', (snapshot) => {
-				this.getDbInfo(uid, this.state.groupid)
-			})
-
-			firebase.database().ref('/groups/'+res.result.groupid + '/chores/').on('value', (snapshot) => {
+			firebase.database().ref('/groups/'+res.result.groupid + '/').on('value', (snapshot) => {
 				this.getDbInfo(uid, this.state.groupid)
 			})
         }
@@ -156,7 +154,6 @@ class ChoresTab extends Component {
     };
 
     onPressChore(data) {
-        console.log("onPressChore", data);
         this.props.navigation.navigate('Chore', {key: data.item.key, groupid: this.groupid});
     }
 
