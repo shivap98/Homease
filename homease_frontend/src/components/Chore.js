@@ -852,6 +852,21 @@ class Chore extends Component{
                         editable={this.state.edit}
                     />
                     {this.showGroupMembers()}
+                    <TextInput
+                        style={styles.textInputStyle}
+                        label='Date'
+                        mode='outlined'
+                        theme={{
+                            colors: {
+                                placeholder: this.state.edit ? 'white' : theme.lightColor,
+                                text: this.state.edit ? 'white' : theme.lightColor,
+                                primary: this.state.edit ? 'white' : theme.lightColor,
+                            }
+                        }}
+                        value={new Date(this.state.timestamp).toString().substr(4, 20)}
+                        onChangeText={textString => this.setState({ choreName: textString })}
+                        editable={false}
+                    />
                     <Button onPress={()=>{this.onDateButtonPressed()}}>Click to select Date for reminder</Button>
                     {this.renderProgressButtons()}
 
