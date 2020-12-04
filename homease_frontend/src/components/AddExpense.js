@@ -21,24 +21,49 @@ class AddExpense extends Component{
 	  
 
     async componentDidMount(){
-		this.props.navigation.setOptions({title: 'Add an Expense'})
+        this.props.navigation.setOptions({title: 'Add an Expense'})
+        var selectedUsers= [];
+        selectedUsers.push(this.props.route.params.uid);
+        var users = this.props.route.params.users;
+        users.map(user => {
+            if (user.uid === this.props.route.params.uid){
+                user.selected = true;
+            }
+        })
 		this.setState({groupid: this.props.route.params.groupid,
-			uid: this.props.route.params.uid, users: this.props.route.params.users})
+			uid: this.props.route.params.uid, users: users, selectedUsers: selectedUsers})
     }
 
     onSelectPressed(selectedUser, index){
         console.log("Select pressed");
         console.log("selected users at time of click "+this.state.selectedUsers);
-        let users = this.state.users;
+        console.log("Selected user is ", selectedUser);
+        if(!(selectedUser.uid === this.state.uid)){
+            let users = this.state.users;
 
-        users[index].selected = !selectedUser.selected;
-		let selectedUsers = this.state.selectedUsers;
-        if(users[index].selected === true){
-            selectedUsers.push(users[index].uid);
+            users[index].selected = !selectedUser.selected;
+            let selectedUsers = this.state.selectedUsers;
+            if(users[index].selected === true){
+                selectedUsers.push(users[index].uid);
+            }else{
+                selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
+            }
+            this.setState({users: users, selectedUsers: selectedUsers});
         }else{
-            selectedUsers = selectedUsers.filter(user => user !== users[index].uid);
+            Alert.alert(
+                'Oops!',
+                'User creating an expense is required to be a part of the split',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => { },
+                        style: 'cancel',
+                    },
+
+                ],
+                { cancelable: false },
+            );
         }
-        this.setState({users: users, selectedUsers: selectedUsers});
     }
 
     renderListOfMembers (){
