@@ -10,12 +10,17 @@ import firebase from 'firebase';
 import LoginPage from './LoginPage';
 import CreateAccount from './CreateAccount';
 import Account from './Account';
+import AddExpense from './AddExpense';
+import Balances from './Balances';
 import Chore from './Chore';
 import ChoresTab from './ChoresTab';
 import CreateChore from './CreateChore';
 import CreateOrJoin from './CreateOrJoinGroup';
 import CreateGroup from './CreateGroup';
+import Expense from './Expense';
+import ExpensesTab from './ExpensesTab';
 import JoinGroup from './JoinGroup';
+import CheckList from './CheckList';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -57,6 +62,8 @@ class App extends Component<Props> {
 				}}
 			>
 				<Tab.Screen name="Chores" component={ChoresTab} />
+				<Tab.Screen name="List" component={CheckList} />
+				<Tab.Screen name="Expenses" component={ExpensesTab} />
 				<Tab.Screen name="Account" component={Account} />
 			</Tab.Navigator>
 		);
@@ -108,6 +115,23 @@ class App extends Component<Props> {
 						name="Chore"
 						component={Chore}
 					/>
+					<Stack.Screen
+						name="AddExpense"
+						component={AddExpense}
+					/>
+					<Stack.Screen
+						name="Balances"
+						component={Balances}
+					/>
+					<Stack.Screen
+						name="Expense"
+						component={Expense}
+					/>
+					<Stack.Screen
+						name="ExpensesTab"
+						component={ExpensesTab}
+					/>
+
 				</Stack.Navigator>
 			</NavigationContainer>
 		);

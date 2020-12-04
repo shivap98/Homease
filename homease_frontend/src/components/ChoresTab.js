@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {Text, View, TouchableOpacity, TouchableHighlight, ScrollView, Alert, Image} from 'react-native';
+import {Text, View, TouchableOpacity, TouchableHighlight, ScrollView, Image} from 'react-native';
 import theme from './common/theme';
 import componentStyles from './common/componentStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import {Button, FAB, Modal, Portal, Provider as PaperProvider} from 'react-native-paper';
+import { Button, FAB, Modal, Portal, Provider as PaperProvider, ActivityIndicator, Colors} from 'react-native-paper';
 import getDB from './Cloud';
 import auth from '@react-native-firebase/auth';
 import firebase from 'firebase';
@@ -23,22 +23,19 @@ const options = {
 
 class ChoresTab extends Component {
 
-    mockData = [
-        {key: '1', name: 'Dishes', status: 'incomplete'},
-        {key: '2', name: 'Cleaning', status: 'in progress'},
-        {key: '3', name: 'Cleaning', status: 'in progress'},
-        {key: '4', name: 'Cleaning', status: 'in progress'},
-        {key: '5', name: 'Cleaning', status: 'in progress'},
-        {key: '6', name: 'Cleaning', status: 'in progress'},
-    ]
-
     state = {
+        loading: true,
         myChoresList: [],
         allChoresList: [],
+        remindersList: [],
         photoURL: '',
         modalVisible: false,
         currentSwipedKey: '',
+        creepList: [],
         photoURI: '',
+        reminderModalVisible: false,
+        reminderChoreName: '',
+        reminderChoreKey: '',
     }
 
     groupid = ''
@@ -48,10 +45,14 @@ class ChoresTab extends Component {
 	}
 
 	async getDbInfo(uid, groupid) {
-        this.setState({allChoresList: [], myChoresList: []})
-		chores = await getDB({data: {groupid: groupid}}, 'getChoresByGroupID')
-		var allChoresList = []
-		var myChoresList = []
+        this.setState({allChoresList: [], myChoresList: [], remindersList: []});
+		chores = await getDB({data: {groupid: groupid}}, 'getChoresByGroupID');
+		var allChoresList = [];
+		var myChoresList = [];
+        var remindersList = [];
+        var creepList = [];
+        var reminderChoreName = '';
+        var reminderChoreKey = '';
 		for(key in chores.result){
 			var obj = chores.result[key];
 			var name = '';
@@ -65,6 +66,9 @@ class ChoresTab extends Component {
             var currentUser = '';
             var recursiveChore = '';
             var currentUser = '';
+            var isChore = false;
+            var reminderActive = false;
+            var timestamp
 			for (var prop in obj) {
 				if (!obj.hasOwnProperty(prop)) continue;
 				if(prop == "choreName"){
@@ -89,19 +93,36 @@ class ChoresTab extends Component {
                     recursiveChore = obj[prop];
                 } else if(prop == "currentUser"){
                     currentUser = obj[prop];
+                } else if(prop == "isChore"){
+				    isChore = obj[prop];
+                } else if(prop == "reminderActive"){
+				    reminderActive = obj[prop];
+                } else if(prop == "timestamp"){
+				    timestamp = obj[prop];
                 }
             }
 
             res = await getDB({data: {uid: currentUser} }, "getUser")
             var currentUserName = res.result.firstName + " " + res.result.lastName
-            
-            if (currentUser === uid && status !== 'Complete') {
-                myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName})
+
+            if(!isChore){
+                remindersList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
+            } else if (currentUser === uid && status !== 'Complete') {
+                if(reminderActive){
+                    reminderChoreName = name;
+                    reminderChoreKey = key;
+                }
+                myChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
             } else {
-                allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName})
+                allChoresList.push({key, name, status, selectedUsers, description, lastDoneBy, lastDoneDate, lastDonePhoto, currentUser, recursiveChore, currentUserName, isChore, timestamp, reminderActive})
             }
-		}
-		this.setState({allChoresList, myChoresList})
+        }
+
+		if(reminderChoreName.length === 0) {
+            this.setState({allChoresList, myChoresList, remindersList, reminderModalVisible: false, reminderChoreName, reminderChoreKey});
+        }else{
+		    this.setState({allChoresList: allChoresList, myChoresList: myChoresList, remindersList: remindersList, reminderModalVisible: true, reminderChoreName: reminderChoreName, reminderChoreKey: reminderChoreKey});
+        }
 	}
 
 	async componentDidMount(){
@@ -118,12 +139,14 @@ class ChoresTab extends Component {
 
 		if(res.result.groupid){
             this.groupid = res.result.groupid
-            this.setState({groupid: this.groupid})
-
-			firebase.database().ref('/').on('value', (snapshot) => {
+			this.setState({groupid: this.groupid})
+			
+			firebase.database().ref('/groups/'+res.result.groupid + '/').on('value', (snapshot) => {
 				this.getDbInfo(uid, this.state.groupid)
 			})
-		}
+        }
+        
+        this.setState({ loading: false })
 	}
 
      onRowDidOpen = rowKey => {
@@ -131,61 +154,62 @@ class ChoresTab extends Component {
     };
 
     onPressChore(data) {
-        console.log("View chore");
         this.props.navigation.navigate('Chore', {key: data.item.key, groupid: this.groupid});
     }
 
-    renderMyChores = data => (
-        <TouchableHighlight
-            onPress={() => this.onPressChore(data)}
-            style={styles.rowFront}
-            underlayColor={theme.lightColor}
-        >
-            <View>
-                <Text
-                    style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}
-                >
-                    {data.item.name}
-                </Text>
-                <Text
-                    style={{ color: 'white', fontSize: 18 }}
-                >
-                    Status: {data.item.status}
-                </Text>
-            </View>
-        </TouchableHighlight>
-    );
+    renderMyChores = data => {
+        return (
+            <TouchableHighlight
+                onPress={() => {this.onPressChore(data)}}
+                style={styles.rowFront}
+                underlayColor={theme.lightColor}
+            >
+                <View>
+                    <Text
+                        style={{fontSize: 20, color: 'white', fontWeight: 'bold'}}
+                    >
+                        {data.item.name}
+                    </Text>
+                    <Text
+                        style={{color: 'white', fontSize: 18}}
+                    >
+                        Status: {data.item.status}
+                    </Text>
+                </View>
+            </TouchableHighlight>
+        )
+    }
 
-    renderAllChores = data => (
+    renderAllChores = data => {
+        return(
         <TouchableHighlight
-            onPress={() => this.onPressChore(data)}
+            onPress={() => {this.onPressChore(data)}}
             style={styles.rowFront}
             underlayColor={theme.lightColor}
         >
             <View>
                 <Text
-                    style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}
+                    style={{fontSize: 20, color: 'white', fontWeight: 'bold'}}
                 >
                     {data.item.name}
                 </Text>
                 <Text
-                    style={{ color: 'white', fontSize: 18 }}
+                    style={{color: 'white', fontSize: 18}}
                 >
                     Status: {data.item.status}
                 </Text>
                 <Text
-                    style={{ color: 'white', fontSize: 18 }}
+                    style={{color: 'white', fontSize: 18}}
                 >
                     Current User: {data.item.currentUserName}
                 </Text>
             </View>
         </TouchableHighlight>
-    );
+        );
+    }
 
     async onDoneButtonClicked() {
 
-        console.log("CLICKED DONE.")
-        
         let chore = {}
         let choreKey = this.state.currentSwipedKey;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
@@ -195,7 +219,7 @@ class ChoresTab extends Component {
             const uploadUri = Platform.OS === 'ios' ? this.state.photoURI.replace('file://', '') : this.state.photoURI;
 
             imageRef = storage().ref(choreKey)
-            
+
             await imageRef.putFile(uploadUri);
             storageURL = await imageRef.getDownloadURL()
         }
@@ -269,18 +293,20 @@ class ChoresTab extends Component {
             };
         }
 
+        chore.reminderActive = false
+        chore.isChore = false
+        chore.timestamp = ""
+
         res = await getDB({ data: {
                 chore: chore,
                 choreid: choreObj.key,
                 groupid: this.groupid
             }}, "editChore");
-        console.log(res)
 
         this.setState({modalVisible: false, photoURL: '', photoURI: ''});
     }
 
     onCompleteClicked(data) {
-        console.log("Complete button pressed");
         this._swipeListView.safeCloseOpenRow();
         this.setState({modalVisible: true, currentSwipedKey: data.item.key});
     }
@@ -305,18 +331,13 @@ class ChoresTab extends Component {
     }
 
     async onInProgressButtonClicked(key) {
-        console.log("In Progress button pressed and key is : ", JSON.stringify(key));
 
         let chore = {}
         let choreKey = key;
         let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
-        console.log("Chores is: ", JSON.stringify(choreObj));
 
         choreObj.status = "In Progress";
 
-        console.log("Chore is now : ", JSON.stringify(choreObj));
-
-        // chore = this.packageChoreObj()
         chore = {
             choreName: choreObj.name,
             currentUser: choreObj.currentUser,
@@ -327,9 +348,10 @@ class ChoresTab extends Component {
             recursiveChore: choreObj.recursiveChore,
             selectedUsers: choreObj.selectedUsers,
             status: choreObj.status,
+            reminderActive: choreObj.reminderActive,
+            isChore: choreObj.isChore,
+            timestamp: choreObj.timestamp
         };
-
-        console.log("Chore is ", JSON.stringify(chore));
 
         res = await getDB({
             data: {
@@ -338,8 +360,6 @@ class ChoresTab extends Component {
                 groupid: this.groupid
             }
         }, "editChore");
-
-        console.log("Result is ", JSON.stringify(res));
     }
 
     renderSwipeOptions = (data, rowMap) => (
@@ -377,6 +397,95 @@ class ChoresTab extends Component {
         this.setState({modalVisible: false, photoURL: ''});
     }
 
+    async onReminderModalClose() {
+        console.log("Reminder Modal Closed");
+        let chore = {}
+        let choreKey = this.state.reminderChoreKey;
+        let choreObj = this.state.myChoresList.find(chore => chore.key === choreKey);
+        console.log("My chores is ", JSON.stringify(this.state.myChoresList));
+        console.log("Reminder chore name is ", this.state.reminderChoreName);
+        console.log("Reminder chore key is ", this.state.reminderChoreKey);
+        console.log("Chores is: ", JSON.stringify(choreObj));
+
+        chore = {
+            choreName: choreObj.name,
+            currentUser: choreObj.currentUser,
+            description: choreObj.description,
+            lastDoneBy: choreObj.lastDoneBy,
+            lastDoneDate: choreObj.lastDoneDate,
+            lastDonePhoto: choreObj.lastDonePhoto,
+            recursiveChore: choreObj.recursiveChore,
+            selectedUsers: choreObj.selectedUsers,
+            status: choreObj.status,
+            reminderActive: false,
+            isChore: choreObj.isChore,
+            timestamp: choreObj.timestamp
+        };
+
+        console.log("Chore is ", JSON.stringify(chore));
+
+        res = await getDB({
+            data: {
+                chore: chore,
+                choreid: choreObj.key,
+                groupid: this.groupid
+            }
+        }, "editChore");
+
+        console.log("Result is ", JSON.stringify(res));
+        this.setState({reminderModalVisible: false});
+    }
+
+    renderCards() {
+        if (this.state.loading) {
+            return (
+                <View style={componentStyles.cardSectionWithBorderStyle}>
+                    <ActivityIndicator animating={true} color={Colors.blue800} />
+                </View>
+            )
+        } else {
+            return (
+                <View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>Reminders for group</Text>
+                        <SwipeListView
+                            data={this.state.remindersList}
+                            renderItem={this.renderMyChores}
+                            disableRightSwipe={true}
+                            disableLeftSwipe={true}
+                            onRowDidOpen={this.onRowDidOpen}
+                        />
+                    </View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
+                        <SwipeListView
+                            data={this.state.myChoresList}
+                            renderItem={this.renderMyChores}
+                            renderHiddenItem={this.renderSwipeOptions}
+                            rightOpenValue={-150}
+                            disableRightSwipe={true}
+                            previewRowKey={'0'}
+                            previewOpenValue={-40}
+                            previewOpenDelay={5000}
+                            onRowDidOpen={this.onRowDidOpen}
+                            ref={ref => this._swipeListView = ref}
+                        />
+                    </View>
+                    <View style={componentStyles.cardSectionWithBorderStyle}>
+                        <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
+                        <SwipeListView
+                            data={this.state.allChoresList}
+                            renderItem={this.renderAllChores}
+                            disableRightSwipe={true}
+                            disableLeftSwipe={true}
+                            onRowDidOpen={this.onRowDidOpen}
+                        />
+                    </View>
+                </View>
+            )
+        }
+    }
+
     render() {
         return (
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
@@ -408,34 +517,24 @@ class ChoresTab extends Component {
                             </Button>
                         </Modal>
                     </Portal>
-
+                    <Portal>
+                        <Modal
+                            visible={this.state.reminderModalVisible}
+                            onDismiss = {async () => {
+                                await this.onReminderModalClose()
+                            }}
+                            contentContainerStyle={styles.containerStyle}
+                        >
+                            <Text style={styles.modalHeaderTextStyle}>Reminder to complete chore: {this.state.reminderChoreName}</Text>
+                            <Button onPress={async () => {
+                                await this.onReminderModalClose()
+                            }}>
+                                Dismiss reminder
+                            </Button>
+                        </Modal>
+                    </Portal>
                 <ScrollView>
-                    <View style={componentStyles.cardSectionWithBorderStyle}>
-                        <Text style={styles.cardHeaderTextStyle}>My Chores</Text>
-                        <SwipeListView
-                            data={this.state.myChoresList}
-                            renderItem={this.renderMyChores}
-                            renderHiddenItem={this.renderSwipeOptions}
-                            rightOpenValue={-150}
-                            disableRightSwipe={true}
-                            previewRowKey={'0'}
-                            previewOpenValue={-40}
-                            previewOpenDelay={5000}
-                            onRowDidOpen={this.onRowDidOpen}
-                            ref={ref => this._swipeListView = ref}
-                        />
-                    </View>
-
-                    <View style={componentStyles.cardSectionWithBorderStyle}>
-                        <Text style={styles.cardHeaderTextStyle}>All Chores</Text>
-                        <SwipeListView
-                            data={this.state.allChoresList}
-                            renderItem={this.renderAllChores}
-                            disableRightSwipe={true}
-                            disableLeftSwipe={true}
-                            onRowDidOpen={this.onRowDidOpen}
-                        />
-                    </View>
+                        {this.renderCards()}
                 </ScrollView>
                 </PaperProvider>
                 <FAB
