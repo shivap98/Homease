@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView} from 'react-native';
+import {Text, View, ScrollView, FlatList, TouchableOpacity} from 'react-native';
 import theme from './common/theme';
-import {Button, FAB, List, Provider as PaperProvider, Divider} from 'react-native-paper';
+import {Button, FAB, List, Provider as PaperProvider, Divider, ActivityIndicator, Colors} from 'react-native-paper';
 import paperTheme from './common/paperTheme';
 import componentStyles from './common/componentStyles';
 import auth from '@react-native-firebase/auth';
@@ -24,6 +24,7 @@ class ExpensesTab extends Component{
         //     {uid: '4', name: 'Shiv Paul'}
         // ],
         expenses: [],
+        loading: true
 	};
 
 	async getExpenses(res){
@@ -47,7 +48,7 @@ class ExpensesTab extends Component{
 		}
 		this.setState({expenses: values, users})
 	}
-	
+
 	async componentDidMount(){
 		var uid = null
         if (auth().currentUser) {
@@ -64,11 +65,12 @@ class ExpensesTab extends Component{
 				this.getExpenses(res)
 			})
         }
+        this.setState({loading: false})
     }
 
     getUserFromID(id){
 		let users = this.state.users;
-        return users.filter(user => user.uid == id);
+        return users.filter(user => user.uid === id);
     }
 
     showItemDate(item){
@@ -102,32 +104,47 @@ class ExpensesTab extends Component{
     }
 
     renderListOfExpenses(){
-        console.log("List of expenses clicked");
-        console.log(this.state.expenses)
-		let expenses = this.state.expenses;
-		if(expenses){
-        expenses = expenses.sort(this.compareDate).reverse();
-            return expenses.map((item, index)=>{
-                return(
-                    <View key={item.expenseid}>
-                        <List.Item
-                            title={item.title}
-                            key={index}
-                            description={this.showItemDate(item)}
-							onPress={() => {this.props.navigation.navigate('Expense', 
-								{key: item.uid, item: item, users: this.state.users, groupid: this.state.groupid})}}
-                            right={props =>
-                                <CardSection>
+        if (this.state.loading) {
+            return (
+                <View style={componentStyles.cardSectionWithBorderStyle}>
+                    <ActivityIndicator animating={true} color={Colors.blue800} />
+                </View>
+            )
+        } else {
+            console.log("List of expenses clicked");
+            console.log(this.state.expenses)
+            let expenses = this.state.expenses;
+            if (expenses) {
+                expenses = expenses.sort(this.compareDate).reverse();
+                return expenses.map((item, index) => {
+                    return (
+                        <View key={item.expenseid}>
+                            <List.Item
+                                title={item.title}
+                                key={index}
+                                description={this.showItemDate(item)}
+                                onPress={() => {
+                                    this.props.navigation.navigate('Expense',
+                                        {
+                                            key: item.uid,
+                                            item: item,
+                                            users: this.state.users,
+                                            groupid: this.state.groupid
+                                        })
+                                }}
+                                right={props =>
+                                    <CardSection>
                                         <Text style={styles.amountTextStyle}>
-                                            {"$"+item.amount}
+                                            {"$" + item.amount}
                                         </Text>
-                                </CardSection>
-                            }
-                        />
-                        {this.showDivider(expenses, index)}
-                    </View>
-                )
-            })
+                                    </CardSection>
+                                }
+                            />
+                            {this.showDivider(expenses, index)}
+                        </View>
+                    )
+                })
+            }
         }
     }
 

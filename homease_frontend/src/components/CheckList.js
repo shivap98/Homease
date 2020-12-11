@@ -6,6 +6,7 @@ import auth from '@react-native-firebase/auth';
 import firebase from 'firebase';
 import CheckBox from '@react-native-community/checkbox';
 import componentStyles from './common/componentStyles';
+import {ActivityIndicator, Colors} from 'react-native-paper';
 
 
 var mockList = [
@@ -31,6 +32,7 @@ class CheckList extends Component {
     //TODO: follow list structure as mockList
     state = {
 		list: mockList,
+        loading: true
     };
 
     mockIDGenerator(length) {
@@ -42,7 +44,7 @@ class CheckList extends Component {
         }
         return result;
 	 }
-	 
+
 	 async getSharedList(res){
 		let result = await getDB({ data: {
 			groupid: res.result.groupid,
@@ -83,7 +85,8 @@ class CheckList extends Component {
 				this.getSharedList(res)
 			})
 		}
-        
+        this.setState({loading: false})
+
     }
 
     checkThisBox = async (itemID) => {
@@ -102,7 +105,7 @@ class CheckList extends Component {
 			item: list[item_index]
 		}},
 		"editSharedList");
-		
+
     }
 
     changeText = async (itemID, text) => {
@@ -128,7 +131,7 @@ class CheckList extends Component {
     }
 
     async addItem() {
-        
+
         let list=this.state.list
         //TODO: get id from firebase - random UID to save to database
         let id = this.mockIDGenerator(5)
@@ -139,7 +142,7 @@ class CheckList extends Component {
 		this.setState({list:list})
 
 		//TODO: update the DB
-		
+
 		let res = await getDB({ data: {
 			groupid: this.state.groupid,
 			item: toAdd
@@ -155,7 +158,7 @@ class CheckList extends Component {
         const list = this.state.list.filter(item => item.id !== itemID);
         this.setState({list:list})
 		//TODO: update DB
-		
+
 		let res = await getDB({ data: {
 			groupid: this.state.groupid,
 			item: {id: itemID, delete: true}
@@ -172,7 +175,7 @@ class CheckList extends Component {
                     style={{
                         alignItems:'center',
                         justifyContent:'center',
-                        
+
                     }}
                 >
                     <TouchableOpacity
@@ -210,9 +213,15 @@ class CheckList extends Component {
         </View>
     )
 
-    render() {
-        return (
-            <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
+    renderListOrLoading(){
+        if (this.state.loading) {
+            return (
+                <View style={componentStyles.cardSectionWithBorderStyle}>
+                    <ActivityIndicator animating={true} color={Colors.blue800} />
+                </View>
+            )
+        } else {
+            return (
                 <ScrollView style={{padding: 20}}>
                     <FlatList
                         data={this.state.list}
@@ -234,12 +243,20 @@ class CheckList extends Component {
                             marginBottom: 35
                         }}
                         onPress={() => this.addItem()}
-                        >
+                    >
                         <Text style={componentStyles.smallButtonTextStyle}>
                             +
                         </Text>
                     </TouchableOpacity>
                 </ScrollView>
+            )
+        }
+    }
+
+    render() {
+        return (
+            <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
+                {this.renderListOrLoading()}
             </View>
         );
     }

@@ -3,7 +3,7 @@ import {Text, View, ScrollView, FlatList, Linking} from 'react-native';
 import theme from './common/theme';
 import paperTheme from './common/paperTheme';
 import componentStyles from './common/componentStyles';
-import {Provider as PaperProvider, Button} from 'react-native-paper';
+import {Provider as PaperProvider, Button, ActivityIndicator, Colors} from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import firebase from 'firebase';
 import getDB from './Cloud';
@@ -12,11 +12,11 @@ const mockBalances = [
     {
         id: "a-b",
         amount: 10
-    }, 
+    },
     {
         id: "b-a",
         amount: -10
-    }, 
+    },
 ]
 
 const mockUsers = [
@@ -33,10 +33,11 @@ const mockUsers = [
 class Balances extends Component{
 
     state = {
-        balances: [], 
-        users: []
+        balances: [],
+        users: [],
+        loading: true
 	}
-	
+
 	async getBalances(res){
 		let result = await getDB({ data: {
 			groupid: res.result.groupid,
@@ -60,7 +61,7 @@ class Balances extends Component{
 		this.setState({users: this.props.route.params.users,
 			groupid: this.props.route.params.groupid,
 			uid: this.props.route.params.uid})
-	   
+
 		var uid = null
         if (auth().currentUser) {
             uid = auth().currentUser.uid
@@ -78,8 +79,9 @@ class Balances extends Component{
 			    this.getBalances(res)
 			})
         }
-        
-        
+        this.setState({loading: false});
+
+
     }
 
     async onSettleButtonPressed(uid1, uid2, amount) {
@@ -116,57 +118,68 @@ class Balances extends Component{
 
 
     renderItems() {
-        let balances = this.state.balances;
-        console.log(balances)
-		if(balances){
-            return balances.map((item, index)=>{
-                //TODO: maybe only render item if uid1-uid2, uid1 matches current user
+        if (this.state.loading) {
+            return (
+                <View style={componentStyles.cardSectionWithBorderStyle}>
+                    <ActivityIndicator animating={true} color={Colors.blue800} />
+                </View>
+            )
+        } else {
+            let balances = this.state.balances;
+            console.log(balances)
+            if (balances) {
+                return balances.map((item, index) => {
+                    //TODO: maybe only render item if uid1-uid2, uid1 matches current user
 
-                var ids = item.id.split("-")
+                    var ids = item.id.split("-")
 
-                var uid1 = ids[0]
-                var uid2 = ids[1]
+                    var uid1 = ids[0]
+                    var uid2 = ids[1]
 
-                //TODO: get all the users before hand and use uid to get name
+                    //TODO: get all the users before hand and use uid to get name
 
-                for(i=0;i<this.state.users.length;i++){
-                    if(this.state.users[i].uid == uid1){
-                        name1 = this.state.users[i].name
-                    }else if(this.state.users[i].uid == uid2){
-                        name2 = this.state.users[i].name
+                    for (i = 0; i < this.state.users.length; i++) {
+                        if (this.state.users[i].uid == uid1) {
+                            name1 = this.state.users[i].name
+                        } else if (this.state.users[i].uid == uid2) {
+                            name2 = this.state.users[i].name
+                        }
                     }
-                }
-                item.amount = (Math.round(item.amount * 100) / 100).toFixed(2);
+                    item.amount = (Math.round(item.amount * 100) / 100).toFixed(2);
 
-                if (item.amount > 0) {
-                    return(
-                        <View style={{margin: 10, justifyContent: 'flex-start', flexDirection: 'column'}} key={item.id}>
-                            <Text 
-                                style={{
-                                    fontSize: 15,
-                                    fontWeight: 'bold',
-                                    color: theme.buttonTextColor, 
-                                }}
-                            >
-                                    {name1} owes {name2}  ${item.amount}
-                            </Text>
-                            <Button
-                                color={theme.buttonColor}
-                                style={{marginLeft: 'auto', marginTop: 20}}
-                                mode="contained"
-                                onPress={() => {this.onSettleButtonPressed(uid1, uid2, item.amount)}}
-                            >
-                                <Text style={componentStyles.smallButtonTextStyle}>
-                                    Settle
+                    if (item.amount > 0) {
+                        return (
+                            <View style={{margin: 10, justifyContent: 'flex-start', flexDirection: 'column'}}
+                                  key={item.id}>
+                                <Text
+                                    style={{
+                                        fontSize: 15,
+                                        fontWeight: 'bold',
+                                        color: theme.buttonTextColor,
+                                    }}
+                                >
+                                    {name1} owes {name2} ${item.amount}
                                 </Text>
-                            </Button>
-                        </View>
-                    )
-                }
-            })
+                                <Button
+                                    color={theme.buttonColor}
+                                    style={{marginLeft: 'auto', marginTop: 20}}
+                                    mode="contained"
+                                    onPress={() => {
+                                        this.onSettleButtonPressed(uid1, uid2, item.amount)
+                                    }}
+                                >
+                                    <Text style={componentStyles.smallButtonTextStyle}>
+                                        Settle
+                                    </Text>
+                                </Button>
+                            </View>
+                        )
+                    }
+                })
+            }
         }
     }
-    
+
     render() {
         return(
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
